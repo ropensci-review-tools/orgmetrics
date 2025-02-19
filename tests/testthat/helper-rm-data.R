@@ -74,12 +74,6 @@ mock_rm_data <- function (repo = TRUE) {
     desc [1] <- "Package: goodpractice"
     writeLines (desc, desc_path)
 
-    # test-cm-metrics.R only tests cran downloads for this one date:
-    end_date <- as.Date ("2024-08-01")
-    dl <- httptest2::with_mock_dir ("cran_dl", {
-        cm_metric_cran_downloads (path, end_date = end_date)
-    })
-
     # The return full mocked data set:
     if (repo) {
         data_fns <- get_rm_data_fns ()

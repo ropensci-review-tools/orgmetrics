@@ -1,6 +1,6 @@
 Package: orgmetrics
 Title: Metrics for Your GitHub Organization
-Version: 0.0.1.001
+Version: 0.0.1.002
 Authors@R: 
     person("Mark", "Padgham", , "mark.padgham@email.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2172-5265"))
@@ -10,6 +10,7 @@ License: GPL-3
 URL: https://docs.ropensci.org/orgmetrics/,
     https://github.com/ropensci-review-tools/orgmetrics
 BugReports: https://github.com/ropensci-review-tools/orgmetrics/issues
+Depends: R (>= 4.1)
 Imports:
     checkmate,
     cli,

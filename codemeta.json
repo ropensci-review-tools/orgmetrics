@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/ropensci-review-tools/orgmetrics",
   "issueTracker": "https://github.com/ropensci-review-tools/orgmetrics/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.001",
+  "version": "0.0.1.002",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -165,6 +165,12 @@
   "softwareRequirements": {
     "1": {
       "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 4.1"
+    },
+    "2": {
+      "@type": "SoftwareApplication",
       "identifier": "checkmate",
       "name": "checkmate",
       "provider": {
@@ -175,7 +181,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=checkmate"
     },
-    "2": {
+    "3": {
       "@type": "SoftwareApplication",
       "identifier": "cli",
       "name": "cli",
@@ -187,7 +193,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=cli"
     },
-    "3": {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
@@ -199,7 +205,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=dplyr"
     },
-    "4": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "fs",
       "name": "fs",
@@ -211,7 +217,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=fs"
     },
-    "5": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "gert",
       "name": "gert",
@@ -223,7 +229,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=gert"
     },
-    "6": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "gh",
       "name": "gh",
@@ -235,7 +241,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=gh"
     },
-    "7": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "git2r",
       "name": "git2r",
@@ -247,7 +253,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=git2r"
     },
-    "8": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
@@ -259,7 +265,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "9": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "memoise",
       "name": "memoise",
@@ -271,7 +277,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=memoise"
     },
-    "10": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "pbapply",
       "name": "pbapply",
@@ -283,7 +289,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=pbapply"
     },
-    "11": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "pkgstats",
       "name": "pkgstats",
@@ -291,7 +297,7 @@
     },
     "SystemRequirements": {}
   },
-  "fileSize": "486.528KB",
+  "fileSize": "486.115KB",
   "readme": "https://github.com/ropensci-review-tools/orgmetrics/blob/main/README.md",
   "contIntegration": [
     "https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check",

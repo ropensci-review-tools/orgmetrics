@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxNi0wNy0yM1QwNToxMToyNiswMjowMM4D0GAw"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2016-07-12T20:46:42Z",
+                        "node": {
+                            "login": "MarkEdmondson1234"
+                        }
+                    },
+                    {
+                        "starredAt": "2016-07-23T03:11:26Z",
+                        "node": {
+                            "login": "osofr"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

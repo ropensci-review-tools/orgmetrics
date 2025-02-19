@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxOC0xMC0wN1QyMToxMDoyMyswMjowMM4IZwyl"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2018-10-01T17:05:08Z",
+                        "node": {
+                            "login": "Fazendaaa"
+                        }
+                    },
+                    {
+                        "starredAt": "2018-10-07T19:10:23Z",
+                        "node": {
+                            "login": "mrchypark"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

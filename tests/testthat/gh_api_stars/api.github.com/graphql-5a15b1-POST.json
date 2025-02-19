@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxOS0wNy0xMFQyMzoxODo0NyswMjowMM4Kl_Cf"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2019-07-08T07:45:59Z",
+                        "node": {
+                            "login": "jemus42"
+                        }
+                    },
+                    {
+                        "starredAt": "2019-07-10T21:18:47Z",
+                        "node": {
+                            "login": "jimbrig"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

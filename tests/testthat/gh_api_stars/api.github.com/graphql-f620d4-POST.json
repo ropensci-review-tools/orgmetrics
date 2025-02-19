@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxOS0xMi0zMVQxMDoxNTozMSswMTowMM4L9e1Y"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2019-12-31T05:48:22Z",
+                        "node": {
+                            "login": "AndreaSanchezTapia"
+                        }
+                    },
+                    {
+                        "starredAt": "2019-12-31T09:15:31Z",
+                        "node": {
+                            "login": "bourbakis"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

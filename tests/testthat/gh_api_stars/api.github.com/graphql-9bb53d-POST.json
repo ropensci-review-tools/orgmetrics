@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxNy0wNi0xM1QxNjoyNzozMiswMjowMM4FZbk1"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2017-05-29T12:57:48Z",
+                        "node": {
+                            "login": "juba"
+                        }
+                    },
+                    {
+                        "starredAt": "2017-06-13T14:27:32Z",
+                        "node": {
+                            "login": "mwmclean"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

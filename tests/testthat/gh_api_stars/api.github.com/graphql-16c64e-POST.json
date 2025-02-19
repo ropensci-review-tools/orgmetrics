@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMy0wNi0yNVQxNzoxODo0OCswMjowMM4ZieWT"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2023-06-24T03:27:34Z",
+                        "node": {
+                            "login": "laderast"
+                        }
+                    },
+                    {
+                        "starredAt": "2023-06-25T15:18:48Z",
+                        "node": {
+                            "login": "pachadotdev"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

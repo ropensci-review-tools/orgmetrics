@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMC0wNy0xMFQxMzoxNDozNiswMjowMM4NnVMC"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2020-06-19T13:50:04Z",
+                        "node": {
+                            "login": "selinaZitrone"
+                        }
+                    },
+                    {
+                        "starredAt": "2020-07-10T11:14:36Z",
+                        "node": {
+                            "login": "MrPops"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

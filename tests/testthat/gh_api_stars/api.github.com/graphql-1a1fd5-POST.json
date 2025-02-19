@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMi0wOC0wNlQxMDoxNDo0MiswMjowMM4U5ejA"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2022-07-03T10:43:17Z",
+                        "node": {
+                            "login": "s3alfisc"
+                        }
+                    },
+                    {
+                        "starredAt": "2022-08-06T08:14:42Z",
+                        "node": {
+                            "login": "peterthunder"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

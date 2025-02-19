@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMi0wNS0yNlQwOTowNToyMyswMjowMM4UJPr9"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2022-05-24T08:31:30Z",
+                        "node": {
+                            "login": "stupidpupil"
+                        }
+                    },
+                    {
+                        "starredAt": "2022-05-26T07:05:23Z",
+                        "node": {
+                            "login": "allisonvmitch"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

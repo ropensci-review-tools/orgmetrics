@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxNy0wMS0zMFQxMDozODowOSswMTowMM4ErCWB"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2017-01-29T04:49:16Z",
+                        "node": {
+                            "login": "gdequeiroz"
+                        }
+                    },
+                    {
+                        "starredAt": "2017-01-30T09:38:09Z",
+                        "node": {
+                            "login": "dleutnant"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

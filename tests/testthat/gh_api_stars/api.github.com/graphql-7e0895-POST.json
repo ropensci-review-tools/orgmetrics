@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMS0wNy0xMlQwMTowOToxOSswMjowMM4Q8fnA"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2021-07-09T14:47:21Z",
+                        "node": {
+                            "login": "psychtek"
+                        }
+                    },
+                    {
+                        "starredAt": "2021-07-11T23:09:19Z",
+                        "node": {
+                            "login": "victordogo"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

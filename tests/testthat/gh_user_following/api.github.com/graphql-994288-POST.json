@@ -1,0 +1,22 @@
+{
+    "data": {
+        "user": {
+            "login": "mpadge",
+            "following": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyNC0xMC0wNFQxNDozNToxNSswMjowMM4KlKhT"
+                },
+                "totalCount": 110,
+                "nodes": [
+                    {
+                        "login": "markvanderloo"
+                    },
+                    {
+                        "login": "emitanaka"
+                    }
+                ]
+            }
+        }
+    }
+}

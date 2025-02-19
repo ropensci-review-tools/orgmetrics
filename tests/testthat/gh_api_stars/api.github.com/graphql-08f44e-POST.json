@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxOC0wMi0yM1QyMjo1NToxMCswMTowMM4G41Ys"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2018-02-17T01:29:49Z",
+                        "node": {
+                            "login": "omair-a-khan"
+                        }
+                    },
+                    {
+                        "starredAt": "2018-02-23T21:55:10Z",
+                        "node": {
+                            "login": "aaronrudkin"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

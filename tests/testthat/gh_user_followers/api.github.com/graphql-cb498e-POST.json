@@ -1,0 +1,22 @@
+{
+    "data": {
+        "user": {
+            "login": "mpadge",
+            "followers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyNS0wMi0xNFQwMDo1OTowMSswMTowMM4Ll8_B"
+                },
+                "totalCount": 303,
+                "nodes": [
+                    {
+                        "login": "leoniedu"
+                    },
+                    {
+                        "login": "XiaomingX"
+                    }
+                ]
+            }
+        }
+    }
+}

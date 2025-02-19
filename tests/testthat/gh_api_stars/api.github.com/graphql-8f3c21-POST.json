@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxOC0xMC0yMlQxNDozNToyNyswMjowMM4IgJdM"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2018-10-17T10:17:47Z",
+                        "node": {
+                            "login": "Lornebradia"
+                        }
+                    },
+                    {
+                        "starredAt": "2018-10-22T12:35:27Z",
+                        "node": {
+                            "login": "abichat"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

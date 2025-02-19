@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMC0wNy0yOVQxNDo1NDowOCswMjowMM4NyI1I"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2020-07-13T21:10:29Z",
+                        "node": {
+                            "login": "chantelwetzel-noaa"
+                        }
+                    },
+                    {
+                        "starredAt": "2020-07-29T12:54:08Z",
+                        "node": {
+                            "login": "jessecambon"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMi0wOS0xNlQwNjoyMToxNyswMjowMM4VU91B"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2022-08-28T23:28:15Z",
+                        "node": {
+                            "login": "crew102"
+                        }
+                    },
+                    {
+                        "starredAt": "2022-09-16T04:21:17Z",
+                        "node": {
+                            "login": "ErinKenna"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

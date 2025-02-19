@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxOC0xMi0wN1QxNDo0NjoxNSswMTowMM4I1Y7_"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2018-12-04T14:31:49Z",
+                        "node": {
+                            "login": "hejtmy"
+                        }
+                    },
+                    {
+                        "starredAt": "2018-12-07T13:46:15Z",
+                        "node": {
+                            "login": "ethanwhite"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

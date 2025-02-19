@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxOS0wMS0yM1QxNDowNToxMSswMTowMM4JLOXK"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2019-01-23T10:14:19Z",
+                        "node": {
+                            "login": "makeyourownmaker"
+                        }
+                    },
+                    {
+                        "starredAt": "2019-01-23T13:05:11Z",
+                        "node": {
+                            "login": "ClaytonJY"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMC0wMi0wNFQxNzoyODo0NCswMTowMM4MN0Xn"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2020-01-30T03:11:00Z",
+                        "node": {
+                            "login": "kelly-sovacool"
+                        }
+                    },
+                    {
+                        "starredAt": "2020-02-04T16:28:44Z",
+                        "node": {
+                            "login": "nikolaospapachristou"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

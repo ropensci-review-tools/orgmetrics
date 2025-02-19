@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxNi0wNi0xOFQwOTowODoxNyswMjowMM4DqpoY"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2016-06-02T19:07:09Z",
+                        "node": {
+                            "login": "gvegayon"
+                        }
+                    },
+                    {
+                        "starredAt": "2016-06-18T07:08:17Z",
+                        "node": {
+                            "login": "nakamichiworks"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

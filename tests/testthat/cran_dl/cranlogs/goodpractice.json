@@ -1,0 +1,21 @@
+[
+    {
+        "downloads": [
+            {
+                "day": "2024-07-30",
+                "downloads": 24
+            },
+            {
+                "day": "2024-07-31",
+                "downloads": 26
+            },
+            {
+                "day": "2024-08-01",
+                "downloads": 65
+            }
+        ],
+        "start": "2024-07-30",
+        "end": "2024-08-01",
+        "package": "goodpractice"
+    }
+]

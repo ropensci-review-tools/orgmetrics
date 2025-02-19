@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMC0xMi0zMVQyMzozODoxOSswMTowMM4PI23y"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2020-12-18T13:52:11Z",
+                        "node": {
+                            "login": "ddbortoli"
+                        }
+                    },
+                    {
+                        "starredAt": "2020-12-31T22:38:19Z",
+                        "node": {
+                            "login": "topfunky"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

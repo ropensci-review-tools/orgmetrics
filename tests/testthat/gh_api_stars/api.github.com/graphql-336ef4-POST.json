@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxNi0wOS0yNlQxNDowODoyMSswMjowMM4EGdX5"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2016-09-22T17:17:54Z",
+                        "node": {
+                            "login": "TiO2"
+                        }
+                    },
+                    {
+                        "starredAt": "2016-09-26T12:08:21Z",
+                        "node": {
+                            "login": "RMHogervorst"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxNy0wOC0xMFQxNjo1NzoxNSswMjowMM4FtRNX"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2017-07-13T00:12:12Z",
+                        "node": {
+                            "login": "jimrothstein"
+                        }
+                    },
+                    {
+                        "starredAt": "2017-08-10T14:57:15Z",
+                        "node": {
+                            "login": "maiing"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

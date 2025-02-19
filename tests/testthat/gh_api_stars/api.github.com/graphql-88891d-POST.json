@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyNC0wNi0xOVQwNDo1MzoyNiswMjowMM4eWghv"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2024-06-19T02:33:06Z",
+                        "node": {
+                            "login": "Pat-Laub"
+                        }
+                    },
+                    {
+                        "starredAt": "2024-06-19T02:53:26Z",
+                        "node": {
+                            "login": "matheus-rech"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

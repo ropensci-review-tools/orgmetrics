@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxNi0xMC0xMVQyMDowNzoxMiswMjowMM4EKuAT"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2016-10-11T14:32:39Z",
+                        "node": {
+                            "login": "Roon"
+                        }
+                    },
+                    {
+                        "starredAt": "2016-10-11T18:07:12Z",
+                        "node": {
+                            "login": "antongrau"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyNC0wNi0xN1QxNjoyMToyMCswMjowMM4eVL9p"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2024-06-15T13:20:39Z",
+                        "node": {
+                            "login": "PhilBoileau"
+                        }
+                    },
+                    {
+                        "starredAt": "2024-06-17T14:21:20Z",
+                        "node": {
+                            "login": "herrerawilliamh"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

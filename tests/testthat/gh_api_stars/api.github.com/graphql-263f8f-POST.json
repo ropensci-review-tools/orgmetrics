@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxNi0wNi0zMFQwNjoxMDoxNyswMjowMM4Dturu"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2016-06-29T22:56:38Z",
+                        "node": {
+                            "login": "greenore"
+                        }
+                    },
+                    {
+                        "starredAt": "2016-06-30T04:10:17Z",
+                        "node": {
+                            "login": "ateucher"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMS0wNi0yNVQxMTo0MTozOCswMjowMM4QzVAh"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2021-05-22T19:34:51Z",
+                        "node": {
+                            "login": "Felipe-21"
+                        }
+                    },
+                    {
+                        "starredAt": "2021-06-25T09:41:38Z",
+                        "node": {
+                            "login": "recruitmentatmango"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

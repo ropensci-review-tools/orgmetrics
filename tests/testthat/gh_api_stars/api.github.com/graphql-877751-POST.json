@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMS0wNy0xM1QxNzo0Njo0MyswMjowMM4Q9m3Z"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2021-07-12T08:22:09Z",
+                        "node": {
+                            "login": "ceballos-san-md"
+                        }
+                    },
+                    {
+                        "starredAt": "2021-07-13T15:46:43Z",
+                        "node": {
+                            "login": "agila5"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

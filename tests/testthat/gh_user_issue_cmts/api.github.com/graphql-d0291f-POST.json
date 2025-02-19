@@ -1,0 +1,46 @@
+{
+    "data": {
+        "user": {
+            "login": "mpadge",
+            "issueComments": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyNS0wMi0xOVQwOTozOTowNSswMTowMM6fBUOM"
+                },
+                "totalCount": 5275,
+                "nodes": [
+                    {
+                        "createdAt": "2025-02-19T08:41:26Z",
+                        "issue": {
+                            "number": 671,
+                            "comments": {
+                                "totalCount": 33
+                            },
+                            "participants": {
+                                "totalCount": 6
+                            },
+                            "repository": {
+                                "nameWithOwner": "ropensci/software-review"
+                            }
+                        }
+                    },
+                    {
+                        "createdAt": "2025-02-19T08:39:05Z",
+                        "issue": {
+                            "number": 688,
+                            "comments": {
+                                "totalCount": 4
+                            },
+                            "participants": {
+                                "totalCount": 3
+                            },
+                            "repository": {
+                                "nameWithOwner": "ropensci/software-review"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

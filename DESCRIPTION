@@ -1,0 +1,45 @@
+Package: orgmetrics
+Title: Metrics for Your GitHub Organization
+Version: 0.1.6.042
+Authors@R: 
+    person("Mark", "Padgham", , "mark.padgham@email.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-2172-5265"))
+Description: Metrics for your GitHub organization. Call one function to generate an
+    interactive dashboard displaying the state of your organization.
+License: GPL-3
+URL: https://docs.ropensci.org/orgmetrics/,
+    https://github.com/ropensci-review-tools/orgmetrics
+BugReports: https://github.com/ropensci-review-tools/orgmetrics/issues
+Imports:
+    checkmate,
+    cli,
+    dplyr,
+    fs,
+    gert,
+    gh,
+    git2r,
+    httr2,
+    memoise,
+    pbapply,
+    pkgstats
+Suggests:
+    brio,
+    desc,
+    httptest2,
+    jsonlite,
+    pkgmatch,
+    quarto,
+    readr,
+    testthat (>= 3.0.0),
+    tidyr,
+    withr,
+    zoo
+Remotes:
+    ropensci-review-tools/pkgmatch,
+    ropensci-review-tools/pkgstats,
+    ropensci-review-tools/repometrics
+Config/testthat/edition: 3
+Encoding: UTF-8
+Language: en-GB
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxNy0wNC0yMFQxNjoxOToxMSswMjowMM4FHX9j"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2017-04-12T15:31:06Z",
+                        "node": {
+                            "login": "kaneplusplus"
+                        }
+                    },
+                    {
+                        "starredAt": "2017-04-20T14:19:11Z",
+                        "node": {
+                            "login": "janverc"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

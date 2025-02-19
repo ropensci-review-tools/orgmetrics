@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxOS0wNy0yMFQxOTozMTo1MiswMjowMM4KrGn-"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2019-07-20T17:02:05Z",
+                        "node": {
+                            "login": "mpaulacaldas"
+                        }
+                    },
+                    {
+                        "starredAt": "2019-07-20T17:31:52Z",
+                        "node": {
+                            "login": "tanyongseng"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

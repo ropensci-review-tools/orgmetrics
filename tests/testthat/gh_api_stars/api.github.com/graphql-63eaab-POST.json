@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMi0xMi0xM1QwODoxNDoyNyswMTowMM4WT8X2"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2022-12-13T03:45:02Z",
+                        "node": {
+                            "login": "modernhero666"
+                        }
+                    },
+                    {
+                        "starredAt": "2022-12-13T07:14:27Z",
+                        "node": {
+                            "login": "RohitDhankar"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

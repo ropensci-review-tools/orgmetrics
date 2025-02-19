@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMy0wMy0xNVQxNDozMjo0NiswMTowMM4Xys6i"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2023-02-23T15:50:00Z",
+                        "node": {
+                            "login": "SmitsG"
+                        }
+                    },
+                    {
+                        "starredAt": "2023-03-15T13:32:46Z",
+                        "node": {
+                            "login": "avallecam"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

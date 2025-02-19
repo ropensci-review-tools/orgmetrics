@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxOC0wNi0wMlQwNTowNDowMCswMjowMM4HlIXC"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2018-05-30T05:38:06Z",
+                        "node": {
+                            "login": "matt-dray"
+                        }
+                    },
+                    {
+                        "starredAt": "2018-06-02T03:04:00Z",
+                        "node": {
+                            "login": "kprybol"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

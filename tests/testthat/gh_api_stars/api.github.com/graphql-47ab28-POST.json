@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyMy0wNi0yM1QxMDo0NzowOSswMjowMM4ZgwQc"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2023-05-31T10:31:59Z",
+                        "node": {
+                            "login": "larnsce"
+                        }
+                    },
+                    {
+                        "starredAt": "2023-06-23T08:47:09Z",
+                        "node": {
+                            "login": "ErikaDva"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

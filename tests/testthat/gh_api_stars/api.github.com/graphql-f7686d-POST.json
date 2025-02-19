@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxNy0wNi0xNlQyMDo1ODo0NiswMjowMM4Fanlw"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2017-06-16T02:48:48Z",
+                        "node": {
+                            "login": "strategist922"
+                        }
+                    },
+                    {
+                        "starredAt": "2017-06-16T18:58:46Z",
+                        "node": {
+                            "login": "apreshill"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

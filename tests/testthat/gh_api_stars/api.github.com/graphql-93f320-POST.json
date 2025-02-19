@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAyNC0wNi0wOVQxODozNToyNyswMjowMM4eNkoE"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2024-06-07T07:21:36Z",
+                        "node": {
+                            "login": "LukasPietzschmann"
+                        }
+                    },
+                    {
+                        "starredAt": "2024-06-09T16:35:27Z",
+                        "node": {
+                            "login": "Jacinto27"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

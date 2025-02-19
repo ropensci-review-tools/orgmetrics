@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxNy0wNS0yNlQxOTowNDo1OCswMjowMM4FTy4U"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2017-05-18T17:25:19Z",
+                        "node": {
+                            "login": "awentland90"
+                        }
+                    },
+                    {
+                        "starredAt": "2017-05-26T17:04:58Z",
+                        "node": {
+                            "login": "nistara"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

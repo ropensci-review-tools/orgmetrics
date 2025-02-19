@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxNy0wNy0wNlQxODo0OToxNSswMjowMM4FhK9T"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2017-06-20T19:57:52Z",
+                        "node": {
+                            "login": "silverstone1903"
+                        }
+                    },
+                    {
+                        "starredAt": "2017-07-06T16:49:15Z",
+                        "node": {
+                            "login": "ck37"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

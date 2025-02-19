@@ -1,0 +1,26 @@
+{
+    "data": {
+        "repository": {
+            "stargazers": {
+                "pageInfo": {
+                    "hasNextPage": true,
+                    "endCursor": "Y3Vyc29yOnYyOpK5MjAxOC0wNC0zMFQwMjo0OTo0OSswMjowMM4HWZOG"
+                },
+                "edges": [
+                    {
+                        "starredAt": "2018-04-29T03:19:22Z",
+                        "node": {
+                            "login": "happyshows"
+                        }
+                    },
+                    {
+                        "starredAt": "2018-04-30T00:49:49Z",
+                        "node": {
+                            "login": "faizan-khan-iit"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

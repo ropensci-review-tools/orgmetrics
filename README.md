@@ -9,10 +9,10 @@ Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repost
 
 # orgmetrics
 
-Metrics for your code repository. A single function collates a wealth of data
-from commit histories and GitHub interactions, converts it all to standardised
-metrics, and displays the result as a single, interactive dashboard of your
-repository.
+Metrics for your GitHub organization, collated from applying accompanying
+[`repometrics` package](https://github.com/ropensci-review-tools/repometrics)
+across all organization repositories, enhanced with additional
+organization-level data.
 
 ## How?
 

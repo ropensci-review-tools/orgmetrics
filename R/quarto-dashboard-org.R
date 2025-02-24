@@ -31,8 +31,8 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     action <- match.arg (action, c ("preview", "render"))
     quarto_action <- paste0 ("quarto::quarto_", action)
 
-    path_src <- system.file ("extdata", "quarto-org", package = "orgmetrics")
-    path_dest <- fs::path (fs::path_temp (), "quarto-org")
+    path_src <- system.file ("extdata", "quarto", package = "orgmetrics")
+    path_dest <- fs::path (fs::path_temp (), "quarto")
     dir <- fs::dir_copy (path_src, path_dest, overwrite = TRUE)
     saveRDS (data_all, fs::path (dir, "results-org.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))

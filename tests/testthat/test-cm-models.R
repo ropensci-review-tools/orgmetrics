@@ -6,11 +6,6 @@ test_that ("collate across orgs", {
     dat <- mock_rm_data ()
     path <- generate_test_pkg ()
 
-    metrics_over_end_dates <-
-        utils::getFromNamespace ("metrics_over_end_dates", "repometrics")
-    models_over_end_dates <-
-        utils::getFromNamespace ("models_over_end_dates", "repometrics")
-
     # Then mock one set of org data:
     metrics_all <- withr::with_options (
         list ("repometrics_period" = 365.25 / 2),

@@ -1,6 +1,6 @@
 Package: orgmetrics
 Title: Metrics for Your GitHub Organization
-Version: 0.0.1.035
+Version: 0.0.1.036
 Authors@R: 
     person("Mark", "Padgham", , "mark.padgham@email.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2172-5265"))
@@ -22,17 +22,14 @@ Imports:
     pbapply,
     repometrics
 Suggests:
-    brio,
     desc,
     httptest2,
     jsonlite,
     pkgmatch,
     quarto,
-    readr,
     testthat (>= 3.0.0),
     tidyr,
-    withr,
-    zoo
+    withr
 Remotes:
     ropensci-review-tools/pkgmatch,
     ropensci-review-tools/repometrics

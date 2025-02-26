@@ -23,7 +23,6 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
         dplyr::select (-org, -date) |>
         tidyr::pivot_longer (-package)
 
-    requireNamespace ("brio")
     requireNamespace ("jsonlite")
     requireNamespace ("quarto")
     requireNamespace ("withr")

@@ -1,3 +1,6 @@
+org_repo_from_path <-
+    utils::getFromNamespace ("org_repo_from_path", "repometrics")
+
 repometrics_collate_org_data <- function (org_paths, end_date = Sys.Date, num_years = 3) {
 
     pkgs <- fs::dir_ls (org_paths, type = "directory")

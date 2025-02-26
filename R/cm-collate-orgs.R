@@ -1,5 +1,9 @@
 org_repo_from_path <-
     utils::getFromNamespace ("org_repo_from_path", "repometrics")
+metrics_over_end_dates <-
+    utils::getFromNamespace ("metrics_over_end_dates", "repometrics")
+models_over_end_dates <-
+    utils::getFromNamespace ("models_over_end_dates", "repometrics")
 
 repometrics_collate_org_data <- function (org_paths, end_date = Sys.Date, num_years = 3) {
 

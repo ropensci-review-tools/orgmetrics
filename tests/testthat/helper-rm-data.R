@@ -7,6 +7,10 @@ rm_data_contribs_from_log <-
     utils::getFromNamespace ("rm_data_contribs_from_log", "repometrics")
 rm_data_repo_forks <-
     utils::getFromNamespace ("rm_data_repo_forks", "repometrics")
+rm_data_issues_from_gh_api <-
+    utils::getFromNamespace ("rm_data_issues_from_gh_api", "repometrics")
+rm_data_issue_comments_from_gh_api <-
+    utils::getFromNamespace ("rm_data_issue_comments_from_gh_api", "repometrics")
 
 mock_rm_data <- function (repo = TRUE) {
 

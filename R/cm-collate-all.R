@@ -1,3 +1,6 @@
+get_repometrics_period <-
+    utils::getFromNamespace ("get_repometrics_period", "repometrics")
+
 get_cm_fns <- function (what = "metric") {
 
     what <- match.arg (what, c ("metric", "model"))

@@ -3,6 +3,8 @@
 
 rm_data_contribs_from_gh_api <-
     utils::getFromNamespace ("rm_data_contribs_from_gh_api", "repometrics")
+rm_data_contribs_from_log <-
+    utils::getFromNamespace ("rm_data_contribs_from_log", "repometrics")
 
 mock_rm_data <- function (repo = TRUE) {
 

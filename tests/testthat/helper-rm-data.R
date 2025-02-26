@@ -1,6 +1,8 @@
 # Helper function to use httptest2 mocks to load all data, after which function
 # calls are memoised and so can be called without mocking from that point on.
 
+requireNamespace ("repometrics", quietly = TRUE)
+
 rm_data_contribs_from_gh_api <-
     utils::getFromNamespace ("rm_data_contribs_from_gh_api", "repometrics")
 rm_data_contribs_from_log <-
@@ -23,6 +25,13 @@ rm_data_gh_repo_workflow <-
     utils::getFromNamespace ("rm_data_gh_repo_workflow", "repometrics")
 rm_data_repo_from_gh_api <-
     utils::getFromNamespace ("rm_data_repo_from_gh_api", "repometrics")
+rm_data_dependencies <-
+    utils::getFromNamespace ("rm_data_dependencies", "repometrics")
+rm_data_dependencies_downstream <-
+    utils::getFromNamespace ("rm_data_dependencies_downstream", "repometrics")
+rm_data_libyears <-
+    utils::getFromNamespace ("rm_data_libyears", "repometrics")
+
 gh_user_general <-
     utils::getFromNamespace ("gh_user_general", "repometrics")
 gh_user_follow <-

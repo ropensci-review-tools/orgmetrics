@@ -3,13 +3,13 @@
 \name{orgmetrics_dashboard}
 \alias{orgmetrics_dashboard}
 \title{Start quarto dashboard with results of
-\code{repometrics_collate_org_data} function for collation of data across orgs.}
+\code{orgmetrics_collate_org_data} function for collation of data across orgs.}
 \usage{
 orgmetrics_dashboard(data_org, fn_calls, emb_matrix, action = "preview")
 }
 \arguments{
 \item{data_org}{Data on GitHub organization as returned from
-\code{repometrics_collate_org_data} function.}
+\code{orgmetrics_collate_org_data} function.}
 
 \item{fn_calls}{Data on function calls between packages of the specified
 organization, as returned from the \code{rm_org_data_fn_call_network()} function.}
@@ -28,5 +28,5 @@ simply opening this "index.html" file.
 }
 \description{
 Start quarto dashboard with results of
-\code{repometrics_collate_org_data} function for collation of data across orgs.
+\code{orgmetrics_collate_org_data} function for collation of data across orgs.
 }

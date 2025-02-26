@@ -1,8 +1,8 @@
 #' Start quarto dashboard with results of
-#' `repometrics_collate_org_data` function for collation of data across orgs.
+#' `orgmetrics_collate_org_data` function for collation of data across orgs.
 #'
 #' @param data_org Data on GitHub organization as returned from
-#' `repometrics_collate_org_data` function.
+#' `orgmetrics_collate_org_data` function.
 #' @param fn_calls Data on function calls between packages of the specified
 #' organization, as returned from the `rm_org_data_fn_call_network()` function.
 #' @param action One of "preview", to start and open a live preview of the
@@ -23,7 +23,6 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
         dplyr::select (-org, -date) |>
         tidyr::pivot_longer (-package)
 
-    requireNamespace ("brio")
     requireNamespace ("jsonlite")
     requireNamespace ("quarto")
     requireNamespace ("withr")

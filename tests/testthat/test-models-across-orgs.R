@@ -1,4 +1,9 @@
+# These tests need 'zoo' and 'tidyr' in the namespace, as they call internal
+# 'repometrics' functions which rely on these.
+
 end_date <- as.Date ("2024-08-01")
+
+get_end_date_seq <- utils::getFromNamespace ("get_end_date_seq", "repometrics")
 
 test_that ("collate across orgs", {
 
@@ -37,7 +42,7 @@ test_that ("collate across orgs", {
 
     # Then the main call, which loads those pre-saved data rather than
     # re-generating:
-    org_data <- repometrics_collate_org_data (
+    org_data <- orgmetrics_collate_org_data (
         org_dir,
         end_date = end_date,
         num_years = 1

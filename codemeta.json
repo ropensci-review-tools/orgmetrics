@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/ropensci-review-tools/orgmetrics",
   "issueTracker": "https://github.com/ropensci-review-tools/orgmetrics/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.026",
+  "version": "0.0.2",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -34,18 +34,6 @@
     }
   ],
   "softwareSuggestions": [
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "brio",
-      "name": "brio",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=brio"
-    },
     {
       "@type": "SoftwareApplication",
       "identifier": "desc",
@@ -99,18 +87,6 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=quarto"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "readr",
-      "name": "readr",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=readr"
     },
     {
       "@type": "SoftwareApplication",
@@ -231,30 +207,6 @@
     },
     "7": {
       "@type": "SoftwareApplication",
-      "identifier": "gh",
-      "name": "gh",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=gh"
-    },
-    "8": {
-      "@type": "SoftwareApplication",
-      "identifier": "git2r",
-      "name": "git2r",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=git2r"
-    },
-    "9": {
-      "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
       "provider": {
@@ -265,7 +217,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "10": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "memoise",
       "name": "memoise",
@@ -277,7 +229,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=memoise"
     },
-    "11": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "pbapply",
       "name": "pbapply",
@@ -289,19 +241,16 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=pbapply"
     },
-    "12": {
+    "10": {
       "@type": "SoftwareApplication",
-      "identifier": "pkgstats",
-      "name": "pkgstats",
-      "sameAs": "https://github.com/ropensci-review-tools/pkgstats"
+      "identifier": "repometrics",
+      "name": "repometrics",
+      "sameAs": "https://github.com/ropensci-review-tools/repometrics"
     },
-    "SystemRequirements": {}
+    "SystemRequirements": null
   },
-  "fileSize": "486.115KB",
+  "fileSize": "6922.793KB",
   "readme": "https://github.com/ropensci-review-tools/orgmetrics/blob/main/README.md",
-  "contIntegration": [
-    "https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check",
-    "https://app.codecov.io/gh/ropensci-review-tools/orgmetrics"
-  ],
+  "contIntegration": ["https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check", "https://app.codecov.io/gh/ropensci-review-tools/orgmetrics"],
   "developmentStatus": "https://www.repostatus.org/#active"
 }

@@ -3,6 +3,7 @@ get_cm_fns <- function (what = "metric") {
     what <- match.arg (what, c ("metric", "model"))
     ptn <- paste0 ("^cm\\_", what, "\\_")
 
+    requireNamespace ("repometrics", quietly = TRUE)
     pkg_fns <- ls (envir = asNamespace ("repometrics"))
     fns <- grep (ptn, pkg_fns, value = TRUE)
     fns <- fns [which (!grepl ("internal", fns))]

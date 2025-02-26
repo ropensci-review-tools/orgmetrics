@@ -10,7 +10,7 @@ repometrics_collate_org_data <- function (org_paths, end_date = Sys.Date, num_ye
             dat_i <- readRDS (f_tmp)
         } else {
             dat_i <- list (
-                repo = repometrics_data_repo (path_i),
+                repo = repometrics::repometrics_data_repo (path_i),
                 metrics = metrics_over_end_dates (
                     path_i,
                     end_date = end_date,

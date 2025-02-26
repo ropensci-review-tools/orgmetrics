@@ -1,9 +1,61 @@
 # Helper function to use httptest2 mocks to load all data, after which function
 # calls are memoised and so can be called without mocking from that point on.
 
+requireNamespace ("repometrics", quietly = TRUE)
+
+rm_data_contribs_from_gh_api <-
+    utils::getFromNamespace ("rm_data_contribs_from_gh_api", "repometrics")
+rm_data_contribs_from_log <-
+    utils::getFromNamespace ("rm_data_contribs_from_log", "repometrics")
+rm_data_repo_forks <-
+    utils::getFromNamespace ("rm_data_repo_forks", "repometrics")
+rm_data_issues_from_gh_api <-
+    utils::getFromNamespace ("rm_data_issues_from_gh_api", "repometrics")
+rm_data_issue_comments_from_gh_api <- # nolint
+    utils::getFromNamespace (
+        "rm_data_issue_comments_from_gh_api", "repometrics"
+    )
+rm_data_prs_from_gh_api <-
+    utils::getFromNamespace ("rm_data_prs_from_gh_api", "repometrics")
+rm_data_releases_from_gh_api <-
+    utils::getFromNamespace ("rm_data_releases_from_gh_api", "repometrics")
+rm_data_repo_stargazers <-
+    utils::getFromNamespace ("rm_data_repo_stargazers", "repometrics")
+rm_data_gh_repo_workflow <-
+    utils::getFromNamespace ("rm_data_gh_repo_workflow", "repometrics")
+rm_data_repo_from_gh_api <-
+    utils::getFromNamespace ("rm_data_repo_from_gh_api", "repometrics")
+rm_data_dependencies <-
+    utils::getFromNamespace ("rm_data_dependencies", "repometrics")
+rm_data_dependencies_downstream <-
+    utils::getFromNamespace ("rm_data_dependencies_downstream", "repometrics")
+rm_data_libyears <-
+    utils::getFromNamespace ("rm_data_libyears", "repometrics")
+rm_data_repo <-
+    utils::getFromNamespace ("rm_data_repo", "repometrics")
+
+gh_user_general <-
+    utils::getFromNamespace ("gh_user_general", "repometrics")
+gh_user_follow <-
+    utils::getFromNamespace ("gh_user_follow", "repometrics")
+gh_user_commit_cmt <-
+    utils::getFromNamespace ("gh_user_commit_cmt", "repometrics")
+gh_user_commits <-
+    utils::getFromNamespace ("gh_user_commits", "repometrics")
+gh_user_issues <-
+    utils::getFromNamespace ("gh_user_issues", "repometrics")
+gh_user_issue_cmts <-
+    utils::getFromNamespace ("gh_user_issue_cmts", "repometrics")
+
+get_rm_data_fns <-
+    utils::getFromNamespace ("get_rm_data_fns", "repometrics")
+get_rm_gh_user_fns <-
+    utils::getFromNamespace ("get_rm_gh_user_fns", "repometrics")
+
 mock_rm_data <- function (repo = TRUE) {
 
     Sys.setenv ("ORGMETRICS_TESTS" = "true")
+    Sys.setenv ("REPOMETRICS_TESTS" = "true")
 
     path <- generate_test_pkg ()
     ctbs <- httptest2::with_mock_dir ("gh_api_ctbs", {

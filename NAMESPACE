@@ -2,6 +2,4 @@
 
 export(orgmetrics_dashboard)
 export(repo_pkgstats_history)
-export(repometrics_data_repo)
-export(repometrics_data_user)
 importFrom(memoise,memoise)

@@ -33,6 +33,8 @@ rm_data_libyears <-
     utils::getFromNamespace ("rm_data_libyears", "repometrics")
 rm_data_repo <-
     utils::getFromNamespace ("rm_data_repo", "repometrics")
+rm_data_gitlog <-
+    utils::getFromNamespace ("rm_data_gitlog", "repometrics")
 
 gh_user_general <-
     utils::getFromNamespace ("gh_user_general", "repometrics")

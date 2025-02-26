@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/ropensci-review-tools/orgmetrics",
   "issueTracker": "https://github.com/ropensci-review-tools/orgmetrics/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.27",
+  "version": "0.0.1.28",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -231,18 +231,6 @@
     },
     "7": {
       "@type": "SoftwareApplication",
-      "identifier": "git2r",
-      "name": "git2r",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=git2r"
-    },
-    "8": {
-      "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
       "provider": {
@@ -253,7 +241,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "9": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "memoise",
       "name": "memoise",
@@ -265,7 +253,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=memoise"
     },
-    "10": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "pbapply",
       "name": "pbapply",
@@ -277,7 +265,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=pbapply"
     },
-    "11": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "repometrics",
       "name": "repometrics",
@@ -285,7 +273,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "6947.974KB",
+  "fileSize": "6945.54KB",
   "readme": "https://github.com/ropensci-review-tools/orgmetrics/blob/main/README.md",
   "contIntegration": ["https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check", "https://app.codecov.io/gh/ropensci-review-tools/orgmetrics"],
   "developmentStatus": "https://www.repostatus.org/#active"

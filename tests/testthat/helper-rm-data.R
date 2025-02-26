@@ -23,6 +23,18 @@ rm_data_gh_repo_workflow <-
     utils::getFromNamespace ("rm_data_gh_repo_workflow", "repometrics")
 rm_data_repo_from_gh_api <-
     utils::getFromNamespace ("rm_data_repo_from_gh_api", "repometrics")
+gh_user_general <-
+    utils::getFromNamespace ("gh_user_general", "repometrics")
+gh_user_follow <-
+    utils::getFromNamespace ("gh_user_follow", "repometrics")
+gh_user_commit_cmt <-
+    utils::getFromNamespace ("gh_user_commit_cmt", "repometrics")
+gh_user_commits <-
+    utils::getFromNamespace ("gh_user_commits", "repometrics")
+gh_user_issues <-
+    utils::getFromNamespace ("gh_user_issues", "repometrics")
+gh_user_issue_cmts <-
+    utils::getFromNamespace ("gh_user_issue_cmts", "repometrics")
 
 mock_rm_data <- function (repo = TRUE) {
 

@@ -21,6 +21,8 @@ rm_data_repo_stargazers <-
     utils::getFromNamespace ("rm_data_repo_stargazers", "repometrics")
 rm_data_gh_repo_workflow <-
     utils::getFromNamespace ("rm_data_gh_repo_workflow", "repometrics")
+rm_data_repo_from_gh_api <-
+    utils::getFromNamespace ("rm_data_repo_from_gh_api", "repometrics")
 
 mock_rm_data <- function (repo = TRUE) {
 

@@ -53,6 +53,8 @@ get_rm_data_fns <-
     utils::getFromNamespace ("get_rm_data_fns", "repometrics")
 get_rm_gh_user_fns <-
     utils::getFromNamespace ("get_rm_gh_user_fns", "repometrics")
+get_all_contribs <-
+    utils::getFromNamespace ("get_all_contribs", "repometrics")
 
 mock_rm_data <- function (repo = TRUE) {
 

@@ -1,3 +1,6 @@
+# These tests need 'zoo' and 'tidyr' in the namespace, as they call internal
+# 'repometrics' functions which rely on these.
+
 end_date <- as.Date ("2024-08-01")
 
 get_end_date_seq <- utils::getFromNamespace ("get_end_date_seq", "repometrics")

@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/ropensci-review-tools/orgmetrics",
   "issueTracker": "https://github.com/ropensci-review-tools/orgmetrics/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.037",
+  "version": "0.0.1.37",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -124,6 +124,18 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=withr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "zoo",
+      "name": "zoo",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=zoo"
     }
   ],
   "softwareRequirements": {
@@ -235,13 +247,10 @@
       "name": "repometrics",
       "sameAs": "https://github.com/ropensci-review-tools/repometrics"
     },
-    "SystemRequirements": {}
+    "SystemRequirements": null
   },
-  "fileSize": "6922.696KB",
+  "fileSize": "6922.793KB",
   "readme": "https://github.com/ropensci-review-tools/orgmetrics/blob/main/README.md",
-  "contIntegration": [
-    "https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check",
-    "https://app.codecov.io/gh/ropensci-review-tools/orgmetrics"
-  ],
+  "contIntegration": ["https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check", "https://app.codecov.io/gh/ropensci-review-tools/orgmetrics"],
   "developmentStatus": "https://www.repostatus.org/#active"
 }

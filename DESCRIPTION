@@ -29,7 +29,8 @@ Suggests:
     quarto,
     testthat (>= 3.0.0),
     tidyr,
-    withr
+    withr,
+    zoo
 Remotes:
     ropensci-review-tools/pkgmatch,
     ropensci-review-tools/repometrics

@@ -1,9 +1,13 @@
 # Helper function to use httptest2 mocks to load all data, after which function
 # calls are memoised and so can be called without mocking from that point on.
 
+rm_data_contribs_from_gh_api <-
+    utils::getFromNamespace ("rm_data_contribs_from_gh_api", "repometrics")
+
 mock_rm_data <- function (repo = TRUE) {
 
     Sys.setenv ("ORGMETRICS_TESTS" = "true")
+    Sys.setenv ("REPOMETRICS_TESTS" = "true")
 
     path <- generate_test_pkg ()
     ctbs <- httptest2::with_mock_dir ("gh_api_ctbs", {

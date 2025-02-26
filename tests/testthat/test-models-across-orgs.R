@@ -39,7 +39,7 @@ test_that ("collate across orgs", {
 
     # Then the main call, which loads those pre-saved data rather than
     # re-generating:
-    org_data <- repometrics_collate_org_data (
+    org_data <- orgmetrics_collate_org_data (
         org_dir,
         end_date = end_date,
         num_years = 1

@@ -5,7 +5,7 @@ metrics_over_end_dates <-
 models_over_end_dates <-
     utils::getFromNamespace ("models_over_end_dates", "repometrics")
 
-repometrics_collate_org_data <- function (org_paths, end_date = Sys.Date, num_years = 3) {
+orgmetrics_collate_org_data <- function (org_paths, end_date = Sys.Date, num_years = 3) {
 
     pkgs <- fs::dir_ls (org_paths, type = "directory")
     data <- lapply (seq_along (pkgs), function (i) {

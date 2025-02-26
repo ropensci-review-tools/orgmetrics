@@ -31,6 +31,8 @@ rm_data_dependencies_downstream <-
     utils::getFromNamespace ("rm_data_dependencies_downstream", "repometrics")
 rm_data_libyears <-
     utils::getFromNamespace ("rm_data_libyears", "repometrics")
+rm_data_repo <-
+    utils::getFromNamespace ("rm_data_repo", "repometrics")
 
 gh_user_general <-
     utils::getFromNamespace ("gh_user_general", "repometrics")
@@ -44,6 +46,9 @@ gh_user_issues <-
     utils::getFromNamespace ("gh_user_issues", "repometrics")
 gh_user_issue_cmts <-
     utils::getFromNamespace ("gh_user_issue_cmts", "repometrics")
+
+get_rm_data_fns <-
+    utils::getFromNamespace ("get_rm_data_fns", "repometrics")
 
 mock_rm_data <- function (repo = TRUE) {
 

@@ -11,6 +11,8 @@ rm_data_issues_from_gh_api <-
     utils::getFromNamespace ("rm_data_issues_from_gh_api", "repometrics")
 rm_data_issue_comments_from_gh_api <-
     utils::getFromNamespace ("rm_data_issue_comments_from_gh_api", "repometrics")
+rm_data_prs_from_gh_api <-
+    utils::getFromNamespace ("rm_data_prs_from_gh_api", "repometrics")
 
 mock_rm_data <- function (repo = TRUE) {
 

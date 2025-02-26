@@ -1,3 +1,6 @@
+n_per_page_in_tests <-
+    utils::getFromNamespace ("n_per_page_in_tests", "repometrics")
+
 list_gh_org_repos <- function (org = "ropensci", n_per_page = 100) {
 
     checkmate::assert_character (org, len = 1L)

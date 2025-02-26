@@ -1,5 +1,6 @@
 get_repometrics_period <-
     utils::getFromNamespace ("get_repometrics_period", "repometrics")
+get_end_date_seq <- utils::getFromNamespace ("get_end_date_seq", "repometrics")
 
 get_cm_fns <- function (what = "metric") {
 

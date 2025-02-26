@@ -1,5 +1,7 @@
 end_date <- as.Date ("2024-08-01")
 
+get_end_date_seq <- utils::getFromNamespace ("get_end_date_seq", "repometrics")
+
 test_that ("collate across orgs", {
 
     Sys.setenv ("REPOMETRICS_TESTS" = "true")

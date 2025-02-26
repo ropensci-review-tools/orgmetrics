@@ -24,7 +24,7 @@ collate_all_metrics <- function (path, end_date = Sys.Date ()) {
 
     metrics_data <- lapply (metric_fns, function (f) {
 
-        this_fn <- getFromNamespace (f, "repometrics")
+        this_fn <- utils::getFromNamespace (f, "repometrics")
         these_pars <- pars
         if (f %in% names (extra_pars)) {
             these_pars <- c (pars, extra_pars [[f]])
@@ -49,7 +49,7 @@ collate_all_models <- function (path,
     }
 
     model_data <- vapply (model_fns, function (f) {
-        this_fn <- getFromNamespace (f, "repometrics")
+        this_fn <- utils::getFromNamespace (f, "repometrics")
         do.call (this_fn, pars)
     }, numeric (1L))
 

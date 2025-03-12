@@ -37,7 +37,7 @@ library (orgmetrics)
 dat_models <- readRDS ("results-org.Rds") |>
     as.data.frame ()
 ```
-```{r ojs-in-models, echo = FALSE}
+```{r ojs-in-models}
 ojs_define (models_in = dat_models)
 ```
 ```{ojs}

@@ -3,7 +3,7 @@
         "user": {
             "login": "mpadge",
             "contributionsCollection": {
-                "startedAt": "2023-01-01T08:00:00Z",
+                "startedAt": "2022-12-31T08:00:00Z",
                 "endedAt": "2024-01-01T08:00:00Z",
                 "totalCommitContributions": 3188,
                 "commitContributionsByRepository": [

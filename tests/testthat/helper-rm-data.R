@@ -95,11 +95,11 @@ mock_rm_data <- function (repo = TRUE) {
 
     # rm-data-user:
     login <- "mpadge"
-    ended_at <- as.POSIXct ("2024-01-01T00:00:00")
+    end_date <- as.Date ("2024-01-01")
     pars <- list (
         login = login,
         n_per_page = 1,
-        ended_at = ended_at,
+        end_date = end_date,
         nyears = 1
     )
     general <- httptest2::with_mock_dir ("gh_user_general", {
@@ -146,7 +146,7 @@ mock_rm_data <- function (repo = TRUE) {
         pars <- list (
             login = login,
             n_per_page = 1,
-            ended_at = ended_at,
+            end_date = end_date,
             nyears = 1
         )
 

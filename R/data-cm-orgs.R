@@ -61,7 +61,7 @@ orgmetrics_collate_org_data <- function (org_paths, end_date = Sys.Date, num_yea
 }
 
 rm_tmp_pkg_files <- function (pkgs) {
-    pkgs <- gsub ("^.*\\/", "", unique (pkgs))
+    pkgs <- unique (gsub ("^.*\\/", "", pkgs))
     f_tmp_list <- fs::path (fs::path_temp (), paste0 (pkgs, ".Rds"))
     f_tmp_list <- f_tmp_list [which (fs::file_exists (f_tmp_list))]
     if (length (f_tmp_list) > 0L) {

@@ -117,6 +117,11 @@ clone_gh_org_repos <- function (dir = getwd (), orgs = NULL) {
                 dir,
                 gert::git_clone (url)
             )
+        } else {
+            withr::with_dir (
+                dest_dir,
+                gert::git_pull (verbose = FALSE)
+            )
         }
     }
 }

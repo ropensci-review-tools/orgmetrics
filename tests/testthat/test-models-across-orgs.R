@@ -5,13 +5,11 @@ end_date <- as.Date ("2024-08-01")
 
 get_end_date_seq <- utils::getFromNamespace ("get_end_date_seq", "repometrics")
 
-test_that ("collate across orgs", {
+test_that ("collate_org_data output", {
 
     Sys.setenv ("REPOMETRICS_TESTS" = "true")
     org_dir <- mock_collate_org_data ()
 
-    # Then the main call, which loads those pre-saved data rather than
-    # re-generating:
     org_data <- orgmetrics_collate_org_data (
         org_dir,
         end_date = end_date,
@@ -28,4 +26,57 @@ test_that ("collate across orgs", {
     expect_s3_class (org_data$models, "data.frame")
     n_periods <- length (get_end_date_seq (end_date = end_date, num_years = 1))
     expect_equal (nrow (org_data$models), n_periods)
+})
+
+test_that ("org data preprocessing", {
+
+    Sys.setenv ("REPOMETRICS_TESTS" = "true")
+    org_dir <- mock_collate_org_data ()
+
+    data_org <- orgmetrics_collate_org_data (
+        org_dir,
+        end_date = end_date,
+        num_years = 1
+    )
+
+    fs::dir_delete (org_dir)
+
+    metrics_df <- data_metrics_to_df (data_org$metrics)
+    expect_s3_class (metrics_df, "data.frame")
+    expect_equal (nrow (metrics_df), 4L) # one year with 3-month intervals
+    expect_equal (ncol (metrics_df), 51L) # one year with 3-month intervals
+    expect_equal (names (metrics_df) [1:3], c ("org", "package", "date"))
+    classes <- vapply (
+        names (metrics_df),
+        function (n) class (metrics_df [[n]]),
+        character (1L)
+    )
+    expect_equal (unique (classes [1:3]), "character")
+    classes <- classes [-(1:3)]
+    expect_true (all (classes %in% c ("logical", "integer", "numeric")))
+    df_names <- names (classes) # names of df minus 1st 3.
+
+    mod_dat <- load_model_json_data ()
+    # This is not true, but should be. Have to update repometrics to ensure:
+    # expect_true (all (names (classes)) %in% mod_dat$metrics$names)
+
+    data_pre <- data_metrics_preproces (metrics_df)
+    expect_s3_class (data_pre, "data.frame")
+    expect_equal (ncol (data_pre), 3L)
+    expect_equal (names (data_pre), c ("package", "name", "value"))
+    expect_identical (sort (df_names), sort (data_pre$name))
+    expect_type (data_pre$value, "double")
+    expect_true (!all (is.na (data_pre$value))) # Some actual values!
+
+    data_maintenance <- org_maintenance_metric (data_org)
+    expect_s3_class (data_maintenance, "data.frame")
+    expect_equal (ncol (data_maintenance), 4L)
+    col_nms <- c ("package", "comm_engage", "dev_resp", "maintenance")
+    expect_equal (names (data_maintenance), col_nms)
+    expect_type (data_maintenance$package, "character")
+    for (n in col_nms [-1]) {
+        expect_type (data_maintenance [[n]], "double")
+        # And all should be non-NA:
+        expect_false (any (is.na (data_maintenance [[n]])))
+    }
 })

@@ -43,7 +43,6 @@ pkgs_are_r <- function (pkgs) {
     type <- NULL
 
     u_base <- "https://api.github.com/repos/"
-    u_base <- "https://api.github.com/repos/reconhub/epicookbook/contents/{+path}"
 
     urls <- paste0 (u_base, pkgs, "/contents")
 

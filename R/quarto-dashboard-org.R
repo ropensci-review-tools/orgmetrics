@@ -19,7 +19,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     # Suppress no visible binding notes:
     org <- package <- NULL
 
-    data_all <- data_org_preprocess (data_org$models) |>
+    data_models <- data_models_preprocess (data_org$models) |>
         dplyr::select (-org, -date) |>
         tidyr::pivot_longer (-package)
 
@@ -33,7 +33,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     path_src <- system.file ("extdata", "quarto", package = "orgmetrics")
     path_dest <- fs::path (fs::path_temp (), "quarto")
     dir <- fs::dir_copy (path_src, path_dest, overwrite = TRUE)
-    saveRDS (data_all, fs::path (dir, "results-org.Rds"))
+    saveRDS (data_models, fs::path (dir, "results-models.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))
 
@@ -47,12 +47,12 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
 #' a "final" score from the sum across all model scores. Higher values of this
 #' final score are better than lower values.
 #' @noRd
-data_org_preprocess <- function (data_org) {
+data_models_preprocess <- function (data_models) {
 
     # Suppress no visible binding notes:
     package <- final <- NULL
 
-    data_org |>
+    data_models |>
         dplyr::mutate (
             dplyr::across (dplyr::where (is.numeric), ~ scale (.) [, 1])
         ) |>

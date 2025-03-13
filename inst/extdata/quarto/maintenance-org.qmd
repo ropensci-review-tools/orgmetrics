@@ -12,14 +12,19 @@ format:
 This page identifies maintenance deficits across all repositories within 
 the `reconhub` and `epiverse-trace` organizations. These deficits are higher
 for projects with more community engagement yet less developer responsiveness
-or activity. Lengths of bars indicate community engagement minus developer
-responsiveness, so that:
+or activity. Repositories with higher maintenance deficits are presented first,
+with maintenance deficit decreasing down the page. Lengths of bars indicate
+community engagement minus developer responsiveness, so that:
 
-- More positive bars have high engagement yet lower developer responsiveness.
-- More negative bars have high developer activity yet low community engagement.
+- More positive bars are higher up the page, and have high engagement yet lower
+developer responsiveness.
+- More negative bars are lower down the page, and have high developer activity
+yet low community engagement.
 
-Bars are coloured by developer responsiveness only, to provide insight into the
-contributions of these underlying components, so that:
+Bars are coloured to provide insight into the relative contributions of
+community engagement versus developer responsiveness. Because organizations
+generally have more direct control over the latter than the former, bars are
+coloured by developer responsiveness. This means that:
 
 - Bars with colours tending towards bright green have greater developer
 responsiveness.

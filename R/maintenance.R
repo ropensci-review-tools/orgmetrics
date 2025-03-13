@@ -1,11 +1,15 @@
 # functions to identify maintenance deficits at both org and repo levels
 
-load_model_json_data <- utils::getFromNamespace ("load_model_json_data", "repometrics")
+load_model_json_data <-
+    utils::getFromNamespace ("load_model_json_data", "repometrics")
 
 #' A single metric for each repo of the maintenance deficit, identifying repos
 #' with high community engagement yet low developer responsiveness.
 #' @noRd
 org_maintenance_metric <- function (data_org) {
+
+    # Suppress no visible binding notes:
+    value <- name <- package <- comm_engage <- dev_resp <- maintenance <- NULL
 
     data_metrics <- data_metrics_to_df (data_org$metrics) |>
         data_metrics_preproces ()

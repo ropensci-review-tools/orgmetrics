@@ -43,6 +43,9 @@ data_metrics_to_df <- function (data_metrics) {
         })
         do.call (rbind, df)
     })
+
+    # Suppress no visible binding note:
+    package <- NULL
     do.call (rbind, data_metrics_df) |>
         dplyr::arrange (package, dplyr::desc (date))
 }
@@ -52,6 +55,9 @@ data_metrics_to_df <- function (data_metrics) {
 #' package.
 #' @noRd
 data_metrics_preproces <- function (data_metrics) {
+
+    # Suppress no visible binding notes:
+    org <- date <- package <- NULL
 
     data_metrics |>
         dplyr::mutate (

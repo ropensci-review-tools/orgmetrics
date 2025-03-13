@@ -1,3 +1,6 @@
+test_all <- (identical (Sys.getenv ("MPADGE_LOCAL"), "true") ||
+    identical (Sys.getenv ("GITHUB_JOB"), "test-coverage"))
+
 test_that ("gh org repos", {
 
     Sys.setenv ("ORGMETRICS_TESTS" = "true")
@@ -36,6 +39,34 @@ test_that ("write pkgs_json", {
     expect_s3_class (f, "fs_path")
     expect_true (fs::file_exists (f))
     expect_equal (basename (f), "packages.json")
+
+    fs::dir_delete (d)
+})
+
+skip_if (!test_all)
+
+# No mocking here, just actual cloning on 1st two rOpenSci repos
+test_that ("clone gh org repos", {
+    Sys.setenv ("ORGMETRICS_TESTS" = "true")
+    Sys.setenv ("REPOMETRICS_TESTS" = "true") # n_per_page = 2
+    org <- "ropensci"
+
+    d <- fs::path (fs::path_temp (), "orgrepos")
+    expect_false (fs::dir_exists (d))
+    fs::dir_create (d)
+
+    clone_gh_org_repos (dir = d, orgs = org)
+
+    f <- fs::dir_ls (d, type = "file")
+    expect_length (f, 1L)
+    expect_equal (basename (f), "packages.json")
+    f <- fs::dir_ls (d, type = "directory")
+    expect_length (f, 1L)
+    expect_equal (basename (f), "ropensci")
+
+    d_org <- f
+    f <- fs::dir_ls (d_org, type = "directory")
+    expect_length (f, 2L)
 
     fs::dir_delete (d)
 })

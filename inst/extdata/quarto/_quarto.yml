@@ -8,6 +8,7 @@ website:
   navbar:
     left:
       - maintenance-org.qmd
+      - maintenance-repo.qmd
       - models.qmd
       - network.qmd
     right:

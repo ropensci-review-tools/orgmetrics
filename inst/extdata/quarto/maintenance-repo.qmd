@@ -1,0 +1,82 @@
+---
+title: "Repo Maintenance"
+execute:
+  echo: false
+format: 
+  html:
+    fig-width: 8
+    fig-height: 4
+    code-fold: false
+---
+
+This page identifies maintenance priorities for individual repositories.
+
+
+```{r load-pkg, echo = FALSE, message = FALSE}
+library (orgmetrics)
+```
+
+```{r load-data}
+data_maintenance <- readRDS ("results-maintenance-org.Rds")
+```
+
+```{r ojs-in-models}
+ojs_define (models_in = data_maintenance)
+```
+```{ojs}
+models = {
+    return transpose(models_in).map(row => ({
+        ...row,
+    }));
+}
+models_len = models.length
+```
+
+
+```{ojs plot-all-community-health-vars}
+Plot.plot({
+    height: 20 * models_len,
+    marginLeft: 60,
+    marginRight: 160,
+    marginTop: 50,
+    marginBottom: 50,
+    axis: null,
+    x: {
+        axis: "top",
+        grid: true,
+        label: "Maintenance Deficit"
+    },
+    y: { grid: true },
+    marks: [
+        Plot.barX(models, {
+            y: "package",
+            x: "maintenance",
+            sort: {y: "-x" },
+            fill: "dev_resp",
+        }),
+        Plot.barX(models,
+            Plot.pointer(
+            {
+                y: "package",
+                x: "maintenance",
+                sort: {y: "-x" },
+                stroke: "gray",
+                fill: "maintenance",
+                strokeWidth: 2,
+            })
+        ),
+        Plot.text(models, {
+            x: (d) => d.maintenance < 0 ? 0 : d.maintenance,
+            y: "package",
+            text: "package",
+            textAnchor: "start",
+            fontSize: 16,
+            dx: 5
+        })
+    ],
+    color: {
+        scheme: "Cool",
+        type: "ordinal"
+    }
+})
+```

@@ -79,4 +79,20 @@ test_that ("org data preprocessing", {
         # And all should be non-NA:
         expect_false (any (is.na (data_maintenance [[n]])))
     }
+
+    models_df <- data_models_preprocess (data_org$models)
+    expect_s3_class (models_df, "data.frame")
+    expect_true (nrow (models_df) > 0L)
+    expect_equal (ncol (models_df), 17L)
+    expect_equal (names (models_df) [1:3], c ("package", "org", "date"))
+    classes <- vapply (
+        names (models_df),
+        function (n) class (models_df [[n]]),
+        character (1L)
+    )
+    expect_equal (unique (classes [1:3]), c ("character", "Date"))
+    classes <- classes [-(1:3)]
+    expect_true (all (classes == "numeric"))
+    mod_names <- names (mod_dat$models)
+    expect_true (all (mod_names %in% names (models_df)))
 })

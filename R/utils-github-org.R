@@ -110,10 +110,10 @@ clone_gh_org_repos <- function (dir = getwd (), orgs = NULL) {
         if (!fs::dir_exists (dir_org)) {
             fs::dir_create (dir_org)
         }
-        dest_dir <- fs::path (dir, p)
+        dest_dir <- fs::path (dir_org, p)
         if (!fs::dir_exists (dest_dir)) {
             withr::with_dir (
-                dir,
+                dir_org,
                 gert::git_clone (url)
             )
         } else {

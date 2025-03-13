@@ -19,7 +19,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     # Suppress no visible binding notes:
     org <- package <- NULL
 
-    data_all <- data_org_preprocess (data_org) |>
+    data_all <- data_org_preprocess (data_org$models) |>
         dplyr::select (-org, -date) |>
         tidyr::pivot_longer (-package)
 

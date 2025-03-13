@@ -17,25 +17,41 @@ library (orgmetrics)
 ```
 
 ```{r load-data}
-data_maintenance <- readRDS ("results-maintenance-org.Rds")
+data_metrics <- readRDS ("results-metrics.Rds")
+data_metrics$value [which (is.na (data_metrics$value))] <- 0
 ```
 
-```{r ojs-in-models}
-ojs_define (models_in = data_maintenance)
+```{r ojs-in-metrics}
+ojs_define (metrics_in = data_metrics)
 ```
 ```{ojs}
-models = {
-    return transpose(models_in).map(row => ({
+metrics = {
+    return transpose(metrics_in).map(row => ({
         ...row,
     }));
 }
-models_len = models.length
+metrics_len = metrics.length
 ```
 
+```{ojs get-all-repos}
+// Get array of unique repo names for input selector:
+reposAll = metrics.map(function(item) {
+    return item.package;
+});
+repos = Array.from(new Set(reposAll));
+viewof repo = Inputs.select(repos, {multiple: false, label: "Repository:"})
+```
 
-```{ojs plot-all-community-health-vars}
+```{ojs}
+metrics_repo = metrics.filter(function(mod) {
+    return mod.package.includes(repo)
+})
+metrics_repo_len = metrics_repo.length
+```
+
+```{ojs plot-filtered-repo}
 Plot.plot({
-    height: 20 * models_len,
+    height: 40 * metrics_repo_len,
     marginLeft: 60,
     marginRight: 160,
     marginTop: 50,
@@ -44,31 +60,31 @@ Plot.plot({
     x: {
         axis: "top",
         grid: true,
-        label: "Maintenance Deficit"
+        label: "Community Health"
     },
     y: { grid: true },
     marks: [
-        Plot.barX(models, {
-            y: "package",
-            x: "maintenance",
+        Plot.barX(metrics_repo, {
+            y: "name",
+            x: "value",
             sort: {y: "-x" },
-            fill: "dev_resp",
+            fill: "value",
         }),
-        Plot.barX(models,
+        Plot.barX(metrics_repo,
             Plot.pointer(
             {
-                y: "package",
-                x: "maintenance",
+                y: "name",
+                x: "value",
                 sort: {y: "-x" },
                 stroke: "gray",
-                fill: "maintenance",
+                fill: "value",
                 strokeWidth: 2,
             })
         ),
-        Plot.text(models, {
-            x: (d) => d.maintenance < 0 ? 0 : d.maintenance,
-            y: "package",
-            text: "package",
+        Plot.text(metrics_repo, {
+            x: (d) => d.value < 0 ? 0 : d.value,
+            y: "name",
+            text: "name",
             textAnchor: "start",
             fontSize: 16,
             dx: 5

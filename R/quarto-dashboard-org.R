@@ -24,6 +24,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
         tidyr::pivot_longer (-package)
     data_metrics <- data_metrics_to_df (data_org$metrics) |>
         data_metrics_preproces ()
+    data_maintenance <- org_maintenance_metric (data_org)
 
     requireNamespace ("jsonlite")
     requireNamespace ("quarto")
@@ -37,6 +38,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     dir <- fs::dir_copy (path_src, path_dest, overwrite = TRUE)
     saveRDS (data_models, fs::path (dir, "results-models.Rds"))
     saveRDS (data_metrics, fs::path (dir, "results-metrics.Rds"))
+    saveRDS (data_maintenance, fs::path (dir, "results-maintenance-org.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))
 

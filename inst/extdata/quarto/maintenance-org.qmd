@@ -1,0 +1,102 @@
+---
+title: "Organization Maintenance"
+execute:
+  echo: false
+format: 
+  html:
+    fig-width: 8
+    fig-height: 4
+    code-fold: false
+---
+
+This page identifies maintenance deficits across all repositories within 
+the `reconhub` and `epiverse-trace` organizations. These deficits are higher
+for projects with more community engagement yet less developer responsiveness
+or activity. Lengths of bars indicate community engagement minus developer
+responsiveness, so that:
+
+- More positive bars have high engagement yet lower developer responsiveness.
+- More negative bars have high developer activity yet low community engagement.
+
+Bars are coloured by developer responsiveness only, to provide insight into the
+contributions of these underlying components, so that:
+
+- Bars with colours tending towards bright green have greater developer
+responsiveness.
+- Bars tending toward darker purple have lower developer responsiveness.
+
+Maintenance priorities should likely be focussed on repositories with high
+values of maintenance deficit yet lower levels of developer responsiveness.
+These repositories will be higher up in the graph (more positive values), yet
+with more dark purple colours.
+
+
+
+```{r load-pkg, echo = FALSE, message = FALSE}
+library (orgmetrics)
+```
+
+```{r load-data}
+data_maintenance <- readRDS ("results-maintenance-org.Rds")
+```
+
+```{r ojs-in-models}
+ojs_define (models_in = data_maintenance)
+```
+```{ojs}
+models = {
+    return transpose(models_in).map(row => ({
+        ...row,
+    }));
+}
+models_len = models.length
+```
+
+
+```{ojs plot-all-community-health-vars}
+Plot.plot({
+    height: 20 * models_len,
+    marginLeft: 60,
+    marginRight: 160,
+    marginTop: 50,
+    marginBottom: 50,
+    axis: null,
+    x: {
+        axis: "top",
+        grid: true,
+        label: "Maintenance Deficit"
+    },
+    y: { grid: true },
+    marks: [
+        Plot.barX(models, {
+            y: "package",
+            x: "maintenance",
+            sort: {y: "-x" },
+            fill: "dev_resp",
+        }),
+        Plot.barX(models,
+            Plot.pointer(
+            {
+                y: "package",
+                x: "maintenance",
+                sort: {y: "-x" },
+                stroke: "gray",
+                fill: "maintenance",
+                strokeWidth: 2,
+            })
+        ),
+        Plot.text(models, {
+            x: (d) => d.maintenance < 0 ? 0 : d.maintenance,
+            y: "package",
+            text: "package",
+            textAnchor: "start",
+            fontSize: 16,
+            dx: 5
+        })
+    ],
+    color: {
+        scheme: "Cool",
+        type: "ordinal"
+    }
+})
+```

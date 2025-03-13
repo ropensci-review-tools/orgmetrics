@@ -34,8 +34,7 @@ library (orgmetrics)
 ```
 
 ```{r load-data}
-dat_models <- readRDS ("results-org.Rds") |>
-    as.data.frame ()
+dat_models <- readRDS ("results-models.Rds")
 ```
 ```{r ojs-in-models}
 ojs_define (models_in = dat_models)

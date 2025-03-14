@@ -9,7 +9,15 @@ format:
     code-fold: false
 ---
 
-This page identifies maintenance priorities for individual repositories.
+This page identifies maintenance priorities for a selected repository, in
+terms of both [CHAOSS
+models](https://chaoss.community/kbtopic/all-metrics-models/), and the
+individual [CHAOSS metrics](https://chaoss.community/kbtopic/all-metrics/)
+which comprise those models.
+
+The "Outliers only" selector immediate below determines whether values shown
+for both models and metrics are outliers only (default of "true"), or whether
+all values are shown ("false").
 
 
 ```{r load-pkg, echo = FALSE, message = FALSE}
@@ -61,17 +69,14 @@ reposAll = metricsTranspose.map(function(item) {
     return item.package;
 });
 repos = Array.from(new Set(reposAll));
-viewof repo = Inputs.select(repos, {multiple: false, label: "Repository:"})
+viewof repo = Inputs.select(
+    repos,
+    {
+        multiple: false,
+        label: htl.html`<b>Repository:</b>`
+    }
+)
 ```
-
-## CHAOSS models
-
-This first graph shows scores for the various [CHAOSS (*Community Health
-Analytics in Open Source Software*)
-models](https://chaoss.community/kbtopic/all-metrics-models/) for a selected
-repository. Each of these models is an aggregation of several underlying
-[metrics](https://chaoss.community/kbtopic/all-metrics/), which can be examined
-in the following sub-section.
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
@@ -84,6 +89,16 @@ viewof outliersOnly = Inputs.radio(
     }
 )
 ```
+
+
+## CHAOSS models
+
+This first graph shows scores for the various [CHAOSS (*Community Health
+Analytics in Open Source Software*)
+models](https://chaoss.community/kbtopic/all-metrics-models/) for a selected
+repository. Each of these models is an aggregation of several underlying
+[metrics](https://chaoss.community/kbtopic/all-metrics/), which can be examined
+in the following sub-section.
 
 ```{ojs}
 models_all = {
@@ -105,6 +120,13 @@ model_repo_len = model_repo.length
 model_repo_ht_mult = model_repo_len < 10 ? 80 : 40
 ```
 
+```{ojs colour-scales}
+// Bar colours should be scaled to full data range, not just restricted range
+// of filtered data.
+fullScaleValues = model_repoAll.map(d => d.value);
+minVal = Math.min(...fullScaleValues);
+maxVal = Math.max(...fullScaleValues);
+```
 
 
 ```{ojs plot-filtered-repo-models}
@@ -150,7 +172,8 @@ Plot.plot({
     ],
     color: {
         scheme: "Cool",
-        type: "ordinal"
+        type: "linear",
+        domain: [minVal, maxVal]
     }
 })
 ```

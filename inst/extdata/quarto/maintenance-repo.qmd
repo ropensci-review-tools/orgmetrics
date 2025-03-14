@@ -28,6 +28,7 @@ library (orgmetrics)
 data_metrics <- readRDS ("results-metrics.Rds")
 data_metrics$value [which (is.na (data_metrics$value))] <- 0
 data_models <- readRDS ("results-models.Rds")
+data_repo_src <- readRDS ("results-data-repo-src.Rds")
 ```
 
 ```{r data outliers}
@@ -54,10 +55,16 @@ data_models <- data_models |>
 ```{r ojs-in-metrics}
 ojs_define (metrics_in = data_metrics)
 ojs_define (models_in = data_models)
+ojs_define (repo_src_in = data_repo_src)
 ```
 ```{ojs}
 metricsTranspose = {
     return transpose(metrics_in).map(row => ({
+        ...row,
+    }));
+}
+repo_src = {
+    return transpose(repo_src_in).map(row => ({
         ...row,
     }));
 }
@@ -76,6 +83,16 @@ viewof repo = Inputs.select(
         label: htl.html`<b>Repository:</b>`
     }
 )
+```
+
+<div style="margin-top: 20px; margin-bottom: 20px;"></div>
+
+```{ojs}
+// and get URL for selected repo
+repoURL = repo_src.filter(function(r) {
+    return r.package === repo
+})[0].url;
+htl.html`<div>Click here to see the <a href=${repoURL} target="_blank">${repo} repository</a>.</div>`
 ```
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>

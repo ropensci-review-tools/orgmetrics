@@ -26,6 +26,14 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
         data_metrics_preproces ()
     data_maintenance <- org_maintenance_metric (data_org)
 
+    # Plus mapping from repos to org/repo:
+    data_repo_src <- names (data_org$repos)
+    data_repo_src <- data.frame (
+        package = gsub ("^.*\\/", "", data_repo_src),
+        orgrepo = data_repo_src,
+        url = paste0 ("https://github.com/", data_repo_src)
+    )
+
     requireNamespace ("jsonlite")
     requireNamespace ("quarto")
     requireNamespace ("withr")
@@ -39,6 +47,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (data_models, fs::path (dir, "results-models.Rds"))
     saveRDS (data_metrics, fs::path (dir, "results-metrics.Rds"))
     saveRDS (data_maintenance, fs::path (dir, "results-maintenance-org.Rds"))
+    saveRDS (data_repo_src, fs::path (dir, "results-data-repo-src.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))
 

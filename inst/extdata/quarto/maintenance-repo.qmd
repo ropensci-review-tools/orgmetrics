@@ -19,10 +19,12 @@ library (orgmetrics)
 ```{r load-data}
 data_metrics <- readRDS ("results-metrics.Rds")
 data_metrics$value [which (is.na (data_metrics$value))] <- 0
+dat_models <- readRDS ("results-models.Rds")
 ```
 
 ```{r ojs-in-metrics}
 ojs_define (metrics_in = data_metrics)
+ojs_define (models_in = dat_models)
 ```
 ```{ojs}
 metrics = {
@@ -31,6 +33,15 @@ metrics = {
     }));
 }
 metrics_len = metrics.length
+
+models_all = {
+    return transpose(models_in).map(row => ({
+        ...row,
+    }));
+}
+models_final = models_all.filter(function(mod) {
+    return mod.name.includes("final")
+})
 ```
 
 ```{ojs get-all-repos}
@@ -47,9 +58,78 @@ metrics_repo = metrics.filter(function(mod) {
     return mod.package.includes(repo)
 })
 metrics_repo_len = metrics_repo.length
+model_repo = models_all.filter(function(mod) {
+    return mod.package.includes(repo) && mod.name !== "final"
+})
+model_repo_len = model_repo.length
 ```
 
-```{ojs plot-filtered-repo}
+## CHAOSS models
+
+This first graph shows scores for the various [CHAOSS (*Community Health
+Analytics in Open Source Software*)
+models](https://chaoss.community/kbtopic/all-metrics-models/) for a selected
+repository. Each of these models is an aggregation of several underlying
+[metrics](https://chaoss.community/kbtopic/all-metrics/), which can be examined
+in the following sub-section.
+
+
+```{ojs plot-filtered-repo-models}
+Plot.plot({
+    height: 40 * model_repo_len,
+    marginLeft: 60,
+    marginRight: 160,
+    marginTop: 50,
+    marginBottom: 50,
+    axis: null,
+    x: {
+        axis: "top",
+        grid: true,
+        label: "Model Scores"
+    },
+    y: { grid: true },
+    marks: [
+        Plot.barX(model_repo, {
+            y: "name",
+            x: "value",
+            sort: {y: "-x" },
+            fill: "value",
+        }),
+        Plot.barX(model_repo,
+            Plot.pointer(
+            {
+                y: "name",
+                x: "value",
+                sort: {y: "-x" },
+                stroke: "gray",
+                fill: "value",
+                strokeWidth: 2,
+            })
+        ),
+        Plot.text(model_repo, {
+            x: (d) => d.value < 0 ? 0 : d.value,
+            y: "name",
+            text: "name",
+            textAnchor: "start",
+            fontSize: 16,
+            dx: 5
+        })
+    ],
+    color: {
+        scheme: "Cool",
+        type: "ordinal"
+    }
+})
+```
+
+## CHAOSS metrics
+
+This graph provides more detailed insight into the state of the selected
+repository, through showing values for individual [CHAOSS
+metrics](https://chaoss.community/kbtopic/all-metrics/) used to inform the
+aggregate models.
+
+```{ojs plot-filtered-repo-metrics}
 Plot.plot({
     height: 40 * metrics_repo_len,
     marginLeft: 60,
@@ -60,7 +140,7 @@ Plot.plot({
     x: {
         axis: "top",
         grid: true,
-        label: "Community Health"
+        label: "Metric Scores"
     },
     y: { grid: true },
     marks: [

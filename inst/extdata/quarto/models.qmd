@@ -46,7 +46,7 @@ models_all = {
     }));
 }
 models_final = models_all.filter(function(mod) {
-    return mod.name.includes("final")
+    return mod.name === "final"
 })
 models_len = models_final.length
 ```
@@ -129,7 +129,7 @@ viewof commHealthVar = Inputs.select(
 
 ```{ojs}
 models_filtered = models_all.filter(function(mod) {
-    return mod.name.includes(commHealthVar)
+    return mod.name === commHealthVar
 })
 ```
 
@@ -198,7 +198,7 @@ viewof repo = Inputs.select(repos, {multiple: false, label: "Repository:"})
 
 ```{ojs}
 model_repo = models_all.filter(function(mod) {
-    return mod.package.includes(repo) && mod.name !== "final"
+    return mod.package === repo && mod.name !== "final"
 })
 model_repo_len = model_repo.length
 ```

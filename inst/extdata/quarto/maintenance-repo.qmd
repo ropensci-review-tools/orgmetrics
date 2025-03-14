@@ -19,57 +19,50 @@ library (orgmetrics)
 ```{r load-data}
 data_metrics <- readRDS ("results-metrics.Rds")
 data_metrics$value [which (is.na (data_metrics$value))] <- 0
-dat_models <- readRDS ("results-models.Rds")
+data_models <- readRDS ("results-models.Rds")
 ```
+
+```{r data outliers}
+threshold <- 0.9
+data_metrics <- data_metrics |>
+    dplyr::group_by (name) |>
+    dplyr::arrange (value) |>
+    dplyr::mutate (
+        outlier = dplyr::row_number (value) <= dplyr::n () * (1 - threshold) |
+            dplyr::row_number (value) >= dplyr::n () * threshold
+    ) |>
+    dplyr::arrange (package, dplyr::desc (value))
+data_models <- data_models |>
+    dplyr::group_by (name) |>
+    dplyr::arrange (value) |>
+    dplyr::mutate (
+        outlier = dplyr::row_number (value) <= dplyr::n () * (1 - threshold) |
+            dplyr::row_number (value) >= dplyr::n () * threshold
+    ) |>
+    dplyr::arrange (package, dplyr::desc (value))
+```
+
 
 ```{r ojs-in-metrics}
 ojs_define (metrics_in = data_metrics)
-ojs_define (models_in = dat_models)
+ojs_define (models_in = data_models)
 ```
 ```{ojs}
-metrics = {
+metricsTranspose = {
     return transpose(metrics_in).map(row => ({
         ...row,
     }));
 }
-metrics_len = metrics.length
-
-models_all = {
-    return transpose(models_in).map(row => ({
-        ...row,
-    }));
-}
-models_final = models_all.filter(function(mod) {
-    return mod.name === "final"
-})
 ```
 
 ```{ojs get-all-repos}
 // Get array of unique repo names for input selector:
-reposAll = metrics.map(function(item) {
+reposAll = metricsTranspose.map(function(item) {
     return item.package;
 });
 repos = Array.from(new Set(reposAll));
 viewof repo = Inputs.select(repos, {multiple: false, label: "Repository:"})
 ```
-
-```{ojs}
-metrics_repo = metrics.filter(function(mod) {
-    return mod.package === repo
-})
-metrics_repo_len = metrics_repo.length
-model_repo = models_all.filter(function(mod) {
-    return mod.package === repo && mod.name !== "final"
-})
-model_repo_len = model_repo.length
-```
-
-```{ojs}
-console.log("-----" + JSON.stringify(metrics_repo))
-
-```
-
-
 
 ## CHAOSS models
 
@@ -80,10 +73,43 @@ repository. Each of these models is an aggregation of several underlying
 [metrics](https://chaoss.community/kbtopic/all-metrics/), which can be examined
 in the following sub-section.
 
+<div style="margin-top: 20px; margin-bottom: 20px;"></div>
+
+```{ojs}
+viewof outliersOnly = Inputs.radio(
+    ["true", "false"],
+    {
+        value: "true",
+        label: htl.html`<b>Outliers only:</b>`,
+    }
+)
+```
+
+```{ojs}
+models_all = {
+    return transpose(models_in).map(row => ({
+        ...row,
+    }));
+}
+models_final = models_all.filter(function(mod) {
+    return mod.name === "final"
+})
+model_repoAll = models_all.filter(function(mod) {
+    return mod.package === repo && mod.name !== "final"
+})
+model_repo = outliersOnly === "true" ?
+    model_repoAll.filter(function(m) {
+        return m.outlier === true;
+    }) : model_repoAll;
+model_repo_len = model_repo.length
+model_repo_ht_mult = model_repo_len < 10 ? 80 : 40
+```
+
+
 
 ```{ojs plot-filtered-repo-models}
 Plot.plot({
-    height: 40 * model_repo_len,
+    height: model_repo_ht_mult * model_repo_len,
     marginLeft: 60,
     marginRight: 160,
     marginTop: 50,
@@ -135,6 +161,19 @@ This graph provides more detailed insight into the state of the selected
 repository, through showing values for individual [CHAOSS
 metrics](https://chaoss.community/kbtopic/all-metrics/) used to inform the
 aggregate models.
+
+```{ojs}
+metrics = outliersOnly === "true" ?
+    metricsTranspose.filter(function(m) {
+        return m.outlier === true;
+    }) : metricsTranspose;
+
+metrics_repo = metrics.filter(function(mod) {
+    return mod.package === repo
+})
+metrics_repo_len = metrics_repo.length
+```
+
 
 ```{ojs plot-filtered-repo-metrics}
 Plot.plot({

@@ -1,5 +1,5 @@
 ---
-title: "CHOASS Org"
+title: "Maintenance: Org"
 execute:
   echo: false
 format: 
@@ -8,6 +8,13 @@ format:
     fig-height: 4
     code-fold: false
 ---
+
+All graphs on this page are displayed such that darker, more purple colours are
+worse than lighter, more green colours. Graphs are also generally displayed
+with repositories with greater maintenance need plotted near the top, and those
+with less maintenance need near the bottom (or not included at all).
+
+## CHAOSS metrics and models
 
 This page uses CHAOSS metrics and models to identify maintenance deficits
 across all repositories within the `reconhub` and `epiverse-trace`
@@ -132,10 +139,7 @@ Plot.plot({
 
 -----
 
-## Maintenance Priorities
-
-
-### Proportion of issues that are bugs
+## Proportion of bugs
 
 This plot shows the propotion of all recent issues that are bug reports. Values
 are only shown for repositories for which > 25% of all issues are bugs.
@@ -205,7 +209,7 @@ Plot.plot({
 })
 ```
 
-### Proportion of labelled issues
+## Issue labelling
 
 And this shows the proportion of all issues that are labelled. Values are only
 shown for repositories with poor issue labelling.
@@ -259,7 +263,7 @@ Plot.plot({
 })
 ```
 
-### Issue response time
+## Issue response time
 
 This graph shows average response times to issues reported by people other than
 main repository maintainers.

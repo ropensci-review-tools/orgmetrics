@@ -73,6 +73,7 @@ issue_resp = {
         ...row,
     }));
 }
+issue_resp_len = issue_resp.length;
 issue_bugs = {
     return transpose(issue_bugs_in).map(row => ({
         ...row,
@@ -203,6 +204,8 @@ Plot.plot({
 })
 ```
 
+### Proportion of labelled issues
+
 And this shows the proportion of all issues that are labelled. Values are only
 shown for repositories with poor issue labelling.
 
@@ -241,6 +244,59 @@ Plot.plot({
         ),
         Plot.text(issue_labs_filt, {
             x: "labels",
+            y: "repo",
+            text: "repo",
+            textAnchor: "start",
+            fontSize: 16,
+            dx: 5
+        })
+    ],
+    color: {
+        scheme: "Cool",
+        type: "ordinal"
+    }
+})
+```
+
+### Issue response time
+
+This graph shows average response times to issues reported by people other than
+main repository maintainers.
+
+```{ojs plot-all-issue-resp-time}
+Plot.plot({
+    height: 20 * issue_resp_len,
+    marginLeft: 60,
+    marginRight: 160,
+    marginTop: 50,
+    marginBottom: 50,
+    axis: null,
+    x: {
+        axis: "top",
+        grid: true,
+        label: "Issue response time (days)"
+    },
+    y: { grid: true },
+    marks: [
+        Plot.barX(issue_resp, {
+            y: "repo",
+            x: "response",
+            sort: {y: "-x" },
+            fill: "response",
+        }),
+        Plot.barX(issue_resp,
+            Plot.pointer(
+            {
+                y: "repo",
+                x: "response",
+                sort: {y: "-x" },
+                stroke: "gray",
+                fill: "response",
+                strokeWidth: 2,
+            })
+        ),
+        Plot.text(issue_resp, {
+            x: "response",
             y: "repo",
             text: "repo",
             textAnchor: "start",

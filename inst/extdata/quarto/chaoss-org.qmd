@@ -78,7 +78,6 @@ issue_bugs = {
         ...row,
     }));
 }
-bugs_len = issue_bugs.length;
 ```
 
 
@@ -138,12 +137,22 @@ Plot.plot({
 ### Proportion of issues that are bugs
 
 This plot shows the propotion of all recent issues that are bug reports. Values
-are only shown for repositories with a lot of bugs.
+are only shown for repositories for which > 25% of all issues are bugs.
 
 ```{ojs}
 console.log("------ctb abs: " + JSON.stringify(ctb_abs));
 console.log("------issue_resp: " + JSON.stringify(issue_resp));
 console.log("------issue_bugs: " + JSON.stringify(issue_bugs));
+```
+```{ojs}
+issue_bugs_filt = issue_bugs.filter(function(i) {
+    return i.bugs >= 0.25
+});
+bugs_len = issue_bugs_filt.length;
+issue_labs_filt = issue_bugs.filter(function(i) {
+    return i.labels <= 0.5
+});
+labs_len = issue_labs_filt.length;
 ```
 
 ```{ojs plot-all-issue-bugs}
@@ -161,13 +170,13 @@ Plot.plot({
     },
     y: { grid: true },
     marks: [
-        Plot.barX(issue_bugs, {
+        Plot.barX(issue_bugs_filt, {
             y: "repo",
             x: "bugs",
             sort: {y: "-x" },
             fill: "dev_resp",
         }),
-        Plot.barX(issue_bugs,
+        Plot.barX(issue_bugs_filt,
             Plot.pointer(
             {
                 y: "repo",
@@ -178,7 +187,7 @@ Plot.plot({
                 strokeWidth: 2,
             })
         ),
-        Plot.text(issue_bugs, {
+        Plot.text(issue_bugs_filt, {
             x: "bugs",
             y: "repo",
             text: "repo",
@@ -200,7 +209,7 @@ shown for repositories with poor issue labelling.
 
 ```{ojs plot-all-issue-labels}
 Plot.plot({
-    height: 20 * bugs_len,
+    height: 20 * labs_len,
     marginLeft: 60,
     marginRight: 160,
     marginTop: 50,
@@ -213,24 +222,24 @@ Plot.plot({
     },
     y: { grid: true },
     marks: [
-        Plot.barX(issue_bugs, {
+        Plot.barX(issue_labs_filt, {
             y: "repo",
             x: "labels",
-            sort: {y: "-x" },
+            sort: {y: "x" },
             fill: "dev_resp",
         }),
-        Plot.barX(issue_bugs,
+        Plot.barX(issue_labs_filt,
             Plot.pointer(
             {
                 y: "repo",
                 x: "labels",
-                sort: {y: "-x" },
+                sort: {y: "x" },
                 stroke: "gray",
                 fill: "labels",
                 strokeWidth: 2,
             })
         ),
-        Plot.text(issue_bugs, {
+        Plot.text(issue_labs_filt, {
             x: "labels",
             y: "repo",
             text: "repo",

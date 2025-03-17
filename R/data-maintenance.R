@@ -162,8 +162,7 @@ issue_bugs <- function (data_org,
         bugs = label_dat [, 2]
     ) |>
         dplyr::filter (!is.na (labels)) |>
-        dplyr::arrange (dplyr::desc (bugs)) |>
-        dplyr::filter (bugs > 0.05)
+        dplyr::arrange (dplyr::desc (bugs))
     rownames (label_dat) <- NULL
 
     return (label_dat)

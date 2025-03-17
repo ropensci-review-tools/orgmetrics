@@ -29,6 +29,10 @@ data_metrics <- readRDS ("results-metrics.Rds")
 data_metrics$value [which (is.na (data_metrics$value))] <- 0
 data_models <- readRDS ("results-models.Rds")
 data_repo_src <- readRDS ("results-data-repo-src.Rds")
+
+data_ctb_abs <- readRDS ("results-data-ctb-absence.Rds")
+data_issue_resp <- readRDS ("results-data-issue-resp.Rds")
+data_issue_bugs <- readRDS ("results-data-issue-bugs.Rds")
 ```
 
 ```{r data outliers}
@@ -56,6 +60,9 @@ data_models <- data_models |>
 ojs_define (metrics_in = data_metrics)
 ojs_define (models_in = data_models)
 ojs_define (repo_src_in = data_repo_src)
+ojs_define (ctb_abs_in = data_ctb_abs)
+ojs_define (issue_resp_in = data_issue_resp)
+ojs_define (issue_bugs_in = data_issue_bugs)
 ```
 ```{ojs}
 metricsTranspose = {
@@ -65,6 +72,21 @@ metricsTranspose = {
 }
 repo_src = {
     return transpose(repo_src_in).map(row => ({
+        ...row,
+    }));
+}
+ctb_absTranspose = {
+    return transpose(ctb_abs_in).map(row => ({
+        ...row,
+    }));
+}
+issue_respTranspose = {
+    return transpose(issue_resp_in).map(row => ({
+        ...row,
+    }));
+}
+issue_bugsTranspose = {
+    return transpose(issue_bugs_in).map(row => ({
         ...row,
     }));
 }
@@ -106,6 +128,20 @@ viewof outliersOnly = Inputs.radio(
     }
 )
 ```
+
+```{ojs}
+ctb_abs = ctb_absTranspose.filter(function(r) {
+    return r.repo === repo
+})
+issue_resp = issue_respTranspose.filter(function(r) {
+    return r.repo === repo
+})
+issue_bugs = issue_bugsTranspose.filter(function(r) {
+    return r.repo === repo
+})
+```
+
+
 
 
 ## CHAOSS models

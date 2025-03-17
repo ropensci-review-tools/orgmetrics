@@ -39,6 +39,11 @@ dat_models <- readRDS ("results-models.Rds")
 ```{r ojs-in-models}
 ojs_define (models_in = dat_models)
 ```
+
+```{ojs plot-latest}
+Plot = import("https://esm.sh/@observablehq/plot")
+```
+
 ```{ojs}
 models_all = {
     return transpose(models_in).map(row => ({

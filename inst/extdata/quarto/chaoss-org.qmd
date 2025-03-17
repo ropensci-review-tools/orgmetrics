@@ -77,6 +77,12 @@ ojs_define (ctb_abs_ctb_in = data_ctb_abs_ctb)
 ojs_define (issue_resp_in = data_issue_resp)
 ojs_define (issue_bugs_in = data_issue_bugs)
 ```
+
+```{ojs plot-latest}
+Plot = import("https://esm.sh/@observablehq/plot")
+```
+
+
 ```{ojs}
 models = {
     return transpose(models_in).map(row => ({

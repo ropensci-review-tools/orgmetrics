@@ -7,8 +7,8 @@ website:
     type: express
   navbar:
     left:
-      - maintenance-org.qmd
-      - maintenance-repo.qmd
+      - chaoss-org.qmd
+      - chaoss-repo.qmd
       - models.qmd
       - network.qmd
     right:

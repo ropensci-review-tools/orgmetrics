@@ -4,10 +4,14 @@ title: "Organization-level Metrics and Models"
 
 This dashboard presents metrics and models for each repository within both the
 [`epiverse-trace`](https://github.com/epiverse-trace) and
-[`reconhub`](https://github.com/reconhub) GitHub organizations. The dashboard
-currently has three main pages:
+[`reconhub`](https://github.com/reconhub) GitHub organizations. It is intended
+to demonstrate the kinds of analyses and insights that are possible. It is
+intended to change and develop a lot. Please provide feedback via GitHub by
+clicking on the symbol on the top right.
 
-1. An [organization maintenance](./maintenance-org.html) page identifying
+The dashboard currently has three main pages:
+
+1. An [organization maintenance](./chaoss-org.html) page identifying
    maintenance priorities across all repositories.
 2. [*Community Models*](./models.html) summarising scores for the various
     [CHAOSS (*Community Health Analytics in Open Source Software*)

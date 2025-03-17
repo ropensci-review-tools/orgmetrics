@@ -1,5 +1,5 @@
 ---
-title: "Organization Maintenance"
+title: "CHOASS Org"
 execute:
   echo: false
 format: 
@@ -9,12 +9,13 @@ format:
     code-fold: false
 ---
 
-This page identifies maintenance deficits across all repositories within 
-the `reconhub` and `epiverse-trace` organizations. These deficits are higher
-for projects with more community engagement yet less developer responsiveness
-or activity. Repositories with higher maintenance deficits are presented first,
-with maintenance deficit decreasing down the page. Lengths of bars indicate
-community engagement minus developer responsiveness, so that:
+This page uses CHAOSS metrics and models to identify maintenance deficits
+across all repositories within the `reconhub` and `epiverse-trace`
+organizations. These deficits are higher for projects with more community
+engagement yet less developer responsiveness or activity. Repositories with
+higher maintenance deficits are presented first, with maintenance deficit
+decreasing down the page. Lengths of bars indicate community engagement minus
+developer responsiveness, so that:
 
 - More positive bars are higher up the page, and have high engagement yet lower
 developer responsiveness.

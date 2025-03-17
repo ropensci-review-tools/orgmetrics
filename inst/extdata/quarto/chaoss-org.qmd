@@ -53,7 +53,11 @@ library (orgmetrics)
 data_maintenance <- readRDS ("results-maintenance-org.Rds")
 
 data_ctb_abs <- readRDS ("results-data-ctb-absence.Rds")
-data_ctb_change <- dplyr::filter (data_ctb_abs, what == "change")
+data_ctb_change <- dplyr::filter (data_ctb_abs, what == "change") |>
+    dplyr::group_by (repo) |>
+    dplyr::summarise (measure = max (measure))
+# That is then not actually used any further, as data are secondary to main
+# measures of contributor absence.
 data_ctb_abs <- dplyr::filter (data_ctb_abs, what == "absence")
 data_ctb_abs_repo <- dplyr::group_by (data_ctb_abs, repo) |>
     dplyr::summarise (measure = max (measure), name = head (name, 1L)) |>

@@ -44,10 +44,17 @@ library (orgmetrics)
 
 ```{r load-data}
 data_maintenance <- readRDS ("results-maintenance-org.Rds")
+
+data_ctb_abs <- readRDS ("results-data-ctb-absence.Rds")
+data_issue_resp <- readRDS ("results-data-issue-resp.Rds")
+data_issue_bugs <- readRDS ("results-data-issue-bugs.Rds")
 ```
 
 ```{r ojs-in-models}
 ojs_define (models_in = data_maintenance)
+ojs_define (ctb_abs_in = data_ctb_abs)
+ojs_define (issue_resp_in = data_issue_resp)
+ojs_define (issue_bugs_in = data_issue_bugs)
 ```
 ```{ojs}
 models = {
@@ -55,7 +62,23 @@ models = {
         ...row,
     }));
 }
-models_len = models.length
+models_len = models.length;
+ctb_abs = {
+    return transpose(ctb_abs_in).map(row => ({
+        ...row,
+    }));
+}
+issue_resp = {
+    return transpose(issue_resp_in).map(row => ({
+        ...row,
+    }));
+}
+issue_bugs = {
+    return transpose(issue_bugs_in).map(row => ({
+        ...row,
+    }));
+}
+bugs_len = issue_bugs.length;
 ```
 
 
@@ -95,6 +118,122 @@ Plot.plot({
             x: (d) => d.maintenance < 0 ? 0 : d.maintenance,
             y: "package",
             text: "package",
+            textAnchor: "start",
+            fontSize: 16,
+            dx: 5
+        })
+    ],
+    color: {
+        scheme: "Cool",
+        type: "ordinal"
+    }
+})
+```
+
+-----
+
+## Maintenance Priorities
+
+
+### Proportion of issues that are bugs
+
+This plot shows the propotion of all recent issues that are bug reports. Values
+are only shown for repositories with a lot of bugs.
+
+```{ojs}
+console.log("------ctb abs: " + JSON.stringify(ctb_abs));
+console.log("------issue_resp: " + JSON.stringify(issue_resp));
+console.log("------issue_bugs: " + JSON.stringify(issue_bugs));
+```
+
+```{ojs plot-all-issue-bugs}
+Plot.plot({
+    height: 20 * bugs_len,
+    marginLeft: 60,
+    marginRight: 160,
+    marginTop: 50,
+    marginBottom: 50,
+    axis: null,
+    x: {
+        axis: "top",
+        grid: true,
+        label: "Proportion Bugs"
+    },
+    y: { grid: true },
+    marks: [
+        Plot.barX(issue_bugs, {
+            y: "repo",
+            x: "bugs",
+            sort: {y: "-x" },
+            fill: "dev_resp",
+        }),
+        Plot.barX(issue_bugs,
+            Plot.pointer(
+            {
+                y: "repo",
+                x: "bugs",
+                sort: {y: "-x" },
+                stroke: "gray",
+                fill: "bugs",
+                strokeWidth: 2,
+            })
+        ),
+        Plot.text(issue_bugs, {
+            x: "bugs",
+            y: "repo",
+            text: "repo",
+            textAnchor: "start",
+            fontSize: 16,
+            dx: 5
+        })
+    ],
+    color: {
+        scheme: "Cool",
+        type: "ordinal"
+    }
+})
+```
+
+And this shows the proportion of all issues that are labelled. Values are only
+shown for repositories with poor issue labelling.
+
+
+```{ojs plot-all-issue-labels}
+Plot.plot({
+    height: 20 * bugs_len,
+    marginLeft: 60,
+    marginRight: 160,
+    marginTop: 50,
+    marginBottom: 50,
+    axis: null,
+    x: {
+        axis: "top",
+        grid: true,
+        label: "Proportion Labelled"
+    },
+    y: { grid: true },
+    marks: [
+        Plot.barX(issue_bugs, {
+            y: "repo",
+            x: "labels",
+            sort: {y: "-x" },
+            fill: "dev_resp",
+        }),
+        Plot.barX(issue_bugs,
+            Plot.pointer(
+            {
+                y: "repo",
+                x: "labels",
+                sort: {y: "-x" },
+                stroke: "gray",
+                fill: "labels",
+                strokeWidth: 2,
+            })
+        ),
+        Plot.text(issue_bugs, {
+            x: "labels",
+            y: "repo",
+            text: "repo",
             textAnchor: "start",
             fontSize: 16,
             dx: 5

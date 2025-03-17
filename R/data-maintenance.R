@@ -64,7 +64,10 @@ ctb_absence <- function (data_org,
             repo = repo$rm$repo_from_gh_api$name,
             name = c (names (ctb_change), names (ctb_abs)),
             measure = c (as.numeric (ctb_change), as.numeric (ctb_abs)),
-            what = c (rep ("change", length (ctb_change)), rep ("absence", length (ctb_abs)))
+            what = c (
+                rep ("change", length (ctb_change)),
+                rep ("absence", length (ctb_abs))
+            )
         )
     })
 

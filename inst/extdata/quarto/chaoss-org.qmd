@@ -53,13 +53,23 @@ library (orgmetrics)
 data_maintenance <- readRDS ("results-maintenance-org.Rds")
 
 data_ctb_abs <- readRDS ("results-data-ctb-absence.Rds")
+data_ctb_change <- dplyr::filter (data_ctb_abs, what == "change")
+data_ctb_abs <- dplyr::filter (data_ctb_abs, what == "absence")
+data_ctb_abs_repo <- dplyr::group_by (data_ctb_abs, repo) |>
+    dplyr::summarise (measure = max (measure), name = head (name, 1L)) |>
+    dplyr::filter (measure >= 0.5)
+data_ctb_abs_ctb <- dplyr::group_by (data_ctb_abs, name) |>
+    dplyr::summarise (measure = mean (measure), n = dplyr::n ())
+
 data_issue_resp <- readRDS ("results-data-issue-resp.Rds")
 data_issue_bugs <- readRDS ("results-data-issue-bugs.Rds")
 ```
 
 ```{r ojs-in-models}
 ojs_define (models_in = data_maintenance)
-ojs_define (ctb_abs_in = data_ctb_abs)
+ojs_define (ctb_change_in = data_ctb_change)
+ojs_define (ctb_abs_repo_in = data_ctb_abs_repo)
+ojs_define (ctb_abs_ctb_in = data_ctb_abs_ctb)
 ojs_define (issue_resp_in = data_issue_resp)
 ojs_define (issue_bugs_in = data_issue_bugs)
 ```
@@ -70,11 +80,26 @@ models = {
     }));
 }
 models_len = models.length;
-ctb_abs = {
-    return transpose(ctb_abs_in).map(row => ({
+
+ctb_change = {
+    return transpose(ctb_change_in).map(row => ({
         ...row,
     }));
 }
+ctb_change_len = ctb_change.length;
+ctb_abs_repo = {
+    return transpose(ctb_abs_repo_in).map(row => ({
+        ...row,
+    }));
+}
+ctb_abs_repo_len = ctb_abs_repo.length;
+ctb_abs_ctb = {
+    return transpose(ctb_abs_ctb_in).map(row => ({
+        ...row,
+    }));
+}
+ctb_abs_ctb_len = ctb_abs_ctb.length;
+
 issue_resp = {
     return transpose(issue_resp_in).map(row => ({
         ...row,
@@ -144,11 +169,6 @@ Plot.plot({
 This plot shows the propotion of all recent issues that are bug reports. Values
 are only shown for repositories for which > 25% of all issues are bugs.
 
-```{ojs}
-console.log("------ctb abs: " + JSON.stringify(ctb_abs));
-console.log("------issue_resp: " + JSON.stringify(issue_resp));
-console.log("------issue_bugs: " + JSON.stringify(issue_bugs));
-```
 ```{ojs}
 issue_bugs_filt = issue_bugs.filter(function(i) {
     return i.bugs >= 0.25
@@ -302,6 +322,62 @@ Plot.plot({
         ),
         Plot.text(issue_resp, {
             x: "response",
+            y: "repo",
+            text: "repo",
+            textAnchor: "start",
+            fontSize: 16,
+            dx: 5
+        })
+    ],
+    color: {
+        scheme: "Cool",
+        type: "ordinal",
+        reverse: true
+    }
+})
+```
+
+## Contributor Absence
+
+This graph shows a metric of main contributor absence. Repositories are only
+shown for which main contributors have not recently contributed. The metric is
+the prooprtion of overall commits made by now absent contributors.
+
+
+```{ojs plot-all-ctb-abs}
+Plot.plot({
+    height: 20 * ctb_abs_repo_len,
+    marginLeft: 60,
+    marginRight: 160,
+    marginTop: 50,
+    marginBottom: 50,
+    axis: null,
+    x: {
+        axis: "top",
+        grid: true,
+        label: "Proportion of overall commits"
+    },
+    y: { grid: true },
+    marks: [
+        Plot.barX(ctb_abs_repo, {
+            y: "repo",
+            x: "measure",
+            sort: {y: "-x" },
+            fill: "measure",
+        }),
+        Plot.barX(ctb_abs_repo,
+            Plot.pointer(
+            {
+                y: "repo",
+                x: "measure",
+                sort: {y: "-x" },
+                stroke: "gray",
+                fill: "measure",
+                strokeWidth: 2,
+            })
+        ),
+        Plot.text(ctb_abs_repo, {
+            x: "measure",
             y: "repo",
             text: "repo",
             textAnchor: "start",

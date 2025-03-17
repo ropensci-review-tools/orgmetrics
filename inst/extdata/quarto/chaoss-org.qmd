@@ -175,7 +175,7 @@ Plot.plot({
             y: "repo",
             x: "bugs",
             sort: {y: "-x" },
-            fill: "dev_resp",
+            fill: "bugs",
         }),
         Plot.barX(issue_bugs_filt,
             Plot.pointer(
@@ -199,7 +199,8 @@ Plot.plot({
     ],
     color: {
         scheme: "Cool",
-        type: "ordinal"
+        type: "ordinal",
+        reverse: true
     }
 })
 ```
@@ -229,7 +230,7 @@ Plot.plot({
             y: "repo",
             x: "labels",
             sort: {y: "x" },
-            fill: "dev_resp",
+            fill: "labels",
         }),
         Plot.barX(issue_labs_filt,
             Plot.pointer(
@@ -306,7 +307,8 @@ Plot.plot({
     ],
     color: {
         scheme: "Cool",
-        type: "ordinal"
+        type: "ordinal",
+        reverse: true
     }
 })
 ```

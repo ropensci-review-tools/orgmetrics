@@ -79,3 +79,57 @@ ctb_absence <- function (data_org,
 
     return (abs)
 }
+
+issue_responses <- function (data_org,
+                             end_date = Sys.Date (),
+                             period = 365) {
+
+    start_date <- end_date - as.integer (period)
+
+    response_dat_all <- lapply (data_org$repos, function (repo) {
+
+        issues <- repo$rm$issues_from_gh_api
+        prop_labelled <- length (which (nzchar (issues$labels))) / nrow (issues)
+        ctbs_gh <- repo$rm$contribs_from_gh_api
+        n_ctbs <- cumsum (ctbs_gh$contributions / sum (ctbs_gh$contributions))
+        ctbs_main <- ctbs_gh$login [which (n_ctbs <= 0.9)]
+
+        issues_others <- issues |> dplyr::filter (!user_login %in% ctbs_main)
+        issue_cmts <- repo$rm$issue_comments_from_gh_api |>
+            dplyr::filter (issue_number %in% issues_others$number)
+        # Put issue author column on cmts:
+        index <- match (issue_cmts$issue_number, issues_others$number)
+        issue_cmts$issue_author <- issues_others$user_login [index]
+        issue_cmts <- dplyr::filter (issue_cmts, user_login != issue_author)
+        issue_cmt_first <- dplyr::group_by (issue_cmts, issue_number) |>
+            dplyr::slice_head (n = 1L)
+        index <- match (issue_cmt_first$issue_number, issues_others$number)
+        issue_cmt_first$opened_date <-
+            as.Date (issues_others$created_at [index])
+        issue_cmt_first <- dplyr::mutate (
+            issue_cmt_first,
+            created_at = as.Date (created_at)
+        ) |>
+            dplyr::select (-c (user_id, updated_at, issue_body)) |>
+            dplyr::mutate (
+                response_duration =
+                    difftime (created_at, opened_date, units = "days")
+            )
+
+        data.frame (
+            repo = rep (repo$rm$repo_from_gh_api$name, nrow (issue_cmt_first)),
+            issue_number = issue_cmt_first$issue_number,
+            created_at = issue_cmt_first$opened_date,
+            responded_at = issue_cmt_first$created_at,
+            response_duration = issue_cmt_first$response_duration
+        )
+    })
+
+    resp_dur <- do.call (rbind, response_dat_all) |>
+        dplyr::filter (created_at >= start_date & responded_at <= end_date) |>
+        dplyr::group_by (repo) |>
+        dplyr::summarise (response = as.integer (mean (response_duration, na.rm = TRUE))) |>
+        dplyr::arrange (dplyr::desc (response))
+
+    return (resp_dur)
+}

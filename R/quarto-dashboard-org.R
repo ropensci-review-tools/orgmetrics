@@ -26,6 +26,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
         data_metrics_preproces ()
     data_maintenance <- org_maintenance_metric (data_org)
     data_abs <- ctb_absence (data_org)
+    data_resp <- issue_responses (data_org)
 
     # Plus mapping from repos to org/repo:
     data_repo_src <- names (data_org$repos)
@@ -50,6 +51,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (data_maintenance, fs::path (dir, "results-maintenance-org.Rds"))
     saveRDS (data_repo_src, fs::path (dir, "results-data-repo-src.Rds"))
     saveRDS (data_abs, fs::path (dir, "results-data-ctb-absence.Rds"))
+    saveRDS (data_resp, fs::path (dir, "results-data-issue-resp.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))
 

@@ -133,3 +133,38 @@ issue_responses <- function (data_org,
 
     return (resp_dur)
 }
+
+issue_bugs <- function (data_org,
+                        end_date = Sys.Date (),
+                        period = 365) {
+
+    start_date <- end_date - as.integer (period)
+
+    label_dat <- t (vapply (data_org$repos, function (repo) {
+
+        issues <- repo$rm$issues_from_gh_api |>
+            dplyr::filter (created_at >= start_date)
+        prop_labelled <- length (which (nzchar (issues$labels))) / nrow (issues)
+
+        bug_label <- grepl ("bug|problem", issues$label, ignore.case = TRUE)
+        bug_title <- grepl ("bug|problem|issue", issues$title, ignore.case = TRUE)
+        bug_body <- grepl ("bug|problem|issue", issues$issue_body, ignore.case = TRUE)
+        is_bug <- bug_label | bug_title | bug_body
+
+        prop_bugs <- length (which (is_bug)) / nrow (issues)
+
+        c (prop_labelled, prop_bugs)
+    }, numeric (2L)))
+
+    label_dat <- data.frame (
+        repo = gsub ("^.*\\/", "", rownames (label_dat)),
+        labels = label_dat [, 1],
+        bugs = label_dat [, 2]
+    ) |>
+        dplyr::filter (!is.na (labels)) |>
+        dplyr::arrange (dplyr::desc (bugs)) |>
+        dplyr::filter (bugs > 0.05)
+    rownames (label_dat) <- NULL
+
+    return (label_dat)
+}

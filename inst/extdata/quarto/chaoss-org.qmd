@@ -9,6 +9,30 @@ format:
     code-fold: false
 ---
 
+This page details maintenance needs for each repository within the `reconhub`
+and `epiverse-trace` organizations. The initial section presents [CHAOSS
+(*Community Health Analytics in Open Source Software*) models and
+metrics](https://chaoss.community/kb-metrics-and-metrics-models/) for each
+repository. The metrics are direct repository-level measures of a variety of
+aspects indicative of open-source community or repository health. The models
+represent higher level conceptual aggregations of metrics, designed by the
+CHAOSS community to represent important and more abstracted aspects of
+community health.
+
+The single graph here converts the models into a single measure of "maintainer
+deficit", which is a ratio of community engagement to developer responsiveness.
+The [*Community Health* page](./models.html) provides full detail of individual
+models and metrics.
+
+Following that graph are several more distinct indicators of maintenance need,
+all of which are assessed over the previous year of repository activity:
+
+- The proportion of new issues openend that were bug reports
+- The proportion of issues with labels
+- The average time for a core maintainer to respond to a new issue
+- A couple of metrics of "contributor absence" for each repository, indicating
+maintenance deficit arising through absence of primary contributors.
+
 All graphs on this page are displayed such that darker, more purple colours are
 worse than lighter, more green colours. Graphs are also generally displayed
 with repositories with greater maintenance need plotted near the top, and those
@@ -77,12 +101,6 @@ ojs_define (ctb_abs_ctb_in = data_ctb_abs_ctb)
 ojs_define (issue_resp_in = data_issue_resp)
 ojs_define (issue_bugs_in = data_issue_bugs)
 ```
-
-```{ojs plot-latest}
-Plot = import("https://esm.sh/@observablehq/plot")
-```
-
-
 ```{ojs}
 models = {
     return transpose(models_in).map(row => ({
@@ -242,7 +260,7 @@ Plot.plot({
 ## Issue labelling
 
 And this shows the proportion of all issues that are labelled. Values are only
-shown for repositories with poor issue labelling.
+shown for repositories with poor issue labelling (< 50%).
 
 
 ```{ojs plot-all-issue-labels}
@@ -295,8 +313,8 @@ Plot.plot({
 
 ## Issue response time
 
-This graph shows average response times to issues reported by people other than
-main repository maintainers.
+This graph shows average response times (in days) to issues reported by people
+other than main repository maintainers.
 
 ```{ojs plot-all-issue-resp-time}
 Plot.plot({

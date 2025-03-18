@@ -9,15 +9,18 @@ format:
     code-fold: false
 ---
 
-This page summarises scores for the various [CHAOSS (*Community Health
-Analytics in Open Source Software*)
-models](https://chaoss.community/kb-metrics-and-metrics-models/) for each
-repository. The CHAOSS project has developed a large range of individual
-metrics of community health. These metrics are aggregated into [conceptual
-*models*](https://chaoss.community/kbtopic/all-metrics-models/) which aim to
-synthesise prominent aspects of community health. This page provides insights
-into a range of those models, assessed for each repository in the
-`epiverse-trace` and `reconhub` GitHub organizations.
+The [*Organizational Maintenance*](./chaoss-org.html) and [*Repository
+Maintenance*](./chaoss-repo.html) pages provide various insights into
+maintenance deficits and needs across the whole organization and within
+individual repositories. This page provides more detail on the various [CHAOSS
+(*Community Health Analytics in Open Source Software*)
+models](https://chaoss.community/kb-metrics-and-metrics-models/) used to
+generate values shown on those two pages. Each of these conceptual models
+aggregates various individual metrics, and aims to synthesise prominent aspects
+of community health. This page provides insights into a range of those models,
+assessed for each repository in the `epiverse-trace` and `reconhub` GitHub
+organizations. Details of individual metrics can be seen on the [*Repository
+Maintenance* page](./chaoss-repo.html).
 
 ## Aggregate Community Health
 
@@ -39,11 +42,6 @@ dat_models <- readRDS ("results-models.Rds")
 ```{r ojs-in-models}
 ojs_define (models_in = dat_models)
 ```
-
-```{ojs plot-latest}
-Plot = import("https://esm.sh/@observablehq/plot")
-```
-
 ```{ojs}
 models_all = {
     return transpose(models_in).map(row => ({

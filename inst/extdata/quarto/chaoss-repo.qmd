@@ -1,5 +1,5 @@
 ---
-title: "CHOASS Repo"
+title: "Maintenance: Repo"
 execute:
   echo: false
 format: 
@@ -13,7 +13,9 @@ This page identifies maintenance priorities for a selected repository, in
 terms of both [CHAOSS
 models](https://chaoss.community/kbtopic/all-metrics-models/), and the
 individual [CHAOSS metrics](https://chaoss.community/kbtopic/all-metrics/)
-which comprise those models.
+which comprise those models. In its present state, this is mostly a
+proof-of-concept, and is not as well developed as the accompanying
+[*Organizational Maintenance* page](./chaoss-org.html).
 
 The "Outliers only" selector immediate below determines whether values shown
 for both models and metrics are outliers only (default of "true"), or whether
@@ -64,11 +66,6 @@ ojs_define (ctb_abs_in = data_ctb_abs)
 ojs_define (issue_resp_in = data_issue_resp)
 ojs_define (issue_bugs_in = data_issue_bugs)
 ```
-
-```{ojs plot-latest}
-Plot = import("https://esm.sh/@observablehq/plot")
-```
-
 ```{ojs}
 metricsTranspose = {
     return transpose(metrics_in).map(row => ({

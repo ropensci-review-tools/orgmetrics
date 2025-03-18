@@ -10,10 +10,15 @@ format:
 ---
 
 This page shows an interactive network diagram of "epiverse" packages, intended
-to demonstrate possible ways to view relationships between packages. The main
-functional component is the slider for "*Dependencies vs Code Similarity". This
-controls the thickness of lines connecting packages, with lines only shown for
-packages which have direct dependencies on one another.
+to demonstrate possible ways to view relationships between packages. The page
+will likely be updated to present two separate network diagrams, one for
+relationships between packages, to enable visual identification of the
+centrality of individual packages, and one for relationships between people.
+
+In current form, the main functional component is the slider for "*Dependencies
+vs Code Similarity". This controls the thickness of lines connecting packages,
+with lines only shown for packages which have direct dependencies on one
+another.
 
 - For a value of zero, lines directly reflect (relative) numbers of function
 calls made from one package (in orange) to another (in blue).

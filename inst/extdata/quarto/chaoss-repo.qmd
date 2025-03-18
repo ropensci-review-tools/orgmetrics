@@ -105,13 +105,16 @@ reposAll = metricsTranspose.map(function(item) {
     return item.package;
 });
 repos = Array.from(new Set(reposAll));
+repoSet = localStorage.getItem("orgmetricsRepo") || repos [0]
 viewof repo = Inputs.select(
     repos,
     {
         multiple: false,
+        value: repoSet,
         label: htl.html`<b>Repository:</b>`
     }
 )
+localStorage.setItem("orgmetricsRepo", repo.toString());
 ```
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>

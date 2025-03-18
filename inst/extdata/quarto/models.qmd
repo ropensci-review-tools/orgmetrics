@@ -201,7 +201,16 @@ reposAll = models_all.map(function(item) {
     return item.package;
 });
 repos = Array.from(new Set(reposAll));
-viewof repo = Inputs.select(repos, {multiple: false, label: "Repository:"})
+repoSet = localStorage.getItem("orgmetricsRepo") || repos [0]
+viewof repo = Inputs.select(
+    repos,
+    {
+        multiple: false,
+        value: repoSet,
+        label: htl.html`<b>Repository:</b>`
+    }
+)
+localStorage.setItem("orgmetricsRepo", repo.toString());
 ```
 
 ```{ojs}

@@ -23,7 +23,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
         dplyr::select (-org, -date) |>
         tidyr::pivot_longer (-package)
     data_metrics <- data_metrics_to_df (data_org$metrics) |>
-        data_metrics_preproces ()
+        data_metrics_preprocess ()
     data_maintenance <- org_maintenance_metric (data_org)
     data_abs <- ctb_absence (data_org)
     data_resp <- issue_responses (data_org)

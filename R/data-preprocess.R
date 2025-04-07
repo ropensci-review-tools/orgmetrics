@@ -54,7 +54,7 @@ data_metrics_to_df <- function (data_metrics) {
 #' long-form tibble reduced to re-scaled values of latest metrics only for each
 #' package.
 #' @noRd
-data_metrics_preproces <- function (data_metrics) {
+data_metrics_preprocess <- function (data_metrics) {
 
     # Suppress no visible binding notes:
     org <- date <- package <- NULL

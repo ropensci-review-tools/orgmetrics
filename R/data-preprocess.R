@@ -54,12 +54,12 @@ data_metrics_to_df <- function (data_metrics) {
 #' long-form tibble reduced to re-scaled values of latest metrics only for each
 #' package.
 #' @noRd
-data_metrics_preprocess <- function (data_metrics) {
+data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
 
     # Suppress no visible binding notes:
     org <- date <- package <- NULL
 
-    data_metrics |>
+    data_metrics <- data_metrics |>
         dplyr::mutate (
             dplyr::across (dplyr::where (is.logical), as.numeric)
         ) |>
@@ -67,9 +67,13 @@ data_metrics_preprocess <- function (data_metrics) {
             dplyr::across (dplyr::where (is.numeric), ~ scale (.) [, 1])
         ) |>
         dplyr::group_by (package) |>
-        dplyr::slice_head (n = 1L) |>
-        dplyr::select (-org, -date) |>
-        tidyr::pivot_longer (-package)
+        dplyr::slice_head (n = 1L)
+    if (longer) {
+        data_metrics <- data_metrics |>
+            dplyr::select (-org, -date) |>
+            tidyr::pivot_longer (-package)
+    }
+    return (data_metrics)
 }
 
 #' Pre-process organization data by converting all model values to standard

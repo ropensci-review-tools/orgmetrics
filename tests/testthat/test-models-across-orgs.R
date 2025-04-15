@@ -45,7 +45,7 @@ test_that ("org data preprocessing", {
     expect_s3_class (metrics_df, "data.frame")
     expect_equal (nrow (metrics_df), 4L) # one year with 3-month intervals
     expect_equal (ncol (metrics_df), 51L) # one year with 3-month intervals
-    expect_equal (names (metrics_df) [1:3], c ("org", "package", "date"))
+    expect_equal (names (metrics_df) [1:3], c ("package", "org", "date"))
     classes <- vapply (
         names (metrics_df),
         function (n) class (metrics_df [[n]]),
@@ -60,7 +60,7 @@ test_that ("org data preprocessing", {
     # This is not true, but should be. Have to update repometrics to ensure:
     # expect_true (all (names (classes)) %in% mod_dat$metrics$names)
 
-    data_pre <- data_metrics_preproces (metrics_df)
+    data_pre <- data_metrics_preprocess (metrics_df)
     expect_s3_class (data_pre, "data.frame")
     expect_equal (ncol (data_pre), 3L)
     expect_equal (names (data_pre), c ("package", "name", "value"))
@@ -80,7 +80,16 @@ test_that ("org data preprocessing", {
         expect_false (any (is.na (data_maintenance [[n]])))
     }
 
-    models_df <- data_models_preprocess (data_org$models)
+
+    # data_models needs > 1 package to generate meaningful results:
+    data_models <- data_org$models
+    data_models$package <- paste0 (
+        data_models$package,
+        "/",
+        letters [seq_len (nrow (data_models))]
+    )
+
+    models_df <- data_models_preprocess (data_models)
     expect_s3_class (models_df, "data.frame")
     expect_true (nrow (models_df) > 0L)
     expect_equal (ncol (models_df), 17L)

@@ -1,0 +1,38 @@
+---
+title: "Overview"
+execute:
+  echo: false
+format: 
+  dashboard:
+    theme: lux
+  html:
+    fig-width: 8
+    fig-height: 4
+    code-fold: false
+---
+
+
+```{r}
+x <- 1
+y <- 2
+```
+
+## Row {height=10%}
+
+First row
+
+## Row {height=30%}
+
+::: {.valuebox color="info" title="First Box"}
+
+`{r} x`
+:::
+
+::: {.valuebox color="success" title="Second box"}
+
+`{r} y`
+:::
+
+
+
+

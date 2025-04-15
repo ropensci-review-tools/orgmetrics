@@ -20,8 +20,8 @@ add_gh_token_to_req <- function (req) {
 
     if (!nzchar (Sys.getenv ("GITHUB_WORKFLOW"))) {
         tok <- get_gh_token ()
-        headers <- list (Authorization = paste0 ("Bearer ", tok))
-        req <- httr2::req_headers (req, "Authorization" = headers)
+        req <- req |>
+            httr2::req_headers ("Authorization" = paste0 ("Bearer ", tok))
     }
 
     return (req)

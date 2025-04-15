@@ -80,7 +80,16 @@ test_that ("org data preprocessing", {
         expect_false (any (is.na (data_maintenance [[n]])))
     }
 
-    models_df <- data_models_preprocess (data_org$models)
+
+    # data_models needs > 1 package to generate meaningful results:
+    data_models <- data_org$models
+    data_models$package <- paste0 (
+        data_models$package,
+        "/",
+        letters [seq_len (nrow (data_models))]
+    )
+
+    models_df <- data_models_preprocess (data_models)
     expect_s3_class (models_df, "data.frame")
     expect_true (nrow (models_df) > 0L)
     expect_equal (ncol (models_df), 17L)

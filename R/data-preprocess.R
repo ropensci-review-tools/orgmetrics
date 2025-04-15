@@ -35,8 +35,8 @@ data_metrics_to_df <- function (data_metrics) {
     data_metrics_df <- lapply (seq_along (data_metrics), function (i) {
         df <- lapply (seq_along (data_metrics [[i]]), function (j) {
             data.frame (
-                org = gsub ("\\/.*$", "", names (data_metrics) [i]),
                 package = gsub ("^.*\\/", "", names (data_metrics) [i]),
+                org = gsub ("\\/.*$", "", names (data_metrics) [i]),
                 date = names (data_metrics [[i]]) [j],
                 as.data.frame (data_metrics [[i]] [[j]])
             )
@@ -86,14 +86,26 @@ data_models_preprocess <- function (data_models) {
     # Suppress no visible binding notes:
     package <- final <- NULL
 
-    data_models |>
-        dplyr::mutate (
-            dplyr::across (dplyr::where (is.numeric), ~ scale (.) [, 1])
-        ) |>
+    dm <- data_models |>
         dplyr::group_by (package) |>
         dplyr::slice_head (n = 1L) |>
         dplyr::mutate (org = gsub ("\\/.*$", "", package), .after = package) |>
-        dplyr::mutate (package = gsub ("^.*\\/", "", package)) |>
+        dplyr::mutate (package = gsub ("^.*\\/", "", package))
+
+    is_numeric <- vapply (
+        names (dm),
+        function (n) is.numeric (dm [[n]]),
+        logical (1L)
+    )
+    index <- which (is_numeric)
+    dm [, index] <- scale (dm [, index])
+    dm [, index] <- apply (
+        dm [, index],
+        2,
+        function (i) (i - min (i)) / diff (range (i))
+    )
+
+    dm |>
         dplyr::mutate (
             final = sum (dplyr::across (dplyr::where (is.numeric))),
             .after = "date"

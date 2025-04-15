@@ -92,18 +92,20 @@ data_models_preprocess <- function (data_models) {
         dplyr::mutate (org = gsub ("\\/.*$", "", package), .after = package) |>
         dplyr::mutate (package = gsub ("^.*\\/", "", package))
 
-    is_numeric <- vapply (
-        names (dm),
-        function (n) is.numeric (dm [[n]]),
-        logical (1L)
-    )
-    index <- which (is_numeric)
-    dm [, index] <- scale (dm [, index])
-    dm [, index] <- apply (
-        dm [, index],
-        2,
-        function (i) (i - min (i)) / diff (range (i))
-    )
+    if (nrow (dm) > 1L) {
+        is_numeric <- vapply (
+            names (dm),
+            function (n) is.numeric (dm [[n]]),
+            logical (1L)
+        )
+        index <- which (is_numeric)
+        dm [, index] <- scale (dm [, index])
+        dm [, index] <- apply (
+            dm [, index],
+            2,
+            function (i) (i - min (i)) / diff (range (i))
+        )
+    }
 
     dm |>
         dplyr::mutate (

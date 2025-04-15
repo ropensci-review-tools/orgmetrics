@@ -45,7 +45,7 @@ test_that ("org data preprocessing", {
     expect_s3_class (metrics_df, "data.frame")
     expect_equal (nrow (metrics_df), 4L) # one year with 3-month intervals
     expect_equal (ncol (metrics_df), 51L) # one year with 3-month intervals
-    expect_equal (names (metrics_df) [1:3], c ("org", "package", "date"))
+    expect_equal (names (metrics_df) [1:3], c ("package", "org", "date"))
     classes <- vapply (
         names (metrics_df),
         function (n) class (metrics_df [[n]]),

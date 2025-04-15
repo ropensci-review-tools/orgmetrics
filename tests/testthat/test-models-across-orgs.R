@@ -60,7 +60,7 @@ test_that ("org data preprocessing", {
     # This is not true, but should be. Have to update repometrics to ensure:
     # expect_true (all (names (classes)) %in% mod_dat$metrics$names)
 
-    data_pre <- data_metrics_preproces (metrics_df)
+    data_pre <- data_metrics_preprocess (metrics_df)
     expect_s3_class (data_pre, "data.frame")
     expect_equal (ncol (data_pre), 3L)
     expect_equal (names (data_pre), c ("package", "name", "value"))

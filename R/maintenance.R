@@ -12,7 +12,7 @@ org_maintenance_metric <- function (data_org) {
     value <- name <- package <- comm_engage <- dev_resp <- maintenance <- NULL
 
     data_metrics <- data_metrics_to_df (data_org$metrics) |>
-        data_metrics_preproces ()
+        data_metrics_preprocess ()
 
     mod_dat <- load_model_json_data ()$models
     stopifnot (all (models_comm_engage %in% names (mod_dat)))

@@ -37,7 +37,7 @@ bs_theme_dependencies(bs_theme(preset = "bootstrap")) |>
 
 
 
-## Value boxes 
+## Value boxes
 
 ```{r sparkline-plot, echo = FALSE}
 set.seed(4242)
@@ -168,12 +168,11 @@ bslib::card(
         plotly_widget
     ),
     card_body(
-        class = "lead container",
+        class = "card-text",
         lorem::ipsum(paragraphs = 10, sentences = 5)
     )
 )
 ```
-
 
 ::::
 
@@ -204,7 +203,6 @@ navset_card_tab(
 ::::
 
 :::::
-
 
 ---
 

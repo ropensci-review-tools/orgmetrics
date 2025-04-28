@@ -36,7 +36,6 @@ bs_theme_dependencies(bs_theme(preset = "bootstrap")) |>
 ```
 
 
-
 ## Value boxes
 
 ```{r sparkline-plot, echo = FALSE}
@@ -88,7 +87,7 @@ sparkline_plot <- function() {
 }
 ```
 
-:::::{.grid}
+:::{.grid}
 
 ::::{.g-col-12 .g-col-md-4}
 
@@ -136,7 +135,8 @@ bslib::value_box(
 ```
 
 ::::
-:::::
+
+:::
 
 ---
 
@@ -152,7 +152,6 @@ line_widget <- plot_ly(linedat, x = ~x, y = ~y) |>
     config(displayModeBar = FALSE) |>
     layout(margin = list(t = 0, b = 0, l = 0, r = 0))
 ```
-
 
 :::::{.grid}
 
@@ -206,6 +205,7 @@ navset_card_tab(
 
 ---
 
+<div class="text-paragraph">
 
 This page details maintenance needs for each repository within the `reconhub`
 and `epiverse-trace` organizations. The initial section presents [CHAOSS
@@ -265,6 +265,7 @@ values of maintenance deficit yet lower levels of developer responsiveness.
 These repositories will be higher up in the graph (more positive values), yet
 with more dark purple colours.
 
+</div>
 
 
 ```{r load-pkg, echo = FALSE, message = FALSE}

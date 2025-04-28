@@ -22,7 +22,10 @@ Imports:
     pbapply,
     repometrics
 Suggests:
+    bsicons,
+    bslib,
     desc,
+    htmltools,
     httptest2,
     jsonlite,
     pkgmatch,

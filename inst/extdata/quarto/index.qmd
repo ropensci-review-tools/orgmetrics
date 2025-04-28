@@ -7,30 +7,6 @@ format:
     theme: yeti
 ---
 
-This dashboard presents metrics and models for each repository within both the
-[`epiverse-trace`](https://github.com/epiverse-trace) and
-[`reconhub`](https://github.com/reconhub) GitHub organizations. It is intended
-to demonstrate the kinds of analyses and insights that are possible. It is
-intended to change and develop a lot. Please provide feedback via GitHub by
-clicking on the symbol on the top right.
-
-The dashboard currently has three main pages:
-
-1. An [organization maintenance](./chaoss-org.html) page identifying
-   maintenance priorities across all repositories.
-2. A [repository maintenance](./chaoss-repo.html) page providing additional
-   detail on maintenance needs of a selected repository.
-3. A [*Community Health*](./models.html) summarising scores for the various
-   [CHAOSS (*Community Health Analytics in Open Source Software*)
-    models and
-    metrics](https://chaoss.community/kb-metrics-and-metrics-models/) for each
-    repository.
-
-There is also an additional [network diagram page](./network.html), showing
-strengths of relationship between each repository.
-
------
-
 ```{r message = FALSE}
 library (bslib)
 library (bsicons)
@@ -58,8 +34,6 @@ bs_theme_dependencies(bs_theme(
     htmltools::tagList()
 ```
 
-
-## Value boxes
 
 ```{r sparkline-plot, echo = FALSE}
 set.seed(4242)
@@ -227,3 +201,26 @@ navset_card_tab(
 :::::
 
 ---
+
+This dashboard presents metrics and models for each repository within both the
+[`epiverse-trace`](https://github.com/epiverse-trace) and
+[`reconhub`](https://github.com/reconhub) GitHub organizations. It is intended
+to demonstrate the kinds of analyses and insights that are possible. It is
+intended to change and develop a lot. Please provide feedback via GitHub by
+clicking on the symbol on the top right.
+
+The dashboard currently has three main pages:
+
+1. An [organization maintenance](./chaoss-org.html) page identifying
+   maintenance priorities across all repositories.
+2. A [repository maintenance](./chaoss-repo.html) page providing additional
+   detail on maintenance needs of a selected repository.
+3. A [*Community Health*](./models.html) summarising scores for the various
+   [CHAOSS (*Community Health Analytics in Open Source Software*)
+    models and
+    metrics](https://chaoss.community/kb-metrics-and-metrics-models/) for each
+    repository.
+
+There is also an additional [network diagram page](./network.html), showing
+strengths of relationship between each repository.
+

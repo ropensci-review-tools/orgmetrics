@@ -225,7 +225,7 @@ Plot.plot({
 })
 ```
 
-## Line Plot
+## Line Plot {.active}
 
 ```{ojs}
 Plot.plot({

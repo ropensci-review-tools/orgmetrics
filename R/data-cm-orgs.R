@@ -52,12 +52,14 @@ orgmetrics_collate_org_data <- function (org_paths, end_date = Sys.Date, num_yea
     rm_tmp_pkg_files (or)
 
     annual_commits <- org_annual_commits (org_paths)
+    annual_gh_activity <- org_annual_gh_activity (pkgs_repos)
 
     data <- list (
         repos = pkgs_repos,
         metrics = pkgs_metrics,
         models = pkgs_models,
-        annual_commits = annual_commits
+        annual_commits = annual_commits,
+        annual_gh_activity = annual_gh_activity
     )
 
     return (data)
@@ -91,4 +93,41 @@ org_annual_commits <- function (org_paths) {
         year = names (annual_commits),
         num_commits = as.integer (annual_commits)
     )
+}
+
+org_annual_gh_activity <- function (pkgs_repos) {
+    annual_gh <- lapply (pkgs_repos, function (repo) {
+        issues <- repo$rm$issues_from_gh_api
+        prs <- repo$rm$prs_from_gh_api
+        issue_cmts <- repo$rm$issue_comments_from_gh_api
+
+        issues_created_at <- as.integer (gsub ("\\-.*$", "", issues$created_at))
+        prs_created_at <- as.integer (gsub ("\\-.*$", "", prs$created_at))
+        cmts_created_at <- as.integer (gsub ("\\-.*$", "", issue_cmts$created_at))
+
+        list (
+            issues = issues_created_at,
+            prs = prs_created_at,
+            cmts = cmts_created_at
+        )
+    })
+
+    years <- unlist (lapply (annual_gh, function (i) i$issues))
+    years <- seq (min (years), max (years))
+    res <- lapply (c ("issues", "prs", "cmts"), function (what) {
+        data <- lapply (annual_gh, function (i) i [[what]]) |>
+            unlist () |>
+            table ()
+        data_years <- rep (0L, length (years))
+        index <- match (names (data), years)
+        data_years [index] <- as.integer (data)
+        return (data_years)
+    })
+    data.frame (
+        year = years,
+        issues = res [[1]],
+        prs = res [[2]],
+        cmts = res [[3]]
+    )
+
 }

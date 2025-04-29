@@ -67,55 +67,45 @@ sparkline_plot <- function() {
 }
 ```
 
-:::{.grid}
-
-::::{.g-col-12 .g-col-md-4}
 ```{r echo = FALSE, message = TRUE}
 lines <- paste0 (unname (repo_orgs), " from ", names (repo_orgs))
-bslib::value_box(
-    title = "There are",
-    value = paste0 (format (num_repos, big.mark = ","), " repositories"),
-    showcase = bsicons::bs_icon("award"),
-    theme = "bg-gradient-teal-orange",
-    htmltools::p("including"),
-    htmltools::p(bsicons::bs_icon("1-square"), lines [1]),
-    htmltools::p(bsicons::bs_icon("2-square"), lines [2])
+bslib::page_fillable (
+    bslib::layout_columns (
+        bslib::value_box(
+            title = "There are",
+            value = paste0 (format (num_repos, big.mark = ","), " repositories"),
+            showcase = bsicons::bs_icon("award"),
+            theme = "bg-gradient-teal-orange",
+            htmltools::p("including"),
+            htmltools::p(bsicons::bs_icon("1-square"), lines [1]),
+            htmltools::p(bsicons::bs_icon("2-square"), lines [2])
+        ),
+        bslib::value_box(
+            title = "Total commits:",
+            value = format (sum (annual_commits$num_commits), big.mark = ","),
+            htmltools::p(
+                "between ",
+                min (as.integer (annual_commits$year)),
+                " and ",
+                max (as.integer (annual_commits$year))
+            ),
+            showcase = sparkline_plot(),
+            showcase_layout = "bottom",
+            class = "border"
+        ),
+        value_box(
+            title = "KPI Title",
+            h1(HTML("$1 <i>Billion</i> Dollars")),
+            span(
+                bsicons::bs_icon("arrow-up"),
+                " 30% VS PREVIOUS 30 DAYS"
+            ),
+            showcase = bsicons::bs_icon("piggy-bank"),
+            theme = "bg-gradient-red-yellow"
+        )
+    )
 )
 ```
-::::
-
-::::{.g-col-12 .g-col-md-4}
-```{r echo = FALSE, message = TRUE}
-bslib::value_box(
-    title = "Total commits:",
-    value = format (sum (annual_commits$num_commits), big.mark = ","),
-    htmltools::p(
-        "between ",
-        min (as.integer (annual_commits$year)),
-        " and ",
-        max (as.integer (annual_commits$year))
-    ),
-    showcase = sparkline_plot(),
-    showcase_layout = "bottom",
-    class = "border"
-)
-```
-::::
-
-::::{.g-col-12 .g-col-md-4}
-```{r echo = FALSE, message = TRUE}
-value_box(
-  title = "KPI Title",
-  h1(HTML("$1 <i>Billion</i> Dollars")),
-  span(
-    bsicons::bs_icon("arrow-up"),
-    " 30% VS PREVIOUS 30 DAYS"
-  ),
-  showcase = bsicons::bs_icon("piggy-bank"),
-  theme = "bg-gradient-red-yellow"
-)
-```
-::::
 
 :::
 

@@ -28,7 +28,7 @@ value2 <- 33
 
 ```{r sparkline-plot, echo = FALSE}
 set.seed(4242)
-sparkline_plot_in <- function (annual_commits) {
+sparkline_plot_commits <- function (annual_commits) {
     x <- as.integer (annual_commits$year)
     y <- annual_commits$num_commits
     x_lim <- range (x)
@@ -59,7 +59,7 @@ sparkline_plot_in <- function (annual_commits) {
 sparkline_plot <- function() {
     as_fill_item(
         htmltools::plotTag(
-            sparkline_plot_in(annual_commits),
+            sparkline_plot_commits(annual_commits),
             suppressSize = "xy",
             alt <- "sparkline plot of annual numbers of commits."
         )
@@ -106,8 +106,6 @@ bslib::page_fillable (
     )
 )
 ```
-
-:::
 
 ---
 

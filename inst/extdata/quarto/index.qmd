@@ -7,48 +7,51 @@ format:
     theme: yeti
 ---
 
-```{r message = FALSE}
+```{r libraries, message = FALSE}
 library (bslib)
 library (bsicons)
 library (htmltools)
 library (plotly)
+```
 
+```{r valuebox-values}
+repo_data <- readRDS ("results-data-repo-src.Rds")
+num_repos <- nrow (repo_data)
+repo_orgs <- gsub ("\\/.*$", "", repo_data$orgrepo) |>
+    table () |>
+    sort (decreasing = TRUE) |>
+    head (n = 2L)
 value1 <- 99
 value2 <- 33
-value3 <- 1234
 ```
 
 ```{r sparkline-plot, echo = FALSE}
 set.seed(4242)
 random_sparkline_plot <- function() {
-    timeseries <- cumsum(runif(100, -2, 2))
-    x_axis <- seq_along(timeseries)
-    x_lim <- c(1, length(timeseries))
-    y_lim <- range(timeseries) + c(-2, 0)
+    timeseries <- cumsum (runif (100, -2, 2))
+    x_axis <- seq_along (timeseries)
+    x_lim <- range (x_axis)
+    y_lim <- range (timeseries) + c (-2, 0)
 
-    par(mar = c(0, 0, 0, 0))
-    # Set up the plot area
+    par(mar = c(2, 0, 0, 0))
     plot(
         timeseries,
         type = "n",
-        axes = FALSE,
+        axes = TRUE,
         frame.plot = FALSE,
         ylim = y_lim,
         xlim = x_lim,
         ylab = "",
         xlab = "",
         yaxs = "i",
-        xaxs = "i"
+        xaxs = "r"
     )
 
-    # Add the sparkline line
     lines(timeseries, type = "l", pch = NA, col = "#0B538E", lwd = 3)
 
-    # Create polygon coordinates for shading
     polygon_x <- c(1, x_axis, length(timeseries))
     polygon_y <- c(min(y_lim), timeseries, min(y_lim))
 
-    # Add shading under the line
     polygon(polygon_x, polygon_y, col = "#e6f2fd", border = NA)
 }
 sparkline_plot <- function() {
@@ -70,7 +73,21 @@ sparkline_plot <- function() {
 :::{.grid}
 
 ::::{.g-col-12 .g-col-md-4}
+```{r echo = FALSE, message = TRUE}
+lines <- paste0 (unname (repo_orgs), " from ", names (repo_orgs))
+bslib::value_box(
+    title = "There are",
+    value = paste0 (format (num_repos, big.mark = ","), " repositories"),
+    showcase = bsicons::bs_icon("award"),
+    theme = "bg-gradient-teal-orange",
+    htmltools::p("including"),
+    htmltools::p(bsicons::bs_icon("1-square"), lines [1]),
+    htmltools::p(bsicons::bs_icon("2-square"), lines [2])
+)
+```
+::::
 
+::::{.g-col-12 .g-col-md-4}
 ```{r echo = FALSE, message = TRUE}
 bslib::value_box(
     title = "First value is",
@@ -81,11 +98,9 @@ bslib::value_box(
     class = "border"
 )
 ```
-
 ::::
 
 ::::{.g-col-12 .g-col-md-4}
-
 ```{r echo = FALSE, message = TRUE}
 value_box(
   title = "KPI Title",
@@ -98,22 +113,6 @@ value_box(
   theme = "bg-gradient-red-yellow"
 )
 ```
-
-::::
-
-::::{.g-col-12 .g-col-md-4}
-
-```{r echo = FALSE, message = TRUE}
-bslib::value_box(
-    title = "There are",
-    value = paste0 (format (value3, big.mark = ","), " values"),
-    showcase = bsicons::bs_icon("award"),
-    theme = "bg-gradient-teal-orange",
-    htmltools::p("That's really good", bsicons::bs_icon("emoji-smile")),
-    htmltools::p("A second line", bsicons::bs_icon("boombox"))
-)
-```
-
 ::::
 
 :::

@@ -19,11 +19,13 @@ test_that ("collate_org_data output", {
     fs::dir_delete (org_dir)
 
     expect_type (org_data, "list")
-    expect_named (org_data, c ("repos", "metrics", "models"))
+    expect_named (org_data, c ("repos", "metrics", "models", "annual_commits"))
     npkgs <- 2L
     expect_length (org_data$repos, npkgs)
     expect_length (org_data$metrics, npkgs)
     expect_s3_class (org_data$models, "data.frame")
+    expect_s3_class (org_data$annual_commits, "data.frame")
+    expect_named (org_data$annual_commits, c ("year", "num_commits"))
     n_periods <- length (get_end_date_seq (end_date = end_date, num_years = 1))
     expect_equal (nrow (org_data$models), n_periods)
 })

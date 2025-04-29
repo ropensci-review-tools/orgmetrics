@@ -51,10 +51,13 @@ orgmetrics_collate_org_data <- function (org_paths, end_date = Sys.Date, num_yea
 
     rm_tmp_pkg_files (or)
 
+    annual_commits <- org_annual_commits (org_paths)
+
     data <- list (
         repos = pkgs_repos,
         metrics = pkgs_metrics,
-        models = pkgs_models
+        models = pkgs_models,
+        annual_commits = annual_commits
     )
 
     return (data)
@@ -67,4 +70,25 @@ rm_tmp_pkg_files <- function (pkgs) {
     if (length (f_tmp_list) > 0L) {
         fs::file_delete (f_tmp_list)
     }
+}
+
+org_annual_commits <- function (org_paths) {
+
+    pkgs <- fs::dir_ls (org_paths, type = "directory")
+    annual_commits <- lapply (pkgs, function (i) {
+        cmts <- git2r::commits (repo = i)
+        cmt_times <- vapply (
+            cmts,
+            function (j) as.character (j$author$when),
+            character (1L)
+        )
+        cmt_years <- as.integer (gsub ("\\-.*$", "", cmt_times))
+        return (cmt_years)
+    })
+    annual_commits <- table (unlist (annual_commits))
+
+    data.frame (
+        year = names (annual_commits),
+        num_commits = as.integer (annual_commits)
+    )
 }

@@ -16,6 +16,7 @@ library (plotly)
 
 ```{r valuebox-values}
 repo_data <- readRDS ("results-data-repo-src.Rds")
+annual_commits <- readRDS ("./results-annual-commits.Rds")
 num_repos <- nrow (repo_data)
 repo_orgs <- gsub ("\\/.*$", "", repo_data$orgrepo) |>
     table () |>
@@ -27,44 +28,44 @@ value2 <- 33
 
 ```{r sparkline-plot, echo = FALSE}
 set.seed(4242)
-random_sparkline_plot <- function() {
-    timeseries <- cumsum (runif (100, -2, 2))
-    x_axis <- seq_along (timeseries)
-    x_lim <- range (x_axis)
-    y_lim <- range (timeseries) + c (-2, 0)
+sparkline_plot_in <- function (annual_commits) {
+    x <- as.integer (annual_commits$year)
+    y <- annual_commits$num_commits
+    x_lim <- range (x)
+    y_lim <- c (0, max (y) * 1.05)
 
-    par(mar = c(2, 0, 0, 0))
+    par(mar = c(3, 0, 0, 0))
     plot(
-        timeseries,
+        x,
+        y,
         type = "n",
-        axes = TRUE,
+        axes = FALSE,
         frame.plot = FALSE,
         ylim = y_lim,
         xlim = x_lim,
         ylab = "",
         xlab = "",
         yaxs = "i",
-        xaxs = "r"
+        xaxs = "i"
     )
 
-    lines(timeseries, type = "l", pch = NA, col = "#0B538E", lwd = 3)
+    lines(x, y, type = "l", pch = NA, col = "#0B538E", lwd = 3)
 
-    polygon_x <- c(1, x_axis, length(timeseries))
-    polygon_y <- c(min(y_lim), timeseries, min(y_lim))
+    polygon_x <- c(x [1], x, x [length (x)])
+    polygon_y <- c(0, y, 0)
 
     polygon(polygon_x, polygon_y, col = "#e6f2fd", border = NA)
+
+    ypos <- -max (y) / 20
+    text (x = x [1], y = ypos, labels = x [1], xpd = NA, adj = -0.2, cex = 2)
+    text (x = x [length (x)], y = ypos, labels = x [length (x)], xpd = NA, adj = 1, cex = 2)
 }
 sparkline_plot <- function() {
     as_fill_item(
         htmltools::plotTag(
-            random_sparkline_plot(),
-            width = 500,
-            height = 125,
+            sparkline_plot_in(annual_commits),
             suppressSize = "xy",
-            alt = paste(
-                "A sparkline plot with a randomly-generated timeseries.",
-                "The timeseries starts high and ends low, with lots of variation."
-            )
+            alt <- "sparkline plot of annual numbers of commits."
         )
     )
 }
@@ -90,9 +91,8 @@ bslib::value_box(
 ::::{.g-col-12 .g-col-md-4}
 ```{r echo = FALSE, message = TRUE}
 bslib::value_box(
-    title = "First value is",
-    htmltools::p("With a sparkline plot", bsicons::bs_icon("graph-up-arrow")),
-    value = value1,
+    title = "Total commits:",
+    value = format (sum (annual_commits$num_commits), big.mark = ","),
     showcase = sparkline_plot(),
     showcase_layout = "bottom",
     class = "border"

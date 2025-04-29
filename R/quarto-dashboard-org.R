@@ -50,6 +50,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (data_models, fs::path (dir, "results-models.Rds"))
     saveRDS (data_metrics, fs::path (dir, "results-metrics.Rds"))
     saveRDS (data_org$annual_commits, fs::path (dir, "results-annual-commits.Rds"))
+    saveRDS (data_org$annual_gh_activity, fs::path (dir, "results-annual-gh-activity.Rds"))
     saveRDS (data_maintenance, fs::path (dir, "results-maintenance-org.Rds"))
     saveRDS (data_repo_src, fs::path (dir, "results-data-repo-src.Rds"))
     saveRDS (data_abs, fs::path (dir, "results-data-ctb-absence.Rds"))

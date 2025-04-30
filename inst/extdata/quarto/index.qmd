@@ -35,7 +35,7 @@ sparkline_plot_commits_in <- function (annual_commits) {
     x_lim <- range (x)
     y_lim <- c (0, max (y) * 1.05)
 
-    par (mar = c(3, 0, 0, 0))
+    par (mar = c (3, 0, 0, 0))
     plot (
         x,
         y,
@@ -50,17 +50,17 @@ sparkline_plot_commits_in <- function (annual_commits) {
         xaxs = "i",
     )
 
-    lines(x, y, type = "l", pch = NA, col = "#0B538E", lwd = 3)
+    lines (x, y, type = "l", pch = NA, col = "#0B538E", lwd = 3)
 
-    polygon_x <- c(x [1], x, x [length (x)])
-    polygon_y <- c(0, y, 0)
+    polygon_x <- c (x [1], x, x [length (x)])
+    polygon_y <- c (0, y, 0)
 
-    polygon(polygon_x, polygon_y, col = "#e6f2fd", border = NA)
+    polygon (polygon_x, polygon_y, col = "#e6f2fd", border = NA)
 }
-sparkline_plot_commits <- function() {
-    as_fill_item(
-        htmltools::plotTag(
-            sparkline_plot_commits_in(annual_commits),
+sparkline_plot_commits <- function () {
+    as_fill_item (
+        htmltools::plotTag (
+            sparkline_plot_commits_in (annual_commits),
             suppressSize = "xy",
             alt = "sparkline plot of annual numbers of commits."
         )
@@ -75,7 +75,7 @@ sparkline_plot_gh_in <- function (annual_gh) {
     x_lim <- range (x)
     y_lim <- c (0, max (y) * 1.05)
 
-    par (mar = c(3, 0, 0, 0))
+    par (mar = c (3, 0, 0, 0))
     plot (
         x,
         y,
@@ -90,17 +90,17 @@ sparkline_plot_gh_in <- function (annual_gh) {
         xaxs = "i",
     )
 
-    lines(x, y, type = "l", pch = NA, col = "#0B538E", lwd = 3)
+    lines (x, y, type = "l", pch = NA, col = "#0B538E", lwd = 3)
 
-    polygon_x <- c(x [1], x, x [length (x)])
-    polygon_y <- c(0, y, 0)
+    polygon_x <- c (x [1], x, x [length (x)])
+    polygon_y <- c (0, y, 0)
 
-    polygon(polygon_x, polygon_y, col = "#e6f2fd", border = NA)
+    polygon (polygon_x, polygon_y, col = "#e6f2fd", border = NA)
 }
-sparkline_plot_gh <- function() {
-    as_fill_item(
-        htmltools::plotTag(
-            sparkline_plot_gh_in(annual_gh_activity),
+sparkline_plot_gh <- function () {
+    as_fill_item (
+        htmltools::plotTag (
+            sparkline_plot_gh_in (annual_gh_activity),
             suppressSize = "xy",
             alt = "sparkline plot of annual GitHub activity."
         )
@@ -112,19 +112,19 @@ sparkline_plot_gh <- function() {
 lines <- paste0 (unname (repo_orgs), " from ", names (repo_orgs))
 bslib::page_fillable (
     bslib::layout_columns (
-        bslib::value_box(
+        bslib::value_box (
             title = "There are",
             value = paste0 (format (num_repos, big.mark = ","), " repositories"),
-            showcase = bsicons::bs_icon("award"),
+            showcase = bsicons::bs_icon ("award"),
             theme = "bg-gradient-teal-orange",
-            htmltools::p("including"),
-            htmltools::p(bsicons::bs_icon("1-square"), lines [1]),
-            htmltools::p(bsicons::bs_icon("2-square"), lines [2])
+            htmltools::p ("including"),
+            htmltools::p (bsicons::bs_icon ("1-square"), lines [1]),
+            htmltools::p (bsicons::bs_icon ("2-square"), lines [2])
         ),
-        bslib::value_box(
+        bslib::value_box (
             title = "Total commits:",
             value = format (sum (annual_commits$num_commits), big.mark = ","),
-            htmltools::p(
+            htmltools::p (
                 "between ",
                 min (as.integer (annual_commits$year)),
                 " and ",
@@ -135,10 +135,10 @@ bslib::page_fillable (
             theme = "bg-gradient-green-yellow",
             class = "border"
         ),
-        value_box(
+        value_box (
             title = "GitHub Activity",
             value = format (sum (annual_gh_activity$total), big.mark = ","),
-            htmltools::p(
+            htmltools::p (
                 "Total issues, comments, and pull requests"
             ),
             showcase = sparkline_plot_gh (),
@@ -149,6 +149,161 @@ bslib::page_fillable (
 )
 ```
 
+---
+
+## Cards
+
+```{r message = FALSE}
+plotly_widget <- plot_ly (x = diamonds$cut) |>
+    config (displayModeBar = FALSE) |>
+    layout (margin = list (t = 0, b = 0, l = 0, r = 0))
+linedat <- data.frame (x = 1:10, y = runif (10))
+line_widget <- plot_ly (linedat, x = ~x, y = ~y) |>
+    add_lines () |>
+    config (displayModeBar = FALSE) |>
+    layout (margin = list (t = 0, b = 0, l = 0, r = 0))
+```
+
+:::::{.grid}
+
+::::{.g-col-12 .g-col-md-6}
+
+```{r message = FALSE}
+bslib::card (
+    height = 375,
+    full_screen = TRUE,
+    card_header ("A filling plot"),
+    card_body (
+        min_height = 200,
+        plotly_widget
+    ),
+    card_body (
+        class = "card-text",
+        lorem::ipsum (paragraphs = 10, sentences = 5)
+    )
+)
+```
+
+::::
+
+::::{.g-col-12 .g-col-md-6}
+
+```{r}
+bar_data <- data.frame (
+    category = letters [1:5],
+    value = round (runif (5, max = 100))
+)
+line_data <- data.frame (x = 1:10, y = runif (10))
+```
+
+```{r ojs-define}
+ojs_define (barDataIn = bar_data)
+ojs_define (lineDataIn = line_data)
+```
+
+```{ojs}
+barData = {
+    return transpose(barDataIn).map(row => ({
+        ...row,
+    }));
+}
+lineData = {
+    return transpose(lineDataIn).map(row => ({
+        ...row,
+    }));
+}
+```
+
+::: {.panel-tabset}
+
+## Bar Plot
+
+```{ojs}
+Plot.plot({
+    height: 375,
+    marginLeft: 60,
+    marginRight: 20,
+    marginTop: 50,
+    marginBottom: 10,
+    axis: null,
+    x: { grid: true, },
+    y: { grid: true, },
+    marks: [
+        Plot.axisY({
+            label: null,
+            fontSize: 18,
+            axis: "left"
+        }),
+        Plot.barY(barData, {
+            y: "value",
+            x: "category",
+            sort: {y: "-x" },
+            fill: "value",
+        }),
+        Plot.text(barData, {
+            y: "value",
+            x: "category",
+            text: "category",
+            fontSize: 24,
+            dy: -15
+        })
+    ],
+    color: {
+        scheme: "Cool",
+        type: "ordinal",
+        reverse: false
+    }
+})
+```
+
+## Line Plot {.active}
+
+```{ojs}
+Plot.plot({
+    height: 375,
+    marginLeft: 60,
+    marginRight: 20,
+    marginTop: 50,
+    marginBottom: 50,
+    title: "This is a title",
+    subtitle: "And this is a sub-title",
+    x: { grid: true },
+    y: { grid: true },
+    marks: [
+        Plot.axisX({
+            axis: "bottom",
+            label: null,
+            fontSize: 18
+        }),
+        Plot.axisY({
+            axis: "left",
+            label: null,
+            fontSize: 18
+        }),
+        Plot.lineY(lineData, {
+            x: "x",
+            y: "y",
+            stroke: "orange",
+            strokeWidth:  5,
+        }),
+        Plot.text([[1, 0]], {
+                text: ["And here is some 'Plot.text' additional stuff"],
+                lineWidth: 30,
+                textAnchor: "start",
+                fontSize: 14,
+                dy: 40
+        }),
+    ],
+})
+```
+
+:::
+
+::::
+
+:::::
+
+---
 
 This dashboard presents metrics and models for each repository within both the
 [`epiverse-trace`](https://github.com/epiverse-trace) and
@@ -171,4 +326,3 @@ The dashboard currently has three main pages:
 
 There is also an additional [network diagram page](./network.html), showing
 strengths of relationship between each repository.
-

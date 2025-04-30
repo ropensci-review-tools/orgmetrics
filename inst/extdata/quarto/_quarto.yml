@@ -2,7 +2,7 @@ project:
   type: website
 
 website:
-  title: "Organization"
+  title: "EpiVerse"
   cookie-consent:
     type: express
   navbar:

@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/ropensci-review-tools/orgmetrics",
   "issueTracker": "https://github.com/ropensci-review-tools/orgmetrics/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.3.053",
+  "version": "0.0.3.061",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.4.3 (2025-02-28)",
+  "runtimePlatform": "R version 4.5.0 (2025-04-11)",
   "author": [
     {
       "@type": "Person",
@@ -36,6 +36,30 @@
   "softwareSuggestions": [
     {
       "@type": "SoftwareApplication",
+      "identifier": "bsicons",
+      "name": "bsicons",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=bsicons"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "bslib",
+      "name": "bslib",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=bslib"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "desc",
       "name": "desc",
       "provider": {
@@ -45,6 +69,18 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=desc"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "htmltools",
+      "name": "htmltools",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=htmltools"
     },
     {
       "@type": "SoftwareApplication",
@@ -249,10 +285,10 @@
     },
     "SystemRequirements": {}
   },
-  "fileSize": "6948.75KB",
+  "fileSize": "18900.122KB",
   "readme": "https://github.com/ropensci-review-tools/orgmetrics/blob/main/README.md",
   "contIntegration": [
-    "https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check",
+    "https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check.yaml",
     "https://app.codecov.io/gh/ropensci-review-tools/orgmetrics"
   ],
   "developmentStatus": "https://www.repostatus.org/#active"

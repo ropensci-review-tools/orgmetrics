@@ -1,6 +1,6 @@
 Package: orgmetrics
 Title: Metrics for Your GitHub Organization
-Version: 0.0.3.053
+Version: 0.0.3.061
 Authors@R: 
     person("Mark", "Padgham", , "mark.padgham@email.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2172-5265"))
@@ -17,12 +17,16 @@ Imports:
     dplyr,
     fs,
     gert,
+    git2r,
     httr2,
     memoise,
     pbapply,
     repometrics
 Suggests:
+    bsicons,
+    bslib,
     desc,
+    htmltools,
     httptest2,
     jsonlite,
     pkgmatch,

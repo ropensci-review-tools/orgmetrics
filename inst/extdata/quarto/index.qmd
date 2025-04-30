@@ -1,6 +1,154 @@
 ---
 title: "Organization-level Metrics and Models"
+execute:
+  echo: false
+format:
+  html:
+    theme: yeti
 ---
+
+```{r libraries, message = FALSE}
+library (bslib)
+library (bsicons)
+library (htmltools)
+library (plotly)
+```
+
+```{r valuebox-values}
+repo_data <- readRDS ("results-data-repo-src.Rds")
+annual_commits <- readRDS ("results-annual-commits.Rds")
+annual_gh_activity <- readRDS ("results-annual-gh-activity.Rds")
+annual_gh_activity$total <- rowSums (annual_gh_activity [, -1])
+num_repos <- nrow (repo_data)
+repo_orgs <- gsub ("\\/.*$", "", repo_data$orgrepo) |>
+    table () |>
+    sort (decreasing = TRUE) |>
+    head (n = 2L)
+value1 <- 99
+value2 <- 33
+```
+
+```{r sparkline-plot-commits, echo = FALSE}
+sparkline_plot_commits_in <- function (annual_commits) {
+    x <- as.integer (annual_commits$year)
+    y <- annual_commits$num_commits
+    x_lim <- range (x)
+    y_lim <- c (0, max (y) * 1.05)
+
+    par (mar = c(3, 0, 0, 0))
+    plot (
+        x,
+        y,
+        type = "n",
+        axes = FALSE,
+        frame.plot = FALSE,
+        ylim = y_lim,
+        xlim = x_lim,
+        ylab = "",
+        xlab = "",
+        yaxs = "i",
+        xaxs = "i",
+    )
+
+    lines(x, y, type = "l", pch = NA, col = "#0B538E", lwd = 3)
+
+    polygon_x <- c(x [1], x, x [length (x)])
+    polygon_y <- c(0, y, 0)
+
+    polygon(polygon_x, polygon_y, col = "#e6f2fd", border = NA)
+}
+sparkline_plot_commits <- function() {
+    as_fill_item(
+        htmltools::plotTag(
+            sparkline_plot_commits_in(annual_commits),
+            suppressSize = "xy",
+            alt = "sparkline plot of annual numbers of commits."
+        )
+    )
+}
+```
+
+```{r sparkline-plot-gh, echo = FALSE}
+sparkline_plot_gh_in <- function (annual_gh) {
+    x <- as.integer (annual_gh$year)
+    y <- annual_gh$total
+    x_lim <- range (x)
+    y_lim <- c (0, max (y) * 1.05)
+
+    par (mar = c(3, 0, 0, 0))
+    plot (
+        x,
+        y,
+        type = "n",
+        axes = FALSE,
+        frame.plot = FALSE,
+        ylim = y_lim,
+        xlim = x_lim,
+        ylab = "",
+        xlab = "",
+        yaxs = "i",
+        xaxs = "i",
+    )
+
+    lines(x, y, type = "l", pch = NA, col = "#0B538E", lwd = 3)
+
+    polygon_x <- c(x [1], x, x [length (x)])
+    polygon_y <- c(0, y, 0)
+
+    polygon(polygon_x, polygon_y, col = "#e6f2fd", border = NA)
+}
+sparkline_plot_gh <- function() {
+    as_fill_item(
+        htmltools::plotTag(
+            sparkline_plot_gh_in(annual_gh_activity),
+            suppressSize = "xy",
+            alt = "sparkline plot of annual GitHub activity."
+        )
+    )
+}
+```
+
+```{r echo = FALSE, message = TRUE}
+lines <- paste0 (unname (repo_orgs), " from ", names (repo_orgs))
+bslib::page_fillable (
+    bslib::layout_columns (
+        bslib::value_box(
+            title = "There are",
+            value = paste0 (format (num_repos, big.mark = ","), " repositories"),
+            showcase = bsicons::bs_icon("award"),
+            theme = "bg-gradient-teal-orange",
+            htmltools::p("including"),
+            htmltools::p(bsicons::bs_icon("1-square"), lines [1]),
+            htmltools::p(bsicons::bs_icon("2-square"), lines [2])
+        ),
+        bslib::value_box(
+            title = "Total commits:",
+            value = format (sum (annual_commits$num_commits), big.mark = ","),
+            htmltools::p(
+                "between ",
+                min (as.integer (annual_commits$year)),
+                " and ",
+                max (as.integer (annual_commits$year))
+            ),
+            showcase = sparkline_plot_commits (),
+            showcase_layout = "bottom",
+            theme = "bg-gradient-green-yellow",
+            class = "border"
+        ),
+        value_box(
+            title = "GitHub Activity",
+            value = format (sum (annual_gh_activity$total), big.mark = ","),
+            htmltools::p(
+                "Total issues, comments, and pull requests"
+            ),
+            showcase = sparkline_plot_gh (),
+            showcase_layout = "bottom",
+            theme = "bg-gradient-red-yellow"
+        )
+    )
+)
+```
+
 
 This dashboard presents metrics and models for each repository within both the
 [`epiverse-trace`](https://github.com/epiverse-trace) and
@@ -23,3 +171,4 @@ The dashboard currently has three main pages:
 
 There is also an additional [network diagram page](./network.html), showing
 strengths of relationship between each repository.
+

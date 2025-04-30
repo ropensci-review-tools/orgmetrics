@@ -21,5 +21,7 @@ website:
 
 format:
   html:
-    theme: cosmo
+    page-layout: full
+    theme: yeti
+    css: styles.css
     toc: true

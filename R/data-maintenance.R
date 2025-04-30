@@ -31,6 +31,9 @@ ctb_absence <- function (data_org,
     checkmate::assert_date (end_date, len = 1L)
     checkmate::assert_numeric (period, len = 1L, lower = 7)
 
+    # Suppress no visible binding checks:
+    login <- handle <- aut_name <- timestamp <- what <- measure <- NULL
+
     start_date <- end_date - as.integer (period)
 
     abs <- lapply (data_org$repos, function (repo) {
@@ -87,6 +90,11 @@ issue_responses <- function (data_org,
                              end_date = Sys.Date (),
                              period = 365) {
 
+    # Suppress no visible binding checks:
+    user_login <- issue_number <- issue_author <- created_at <- user_id <-
+        updated_at <- issue_body <- opened_date <- responded_at <- repo <-
+            response <- response_duration <- NULL
+
     start_date <- end_date - as.integer (period)
 
     response_dat_all <- lapply (data_org$repos, function (repo) {
@@ -140,6 +148,9 @@ issue_responses <- function (data_org,
 issue_bugs <- function (data_org,
                         end_date = Sys.Date (),
                         period = 365) {
+
+    # Suppress no visible binding checks:
+    created_at <- bugs <- NULL
 
     start_date <- end_date - as.integer (period)
 

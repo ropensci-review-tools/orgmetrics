@@ -1,5 +1,5 @@
 ---
-title: "Organization-level Metrics and Models"
+title: "EpiVerse Organizational Overview"
 execute:
   echo: false
 format:
@@ -35,7 +35,7 @@ sparkline_plot_commits_in <- function (annual_commits) {
     x_lim <- range (x)
     y_lim <- c (0, max (y) * 1.05)
 
-    par (mar = c (3, 0, 0, 0))
+    par (mar = c (3, 0, 0, 0), bg = "#0dcaf0")
     plot (
         x,
         y,
@@ -75,7 +75,7 @@ sparkline_plot_gh_in <- function (annual_gh) {
     x_lim <- range (x)
     y_lim <- c (0, max (y) * 1.05)
 
-    par (mar = c (3, 0, 0, 0))
+    par (mar = c (3, 0, 0, 0), bg = "#20c997")
     plot (
         x,
         y,
@@ -115,7 +115,8 @@ bslib::page_fillable (
         bslib::value_box (
             title = "There are",
             value = paste0 (format (num_repos, big.mark = ","), " repositories"),
-            showcase = bsicons::bs_icon ("award"),
+            showcase = bsicons::bs_icon ("clipboard-data"),
+            showcase_layout = "top right",
             theme = "bg-gradient-teal-orange",
             htmltools::p ("including"),
             htmltools::p (bsicons::bs_icon ("1-square"), lines [1]),
@@ -130,9 +131,10 @@ bslib::page_fillable (
                 " and ",
                 max (as.integer (annual_commits$year))
             ),
+            htmltools::p ("(Plot below shows time series)"),
             showcase = sparkline_plot_commits (),
             showcase_layout = "bottom",
-            theme = "bg-gradient-green-yellow",
+            theme = value_box_theme (bg = "#0dcaf0", fg = "#ffffff"),
             class = "border"
         ),
         value_box (
@@ -143,7 +145,7 @@ bslib::page_fillable (
             ),
             showcase = sparkline_plot_gh (),
             showcase_layout = "bottom",
-            theme = "bg-gradient-red-yellow"
+            theme = "bg-teal"
         )
     )
 )

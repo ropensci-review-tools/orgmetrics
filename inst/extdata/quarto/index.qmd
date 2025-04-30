@@ -35,7 +35,7 @@ sparkline_plot_commits_in <- function (annual_commits) {
     x_lim <- range (x)
     y_lim <- c (0, max (y) * 1.05)
 
-    par (mar = c (3, 0, 0, 0), bg = "#0dcaf0")
+    par (mar = c (3, 0, 0, 0), bg = "#20c997")
     plot (
         x,
         y,
@@ -117,7 +117,7 @@ bslib::page_fillable (
             value = paste0 (format (num_repos, big.mark = ","), " repositories"),
             showcase = bsicons::bs_icon ("clipboard-data"),
             showcase_layout = "top right",
-            theme = "bg-gradient-teal-orange",
+            theme = "bg-gradient-blue-orange",
             htmltools::p ("including"),
             htmltools::p (bsicons::bs_icon ("1-square"), lines [1]),
             htmltools::p (bsicons::bs_icon ("2-square"), lines [2])
@@ -134,8 +134,7 @@ bslib::page_fillable (
             htmltools::p ("(Plot below shows time series)"),
             showcase = sparkline_plot_commits (),
             showcase_layout = "bottom",
-            theme = value_box_theme (bg = "#0dcaf0", fg = "#ffffff"),
-            class = "border"
+            theme = "bg-teal"
         ),
         value_box (
             title = "GitHub Activity",
@@ -146,12 +145,11 @@ bslib::page_fillable (
             showcase = sparkline_plot_gh (),
             showcase_layout = "bottom",
             theme = "bg-teal"
-        )
+        ),
+        col_widths = c (4, 4, 4)
     )
 )
 ```
-
----
 
 ## Cards
 
@@ -305,7 +303,7 @@ Plot.plot({
 
 :::::
 
----
+-----
 
 This dashboard presents metrics and models for each repository within both the
 [`epiverse-trace`](https://github.com/epiverse-trace) and
@@ -328,3 +326,15 @@ The dashboard currently has three main pages:
 
 There is also an additional [network diagram page](./network.html), showing
 strengths of relationship between each repository.
+
+:::{.grid}
+
+:::{.g-col-12 .g-col-md-6}
+<div class="card" style="background-color:powderblue; text-align:center;"><h1>First Card</h1></div>
+:::
+
+:::{.g-col-12 .g-col-md-6}
+<div class="card"><h1>Second Card</h1></div>
+:::
+
+:::

@@ -151,6 +151,51 @@ bslib::page_fillable (
 )
 ```
 
+```{r}
+# This code identifies packages with high community engagement yet low
+# developer responsiveness. It identifies packages lying in the lower-right
+# corner of the quadrant frormed by the regerssion and its perpendicular
+# through the mid-point of the entire plane, and lying below the 90% CI.
+ci_level <- 0.9
+m <- readRDS ("results-maintenance-org.Rds") |>
+    dplyr::rename (x = comm_engage, y = dev_resp)
+x_mid <- min (m$x) + diff (range (m$x)) / 2
+y_mid <- min (m$y) + diff (range (m$y)) / 2
+
+mod <- lm (y ~ x, data = m)
+slope <- coefficients (mod) [2]
+intercept <- coefficients (mod) [1]
+perp_slope <- -1 / slope
+perp_intercept <- y_mid - perp_slope * x_mid
+
+ci <- predict (mod, interval = "confidence", level = ci_level) |>
+    as.data.frame ()
+data <- cbind (m, ci) |>
+    dplyr::mutate (
+        below_ci = y < lwr,
+        pos_reg = y - (slope * x + intercept),
+        pos_perp = y - (perp_slope * x + perp_intercept),
+        index_lr_quad = pos_reg < 0 & pos_perp > 0,
+        target_points = index_lr_quad & below_ci
+    ) |>
+    dplyr::filter (target_points)
+
+npkgs_requiring_maintenance <- nrow (data)
+
+# library (ggplot2)
+# ggplot (m, aes (x = x, y = y)) +
+#     geom_point (cex = 2, col = "orange") +
+#     geom_smooth (method = "lm", formula = "y ~ x", se = TRUE) +
+#     geom_abline (slope = perp_slope, intercept = perp_intercept, col = "orange") +
+#     geom_point (data = data, col = "red") +
+#     ggplot2::theme_minimal ()
+```
+
+
+There are `r npkgs_requiring_maintenance` packages requiring maintenance.
+
+-----
+
 ## Cards
 
 ```{r message = FALSE}

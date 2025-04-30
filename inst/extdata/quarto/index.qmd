@@ -1,5 +1,5 @@
 ---
-title: "Organization-level Metrics and Models"
+title: "EpiVerse Organizational Overview"
 execute:
   echo: false
 format:
@@ -35,7 +35,7 @@ sparkline_plot_commits_in <- function (annual_commits) {
     x_lim <- range (x)
     y_lim <- c (0, max (y) * 1.05)
 
-    par (mar = c(3, 0, 0, 0))
+    par (mar = c (3, 0, 0, 0), bg = "#20c997")
     plot (
         x,
         y,
@@ -50,17 +50,17 @@ sparkline_plot_commits_in <- function (annual_commits) {
         xaxs = "i",
     )
 
-    lines(x, y, type = "l", pch = NA, col = "#0B538E", lwd = 3)
+    lines (x, y, type = "l", pch = NA, col = "#0B538E", lwd = 3)
 
-    polygon_x <- c(x [1], x, x [length (x)])
-    polygon_y <- c(0, y, 0)
+    polygon_x <- c (x [1], x, x [length (x)])
+    polygon_y <- c (0, y, 0)
 
-    polygon(polygon_x, polygon_y, col = "#e6f2fd", border = NA)
+    polygon (polygon_x, polygon_y, col = "#e6f2fd", border = NA)
 }
-sparkline_plot_commits <- function() {
-    as_fill_item(
-        htmltools::plotTag(
-            sparkline_plot_commits_in(annual_commits),
+sparkline_plot_commits <- function () {
+    as_fill_item (
+        htmltools::plotTag (
+            sparkline_plot_commits_in (annual_commits),
             suppressSize = "xy",
             alt = "sparkline plot of annual numbers of commits."
         )
@@ -75,7 +75,7 @@ sparkline_plot_gh_in <- function (annual_gh) {
     x_lim <- range (x)
     y_lim <- c (0, max (y) * 1.05)
 
-    par (mar = c(3, 0, 0, 0))
+    par (mar = c (3, 0, 0, 0), bg = "#20c997")
     plot (
         x,
         y,
@@ -90,17 +90,17 @@ sparkline_plot_gh_in <- function (annual_gh) {
         xaxs = "i",
     )
 
-    lines(x, y, type = "l", pch = NA, col = "#0B538E", lwd = 3)
+    lines (x, y, type = "l", pch = NA, col = "#0B538E", lwd = 3)
 
-    polygon_x <- c(x [1], x, x [length (x)])
-    polygon_y <- c(0, y, 0)
+    polygon_x <- c (x [1], x, x [length (x)])
+    polygon_y <- c (0, y, 0)
 
-    polygon(polygon_x, polygon_y, col = "#e6f2fd", border = NA)
+    polygon (polygon_x, polygon_y, col = "#e6f2fd", border = NA)
 }
-sparkline_plot_gh <- function() {
-    as_fill_item(
-        htmltools::plotTag(
-            sparkline_plot_gh_in(annual_gh_activity),
+sparkline_plot_gh <- function () {
+    as_fill_item (
+        htmltools::plotTag (
+            sparkline_plot_gh_in (annual_gh_activity),
             suppressSize = "xy",
             alt = "sparkline plot of annual GitHub activity."
         )
@@ -112,43 +112,109 @@ sparkline_plot_gh <- function() {
 lines <- paste0 (unname (repo_orgs), " from ", names (repo_orgs))
 bslib::page_fillable (
     bslib::layout_columns (
-        bslib::value_box(
+        bslib::value_box (
             title = "There are",
             value = paste0 (format (num_repos, big.mark = ","), " repositories"),
-            showcase = bsicons::bs_icon("award"),
-            theme = "bg-gradient-teal-orange",
-            htmltools::p("including"),
-            htmltools::p(bsicons::bs_icon("1-square"), lines [1]),
-            htmltools::p(bsicons::bs_icon("2-square"), lines [2])
+            showcase = bsicons::bs_icon ("clipboard-data"),
+            showcase_layout = "top right",
+            theme = "bg-gradient-blue-orange",
+            htmltools::p ("including"),
+            htmltools::p (bsicons::bs_icon ("1-square"), lines [1]),
+            htmltools::p (bsicons::bs_icon ("2-square"), lines [2])
         ),
-        bslib::value_box(
+        bslib::value_box (
             title = "Total commits:",
             value = format (sum (annual_commits$num_commits), big.mark = ","),
-            htmltools::p(
+            htmltools::p (
                 "between ",
                 min (as.integer (annual_commits$year)),
                 " and ",
                 max (as.integer (annual_commits$year))
             ),
+            htmltools::p ("(Plot below shows time series)"),
             showcase = sparkline_plot_commits (),
             showcase_layout = "bottom",
-            theme = "bg-gradient-green-yellow",
-            class = "border"
+            theme = "bg-teal"
         ),
-        value_box(
+        value_box (
             title = "GitHub Activity",
             value = format (sum (annual_gh_activity$total), big.mark = ","),
-            htmltools::p(
+            htmltools::p (
                 "Total issues, comments, and pull requests"
             ),
             showcase = sparkline_plot_gh (),
             showcase_layout = "bottom",
-            theme = "bg-gradient-red-yellow"
-        )
+            theme = "bg-teal"
+        ),
+        col_widths = c (4, 4, 4)
     )
 )
 ```
 
+```{r}
+# This code identifies packages with high community engagement yet low
+# developer responsiveness. It identifies packages lying in the lower-right
+# corner of the quadrant frormed by the regerssion and its perpendicular
+# through the mid-point of the entire plane, and lying below the 90% CI.
+ci_level <- 0.9
+m <- readRDS ("results-maintenance-org.Rds") |>
+    dplyr::rename (x = comm_engage, y = dev_resp)
+x_mid <- min (m$x) + diff (range (m$x)) / 2
+y_mid <- min (m$y) + diff (range (m$y)) / 2
+
+mod <- lm (y ~ x, data = m)
+slope <- coefficients (mod) [2]
+intercept <- coefficients (mod) [1]
+perp_slope <- -1 / slope
+perp_intercept <- y_mid - perp_slope * x_mid
+
+ci <- predict (mod, interval = "confidence", level = ci_level) |>
+    as.data.frame ()
+data <- cbind (m, ci) |>
+    dplyr::mutate (
+        below_ci = y < lwr,
+        pos_reg = y - (slope * x + intercept),
+        pos_perp = y - (perp_slope * x + perp_intercept),
+        index_lr_quad = pos_reg < 0 & pos_perp > 0,
+        target_points = index_lr_quad & below_ci
+    ) |>
+    dplyr::filter (target_points)
+
+npkgs_requiring_maintenance <- nrow (data)
+
+# library (ggplot2)
+# ggplot (m, aes (x = x, y = y)) +
+#     geom_point (cex = 2, col = "orange") +
+#     geom_smooth (method = "lm", formula = "y ~ x", se = TRUE) +
+#     geom_abline (slope = perp_slope, intercept = perp_intercept, col = "orange") +
+#     geom_point (data = data, col = "red") +
+#     ggplot2::theme_minimal ()
+```
+
+
+```{r}
+bslib::page_fillable (
+    bslib::layout_columns (
+        bslib::value_box (
+            title = "Urgent maintance required on",
+            value = paste0 (npkgs_requiring_maintenance, " packages"),
+            # showcase = bsicons::bs_icon ("heart-pulse"),
+            showcase = bsicons::bs_icon ("tools"),
+            showcase_layout = "top right",
+            theme = "bg-gradient-red-yellow"
+        ),
+        bslib::card (
+            full_screen = TRUE,
+            card_header = ("A card")
+        ),
+        col_widths = c (4, 8)
+    )
+)
+```
+
+
+
+-----
 
 This dashboard presents metrics and models for each repository within both the
 [`epiverse-trace`](https://github.com/epiverse-trace) and
@@ -171,4 +237,3 @@ The dashboard currently has three main pages:
 
 There is also an additional [network diagram page](./network.html), showing
 strengths of relationship between each repository.
-

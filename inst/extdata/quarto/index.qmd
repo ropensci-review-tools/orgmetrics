@@ -286,10 +286,16 @@ bslib::page_fillable (
                     htmltools::div (
                         htmltools::h3 (i$h),
                         if (length (i$text) == 1L) {
-                            tags$p (bsicons::bs_icon ("caret-right"), i$text)
+                            tags$p (
+                                bsicons::bs_icon ("caret-right"),
+                                tags$a (href = i$url, i$text)
+                            )
                         } else {
-                            htmltools::tagList (lapply (i$text, function (txt) {
-                                tags$p (bsicons::bs_icon ("caret-right"), txt)
+                            htmltools::tagList (lapply (seq_along (i$text), function (j) {
+                                tags$p (
+                                    bsicons::bs_icon ("caret-right"),
+                                    tags$a (href = i$url [j], i$text [j])
+                                )
                             }))
                         },
                         style = "padding-bottom: 1rem; padding-top: 0px; border-bottom: 1px solid #eee;"

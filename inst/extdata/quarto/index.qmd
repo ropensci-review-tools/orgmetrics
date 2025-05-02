@@ -186,18 +186,52 @@ npkgs_requiring_maintenance <- nrow (data)
 
 # library (ggplot2)
 # ggplot (m, aes (x = x, y = y)) +
-#     geom_point (cex = 2, col = "orange") +
+#     geom_point (cex = 2, col = "yellow") +
 #     geom_smooth (method = "lm", formula = "y ~ x", se = TRUE) +
-#     geom_abline (slope = perp_slope, intercept = perp_intercept, col = "orange") +
-#     geom_point (data = data, col = "red") +
+#     geom_abline (slope = perp_slope, intercept = perp_intercept, col = "blue", lty = 2) +
+#     geom_point (data = data, col = "red", cex = 2) +
 #     ggplot2::theme_minimal ()
 ```
+
+
+```{r}
+# Code to get outlier metrics for packages identified as having maintenance
+# priorities:
+threshold <- 0.9
+threshold <- 0.5 + threshold / 2
+num_sds <- qnorm (threshold, 0, 1)
+limits <- readRDS ("results-metrics.Rds") |>
+    dplyr::group_by (name) |>
+    dplyr::filter (!is.na (value)) |>
+    dplyr::summarise (
+        lower = mean (value) - num_sds * sd (value),
+        upper = mean (value) + num_sds * sd (value)
+    )
+m <- readRDS ("results-metrics.Rds") |>
+    dplyr::left_join (limits, by = "name") |>
+    dplyr::group_by (name) |>
+    dplyr::filter (!is.na (value)) |>
+    dplyr::mutate (below = value < lower) |>
+    dplyr::select (-lower, -upper) |>
+    dplyr::filter (below) |>
+    dplyr::arrange (name)
+
+metrics <- unique (m$name)
+metrics_data <- lapply (metrics, function (i) {
+    list (
+        h = i,
+        text = paste0 ("- ", m$package [which (m$name == i)])
+    )
+})
+```
+
 
 
 ```{r}
 bslib::page_fillable (
     bslib::layout_columns (
         bslib::value_box (
+            full_screen = FALSE,
             title = "Urgent maintance required on",
             value = paste0 (npkgs_requiring_maintenance, " packages"),
             # showcase = bsicons::bs_icon ("heart-pulse"),
@@ -211,7 +245,20 @@ bslib::page_fillable (
         ),
         bslib::card (
             full_screen = TRUE,
-            card_header = ("A card")
+            bslib::card_header ("Maintenance priorities:"),
+            bslib::card_body (
+                lapply (metrics_data, function (i) {
+                    htmltools::div (
+                        htmltools::h3 (i$h),
+                        if (length (i$text) == 1L) {
+                            tags$p (i$text)
+                        } else {
+                            htmltools::tagList (lapply (i$text, function (txt) tags$p (txt)))
+                        },
+                        style = "padding-bottom: 1rem; padding-top: 0px; border-bottom: 1px solid #eee;"
+                    )
+                })
+            )
         ),
         col_widths = c (4, 8)
     )

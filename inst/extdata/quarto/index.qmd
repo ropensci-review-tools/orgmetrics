@@ -181,6 +181,9 @@ data <- cbind (m, ci) |>
     dplyr::filter (target_points) |>
     dplyr::select (package, x, y) |>
     dplyr::rename (comm_engage = x, dev_resp = y)
+repo_urls <- repo_data |>
+    dplyr::select (package, url)
+data <- dplyr::left_join (data, repo_urls, by = "package")
 
 npkgs_requiring_maintenance <- nrow (data)
 
@@ -214,7 +217,8 @@ m <- readRDS ("results-metrics.Rds") |>
     dplyr::mutate (below = value < lower) |>
     dplyr::select (-lower, -upper) |>
     dplyr::filter (below) |>
-    dplyr::arrange (name)
+    dplyr::arrange (name) |>
+    dplyr::left_join (repo_urls, by = "package")
 
 # Update metrics names to descriptions:
 desc <- data.frame (
@@ -232,7 +236,8 @@ metrics <- unique (m$name)
 metrics_data <- lapply (metrics, function (i) {
     list (
         h = i,
-        text = m$package [which (m$name == i)]
+        text = m$package [which (m$name == i)],
+        url = m$url [which (m$name == i)]
     )
 })
 ```
@@ -258,12 +263,17 @@ bslib::page_fillable (
                 if (nrow (data) == 1L) {
                     tags$p (paste0 ("- ", data$package))
                 } else {
-                    htmltools::tagList (lapply (data$package, function (txt) {
-                        tags$p (bsicons::bs_icon ("caret-right"), txt)
-                    }))
+                    htmltools::tagList (
+                        lapply (seq_len (nrow (data)), function (i) {
+                            tags$p (
+                                bsicons::bs_icon ("caret-right"),
+                                tags$a (href = data$url [i], data$package [i])
+                            )
+                        })
+                    )
                 }
             ),
-            theme = "bg-gradient-red-yellow"
+            theme = "bg-yellow"
         ),
         bslib::card (
             full_screen = TRUE,

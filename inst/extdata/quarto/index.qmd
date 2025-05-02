@@ -197,7 +197,7 @@ npkgs_requiring_maintenance <- nrow (data)
 ```{r}
 # Code to get outlier metrics for packages identified as having maintenance
 # priorities:
-threshold <- 0.9
+threshold <- 0.8
 threshold <- 0.5 + threshold / 2
 num_sds <- qnorm (threshold, 0, 1)
 limits <- readRDS ("results-metrics.Rds") |>
@@ -216,11 +216,17 @@ m <- readRDS ("results-metrics.Rds") |>
     dplyr::filter (below) |>
     dplyr::arrange (name)
 
-metric_desc <- rbind (
-    c ("has_ci", "Lacking continuous integration:"),
-    c ("test_coverage", "Low test coverage:")
+# Update metrics names to descriptions:
+desc <- data.frame (
+    name = limits$name,
+    desc = limits$name
 )
-m$name <- metric_desc [, 2] [match (m$name, metric_desc [, 1])]
+desc$desc [desc$name == "dependency_count"] <- "Potentially excessive dependencies:"
+desc$desc [desc$name == "has_ci"] <- "Lacking continuous integration:"
+desc$desc [desc$name == "issues_to_prs"] <- "High ratio of issues-to-PRs:"
+desc$desc [desc$name == "maintainer_count"] <- "Low number of maintainers:"
+desc$desc [desc$name == "test_coverage"] <- "Low test coverage:"
+m$name <- desc$desc [match (m$name, desc$name)]
 
 metrics <- unique (m$name)
 metrics_data <- lapply (metrics, function (i) {

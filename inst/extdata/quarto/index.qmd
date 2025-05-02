@@ -216,6 +216,12 @@ m <- readRDS ("results-metrics.Rds") |>
     dplyr::filter (below) |>
     dplyr::arrange (name)
 
+metric_desc <- rbind (
+    c ("has_ci", "Lacking continuous integration:"),
+    c ("test_coverage", "Low test coverage:")
+)
+m$name <- metric_desc [, 2] [match (m$name, metric_desc [, 1])]
+
 metrics <- unique (m$name)
 metrics_data <- lapply (metrics, function (i) {
     list (
@@ -236,7 +242,7 @@ bslib::page_fillable (
             value = paste0 (npkgs_requiring_maintenance, " packages"),
             # showcase = bsicons::bs_icon ("heart-pulse"),
             showcase = bsicons::bs_icon ("tools"),
-            showcase_layout = "top right",
+            showcase_layout = "bottom",
             htmltools::p (paste0 (
                 "with high community engagement, ",
                 "yet low developer responsiveness."

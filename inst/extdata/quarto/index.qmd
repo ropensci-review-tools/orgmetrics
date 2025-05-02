@@ -261,7 +261,10 @@ bslib::page_fillable (
                 )),
                 htmltools::br (),
                 if (nrow (data) == 1L) {
-                    tags$p (paste0 ("- ", data$package))
+                    tags$p (
+                        bsicons::bs_icon ("caret-right"),
+                        tags$a (href = data$url, data$package)
+                    )
                 } else {
                     htmltools::tagList (
                         lapply (seq_len (nrow (data)), function (i) {
@@ -283,7 +286,7 @@ bslib::page_fillable (
                     htmltools::div (
                         htmltools::h3 (i$h),
                         if (length (i$text) == 1L) {
-                            tags$p (i$text)
+                            tags$p (bsicons::bs_icon ("caret-right"), i$text)
                         } else {
                             htmltools::tagList (lapply (i$text, function (txt) {
                                 tags$p (bsicons::bs_icon ("caret-right"), txt)

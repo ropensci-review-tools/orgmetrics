@@ -232,7 +232,7 @@ metrics <- unique (m$name)
 metrics_data <- lapply (metrics, function (i) {
     list (
         h = i,
-        text = paste0 ("- ", m$package [which (m$name == i)])
+        text = m$package [which (m$name == i)]
     )
 })
 ```
@@ -259,7 +259,7 @@ bslib::page_fillable (
                     tags$p (paste0 ("- ", data$package))
                 } else {
                     htmltools::tagList (lapply (data$package, function (txt) {
-                        tags$p (paste0 ("-", txt))
+                        tags$p (bsicons::bs_icon ("caret-right"), txt)
                     }))
                 }
             ),
@@ -275,7 +275,9 @@ bslib::page_fillable (
                         if (length (i$text) == 1L) {
                             tags$p (i$text)
                         } else {
-                            htmltools::tagList (lapply (i$text, function (txt) tags$p (txt)))
+                            htmltools::tagList (lapply (i$text, function (txt) {
+                                tags$p (bsicons::bs_icon ("caret-right"), txt)
+                            }))
                         },
                         style = "padding-bottom: 1rem; padding-top: 0px; border-bottom: 1px solid #eee;"
                     )

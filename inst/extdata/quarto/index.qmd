@@ -178,34 +178,130 @@ data <- cbind (m, ci) |>
         index_lr_quad = pos_reg < 0 & pos_perp > 0,
         target_points = index_lr_quad & below_ci
     ) |>
-    dplyr::filter (target_points)
+    dplyr::filter (target_points) |>
+    dplyr::select (package, x, y) |>
+    dplyr::rename (comm_engage = x, dev_resp = y)
+repo_urls <- repo_data |>
+    dplyr::select (package, url)
+data <- dplyr::left_join (data, repo_urls, by = "package")
 
 npkgs_requiring_maintenance <- nrow (data)
 
 # library (ggplot2)
 # ggplot (m, aes (x = x, y = y)) +
-#     geom_point (cex = 2, col = "orange") +
+#     geom_point (cex = 2, col = "yellow") +
 #     geom_smooth (method = "lm", formula = "y ~ x", se = TRUE) +
-#     geom_abline (slope = perp_slope, intercept = perp_intercept, col = "orange") +
-#     geom_point (data = data, col = "red") +
+#     geom_abline (slope = perp_slope, intercept = perp_intercept, col = "blue", lty = 2) +
+#     geom_point (data = data, col = "red", cex = 2) +
 #     ggplot2::theme_minimal ()
 ```
+
+
+```{r}
+# Code to get outlier metrics for packages identified as having maintenance
+# priorities:
+threshold <- 0.8
+threshold <- 0.5 + threshold / 2
+num_sds <- qnorm (threshold, 0, 1)
+limits <- readRDS ("results-metrics.Rds") |>
+    dplyr::group_by (name) |>
+    dplyr::filter (!is.na (value)) |>
+    dplyr::summarise (
+        lower = mean (value) - num_sds * sd (value),
+        upper = mean (value) + num_sds * sd (value)
+    )
+m <- readRDS ("results-metrics.Rds") |>
+    dplyr::left_join (limits, by = "name") |>
+    dplyr::group_by (name) |>
+    dplyr::filter (!is.na (value)) |>
+    dplyr::mutate (below = value < lower) |>
+    dplyr::select (-lower, -upper) |>
+    dplyr::filter (below) |>
+    dplyr::arrange (name) |>
+    dplyr::left_join (repo_urls, by = "package")
+
+# Update metrics names to descriptions:
+desc <- data.frame (
+    name = limits$name,
+    desc = limits$name
+)
+desc$desc [desc$name == "dependency_count"] <- "Potentially excessive dependencies:"
+desc$desc [desc$name == "has_ci"] <- "Lacking continuous integration:"
+desc$desc [desc$name == "issues_to_prs"] <- "High ratio of issues-to-PRs:"
+desc$desc [desc$name == "maintainer_count"] <- "Low number of maintainers:"
+desc$desc [desc$name == "test_coverage"] <- "Low test coverage:"
+m$name <- desc$desc [match (m$name, desc$name)]
+
+metrics <- unique (m$name)
+metrics_data <- lapply (metrics, function (i) {
+    list (
+        h = i,
+        text = m$package [which (m$name == i)],
+        url = m$url [which (m$name == i)]
+    )
+})
+```
+
 
 
 ```{r}
 bslib::page_fillable (
     bslib::layout_columns (
         bslib::value_box (
+            full_screen = FALSE,
             title = "Urgent maintance required on",
             value = paste0 (npkgs_requiring_maintenance, " packages"),
             # showcase = bsicons::bs_icon ("heart-pulse"),
             showcase = bsicons::bs_icon ("tools"),
-            showcase_layout = "top right",
-            theme = "bg-gradient-red-yellow"
+            showcase_layout = "bottom",
+            htmltools::div (
+                htmltools::p (paste0 (
+                    "with high community engagement, ",
+                    "yet low developer responsiveness:"
+                )),
+                htmltools::br (),
+                if (nrow (data) == 1L) {
+                    tags$p (
+                        bsicons::bs_icon ("caret-right"),
+                        tags$a (href = data$url, data$package)
+                    )
+                } else {
+                    htmltools::tagList (
+                        lapply (seq_len (nrow (data)), function (i) {
+                            tags$p (
+                                bsicons::bs_icon ("caret-right"),
+                                tags$a (href = data$url [i], data$package [i])
+                            )
+                        })
+                    )
+                }
+            ),
+            theme = "bg-yellow"
         ),
         bslib::card (
             full_screen = TRUE,
-            card_header = ("A card")
+            bslib::card_header ("Maintenance priorities:"),
+            bslib::card_body (
+                lapply (metrics_data, function (i) {
+                    htmltools::div (
+                        htmltools::h3 (i$h),
+                        if (length (i$text) == 1L) {
+                            tags$p (
+                                bsicons::bs_icon ("caret-right"),
+                                tags$a (href = i$url, i$text)
+                            )
+                        } else {
+                            htmltools::tagList (lapply (seq_along (i$text), function (j) {
+                                tags$p (
+                                    bsicons::bs_icon ("caret-right"),
+                                    tags$a (href = i$url [j], i$text [j])
+                                )
+                            }))
+                        },
+                        style = "padding-bottom: 1rem; padding-top: 0px; border-bottom: 1px solid #eee;"
+                    )
+                })
+            )
         ),
         col_widths = c (4, 8)
     )

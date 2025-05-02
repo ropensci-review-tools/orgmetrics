@@ -249,10 +249,20 @@ bslib::page_fillable (
             # showcase = bsicons::bs_icon ("heart-pulse"),
             showcase = bsicons::bs_icon ("tools"),
             showcase_layout = "bottom",
-            htmltools::p (paste0 (
-                "with high community engagement, ",
-                "yet low developer responsiveness."
-            )),
+            htmltools::div (
+                htmltools::p (paste0 (
+                    "with high community engagement, ",
+                    "yet low developer responsiveness:"
+                )),
+                htmltools::br (),
+                if (nrow (data) == 1L) {
+                    tags$p (paste0 ("- ", data$package))
+                } else {
+                    htmltools::tagList (lapply (data$package, function (txt) {
+                        tags$p (paste0 ("-", txt))
+                    }))
+                }
+            ),
             theme = "bg-gradient-red-yellow"
         ),
         bslib::card (

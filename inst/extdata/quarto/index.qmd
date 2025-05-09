@@ -226,8 +226,17 @@ desc <- data.frame (
 desc$desc [desc$name == "burstiness"] <- "Development too 'bursty':"
 desc$desc [desc$name == "dependency_count"] <- "Potentially excessive dependencies:"
 desc$desc [desc$name == "has_ci"] <- "Lacking continuous integration:"
+desc$desc [desc$name == "issue_age"] <- "Old or stale issues:"
+desc$desc [desc$name == "issue_response_time"] <- "Issue response time:"
 desc$desc [desc$name == "issues_to_prs"] <- "High ratio of issues-to-PRs:"
+desc$desc [desc$name == "libyears"] <- "Dependencies need updating/checking:"
 desc$desc [desc$name == "maintainer_count"] <- "Low number of maintainers:"
+desc$desc [desc$name == "num_stars"] <- "Low number of GitHub stars:"
+desc$desc [desc$name == "pr_response_durations"] <- "Slow response to pull requests:"
+desc$desc [desc$name == "pr_review_duration"] <- "Slow review times on pull requests:"
+desc$desc [desc$name == "release_freq"] <- "Infrequent releases:"
+desc$desc [desc$name == "response_time"] <- "Slow response to issues:"
+desc$desc [desc$name == "time_to_close"] <- "Time to close issues too long:"
 desc$desc [desc$name == "test_coverage"] <- "Low test coverage:"
 m$name <- desc$desc [match (m$name, desc$name)]
 

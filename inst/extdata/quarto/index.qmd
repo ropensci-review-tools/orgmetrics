@@ -24,8 +24,6 @@ repo_orgs <- gsub ("\\/.*$", "", repo_data$orgrepo) |>
     table () |>
     sort (decreasing = TRUE) |>
     head (n = 2L)
-value1 <- 99
-value2 <- 33
 ```
 
 ```{r sparkline-plot-commits, echo = FALSE}

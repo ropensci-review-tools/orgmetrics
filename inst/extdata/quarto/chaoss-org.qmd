@@ -103,6 +103,17 @@ Inputs.table(filteredModelsTable, {
     format: {
         dev_responsiveness: sparkbar(d3.max(modelsTable, d => d.dev_responsiveness)),
         proj_engagement: sparkbar(d3.max(modelsTable, d => d.proj_engagement)),
+        proj_awareness: sparkbar(d3.max(modelsTable, d => d.proj_awareness)),
+        community_activity: sparkbar(d3.max(modelsTable, d => d.community_activity)),
+        oss_compliance: sparkbar(d3.max(modelsTable, d => d.oss_compliance)),
+        viability_community: sparkbar(d3.max(modelsTable, d => d.viability_community)),
+        viability_starter: sparkbar(d3.max(modelsTable, d => d.viability_starter)),
+        viability_gov: sparkbar(d3.max(modelsTable, d => d.viability_gov)),
+        viability_strategy: sparkbar(d3.max(modelsTable, d => d.viability_strategy)),
+        collab_devel_index: sparkbar(d3.max(modelsTable, d => d.collab_devel_index)),
+        comm_serv_support: sparkbar(d3.max(modelsTable, d => d.comm_serv_support)),
+        starter_health: sparkbar(d3.max(modelsTable, d => d.starter_health)),
+        comm_welcoming: sparkbar(d3.max(modelsTable, d => d.comm_welcoming)),
     }
 })
 ```

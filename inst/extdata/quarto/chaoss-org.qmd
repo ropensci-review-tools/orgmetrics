@@ -18,7 +18,50 @@ represent higher level conceptual aggregations of metrics, designed by the
 CHAOSS community to represent important and more abstracted aspects of
 community health.
 
-The single graph here converts the models into a single measure of "maintainer
+---
+
+```{r}
+m <- readRDS ("results-models.Rds") |>
+    dplyr::filter (name != "final") |>
+    dplyr::distinct () |>
+    dplyr::mutate (value = round (100 * value)) |>
+    tidyr::pivot_wider (names_from = name, values_from = value)
+ojs_define (models_table_in = m)
+```
+
+```{ojs}
+modelsTable = {
+    return transpose(models_table_in).map(row => ({
+        ...row,
+    }));
+}
+
+function sparkbar(max) {
+  return (x) => htl.html`<div style="
+    background: #00ff64;
+    color: black;
+    width: ${100 * x / max}%;
+    float: right;
+    padding-right: 3px;
+    box-sizing: border-box;
+    overflow: visible;
+    display: flex;
+    justify-content: end;">${x.toLocaleString("en-US")}`
+}
+
+Inputs.table(modelsTable, {
+    format: {
+        dev_responsiveness: sparkbar(d3.max(modelsTable, d => d.dev_responsiveness)),
+        proj_engagement: sparkbar(d3.max(modelsTable, d => d.proj_engagement)),
+    }
+})
+```
+
+
+
+
+
+The following graph converts the models into a single measure of "maintainer
 deficit", which is a ratio of community engagement to developer responsiveness.
 The [*Community Health* page](./models.html) provides full detail of individual
 models and metrics.

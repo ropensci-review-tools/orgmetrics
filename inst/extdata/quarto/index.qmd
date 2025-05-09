@@ -218,6 +218,10 @@ m <- readRDS ("results-metrics.Rds") |>
     dplyr::arrange (name) |>
     dplyr::left_join (repo_urls, by = "package", relationship = "many-to-many")
 
+# Then reduce to only the identified outlier packages:
+m <- dplyr::filter (m, package %in% data$package) |>
+    dplyr::group_by (package)
+
 # Update metrics names to descriptions:
 desc <- data.frame (
     name = limits$name,

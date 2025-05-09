@@ -77,6 +77,12 @@ test_that ("org data preprocessing", {
     expect_type (data_pre$value, "double")
     expect_true (!all (is.na (data_pre$value))) # Some actual values!
 
+    # Replicate metrics in 'data_org' data:
+    names (data_org$metrics) <- rep ("a", length (data_org$metrics))
+    mb <- data_org$metrics
+    names (mb) <- rep ("b", length (mb))
+    data_org$metrics <- c (data_org$metrics, mb)
+
     data_maintenance <- org_maintenance_metric (data_org)
     expect_s3_class (data_maintenance, "data.frame")
     expect_equal (ncol (data_maintenance), 4L)

@@ -249,11 +249,12 @@ bslib::page_fillable (
     bslib::layout_columns (
         bslib::value_box (
             full_screen = FALSE,
+            fill = FALSE,
             title = "Urgent maintance required on",
             value = paste0 (npkgs_requiring_maintenance, " packages"),
             # showcase = bsicons::bs_icon ("heart-pulse"),
             showcase = bsicons::bs_icon ("tools"),
-            showcase_layout = "bottom",
+            showcase_layout = "top right",
             htmltools::div (
                 htmltools::p (paste0 (
                     "with high community engagement, ",

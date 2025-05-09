@@ -51,7 +51,7 @@ test_that ("org data preprocessing", {
     metrics_df <- data_metrics_to_df (data_org$metrics)
     expect_s3_class (metrics_df, "data.frame")
     expect_equal (nrow (metrics_df), 4L) # one year with 3-month intervals
-    expect_equal (ncol (metrics_df), 51L) # one year with 3-month intervals
+    expect_equal (ncol (metrics_df), 50L) # one year with 3-month intervals
     expect_equal (names (metrics_df) [1:3], c ("package", "org", "date"))
     classes <- vapply (
         names (metrics_df),
@@ -63,17 +63,25 @@ test_that ("org data preprocessing", {
     expect_true (all (classes %in% c ("logical", "integer", "numeric")))
     df_names <- names (classes) # names of df minus 1st 3.
 
-    mod_dat <- load_model_json_data ()
-    # This is not true, but should be. Have to update repometrics to ensure:
-    # expect_true (all (names (classes)) %in% mod_dat$metrics$names)
+    # Then replicate metrics_df to simluate multiple packages:
+    metrics_df$package <- "a"
+    metrics_df2 <- metrics_df
+    metrics_df2$package <- "b"
+    metrics_df <- rbind (metrics_df, metrics_df2)
 
     data_pre <- data_metrics_preprocess (metrics_df)
     expect_s3_class (data_pre, "data.frame")
     expect_equal (ncol (data_pre), 3L)
     expect_equal (names (data_pre), c ("package", "name", "value"))
-    expect_identical (sort (df_names), sort (data_pre$name))
+    expect_identical (sort (df_names), sort (unique (data_pre$name)))
     expect_type (data_pre$value, "double")
     expect_true (!all (is.na (data_pre$value))) # Some actual values!
+
+    # Replicate metrics in 'data_org' data:
+    names (data_org$metrics) <- rep ("a", length (data_org$metrics))
+    mb <- data_org$metrics
+    names (mb) <- rep ("b", length (mb))
+    data_org$metrics <- c (data_org$metrics, mb)
 
     data_maintenance <- org_maintenance_metric (data_org)
     expect_s3_class (data_maintenance, "data.frame")
@@ -109,6 +117,8 @@ test_that ("org data preprocessing", {
     expect_equal (unique (classes [1:3]), c ("character", "Date"))
     classes <- classes [-(1:3)]
     expect_true (all (classes == "numeric"))
+
+    mod_dat <- load_model_json_data ()
     mod_names <- names (mod_dat$models)
     expect_true (all (mod_names %in% names (models_df)))
 })

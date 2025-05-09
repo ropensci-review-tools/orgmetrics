@@ -24,8 +24,6 @@ repo_orgs <- gsub ("\\/.*$", "", repo_data$orgrepo) |>
     table () |>
     sort (decreasing = TRUE) |>
     head (n = 2L)
-value1 <- 99
-value2 <- 33
 ```
 
 ```{r sparkline-plot-commits, echo = FALSE}
@@ -218,17 +216,31 @@ m <- readRDS ("results-metrics.Rds") |>
     dplyr::select (-lower, -upper) |>
     dplyr::filter (below) |>
     dplyr::arrange (name) |>
-    dplyr::left_join (repo_urls, by = "package")
+    dplyr::left_join (repo_urls, by = "package", relationship = "many-to-many")
+
+# Then reduce to only the identified outlier packages:
+m <- dplyr::filter (m, package %in% data$package) |>
+    dplyr::group_by (package)
 
 # Update metrics names to descriptions:
 desc <- data.frame (
     name = limits$name,
     desc = limits$name
 )
+desc$desc [desc$name == "burstiness"] <- "Development too 'bursty':"
 desc$desc [desc$name == "dependency_count"] <- "Potentially excessive dependencies:"
 desc$desc [desc$name == "has_ci"] <- "Lacking continuous integration:"
+desc$desc [desc$name == "issue_age"] <- "Old or stale issues:"
+desc$desc [desc$name == "issue_response_time"] <- "Issue response time:"
 desc$desc [desc$name == "issues_to_prs"] <- "High ratio of issues-to-PRs:"
+desc$desc [desc$name == "libyears"] <- "Dependencies need updating/checking:"
 desc$desc [desc$name == "maintainer_count"] <- "Low number of maintainers:"
+desc$desc [desc$name == "num_stars"] <- "Low number of GitHub stars:"
+desc$desc [desc$name == "pr_response_durations"] <- "Slow response to pull requests:"
+desc$desc [desc$name == "pr_review_duration"] <- "Slow review times on pull requests:"
+desc$desc [desc$name == "release_freq"] <- "Infrequent releases:"
+desc$desc [desc$name == "response_time"] <- "Slow response to issues:"
+desc$desc [desc$name == "time_to_close"] <- "Time to close issues too long:"
 desc$desc [desc$name == "test_coverage"] <- "Low test coverage:"
 m$name <- desc$desc [match (m$name, desc$name)]
 
@@ -249,11 +261,12 @@ bslib::page_fillable (
     bslib::layout_columns (
         bslib::value_box (
             full_screen = FALSE,
+            fill = FALSE,
             title = "Urgent maintance required on",
             value = paste0 (npkgs_requiring_maintenance, " packages"),
             # showcase = bsicons::bs_icon ("heart-pulse"),
             showcase = bsicons::bs_icon ("tools"),
-            showcase_layout = "bottom",
+            showcase_layout = "top right",
             htmltools::div (
                 htmltools::p (paste0 (
                     "with high community engagement, ",
@@ -307,7 +320,6 @@ bslib::page_fillable (
     )
 )
 ```
-
 
 
 -----

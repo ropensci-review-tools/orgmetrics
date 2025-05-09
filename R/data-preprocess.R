@@ -52,28 +52,75 @@ data_metrics_to_df <- function (data_metrics) {
 
 #' Convert `data.frame` of metrics data returned from `data_metrics_to_df` to
 #' long-form tibble reduced to re-scaled values of latest metrics only for each
-#' package.
+#' package. Values are scaled and converted according to the specifications in
+#' repometrics JSON data, and then rescaled so that returned values are all on
+#' same scales, with higher values being better than lower values.
+#'
 #' @noRd
 data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
 
     # Suppress no visible binding notes:
     org <- date <- package <- NULL
 
-    data_metrics <- data_metrics |>
+    metric_direction <- load_model_json_data ()$metrics
+
+    metrics <- data_metrics |>
         dplyr::mutate (
             dplyr::across (dplyr::where (is.logical), as.numeric)
         ) |>
-        dplyr::mutate (
-            dplyr::across (dplyr::where (is.numeric), ~ scale (.) [, 1])
-        ) |>
         dplyr::group_by (package) |>
-        dplyr::slice_head (n = 1L)
-    if (longer) {
-        data_metrics <- data_metrics |>
-            dplyr::select (-org, -date) |>
-            tidyr::pivot_longer (-package)
+        dplyr::slice_head (n = 1L) |>
+        dplyr::select (-org, -date) |>
+        tidyr::pivot_longer (-package) |>
+        dplyr::left_join (metric_direction, by = "name")
+    # libyears is log-scaled, but can be negative
+    i <- which (metrics$name == "libyears")
+    metrics$value [i] <-
+        metrics$value [i] - min (metrics$value [i], na.rm = TRUE)
+
+    # Use random metrics values for tests:
+    is_test_env <- Sys.getenv ("ORGMETRICS_TESTS") == "true"
+    if (is_test_env) {
+        set.seed (1L)
+        metrics$value <- runif (nrow (metrics))
     }
-    return (data_metrics)
+    # Remove any metrics which have no non-NA values, or all identical values
+    chk <- metrics |>
+        dplyr::group_by (name) |>
+        dplyr::summarise (allna = dplyr::if_else (
+            all (is.na (value)) || length (unique (value)) == 1L, TRUE, FALSE
+        )) |>
+        dplyr::filter (!allna)
+    metrics <- metrics |> dplyr::filter (name %in% chk$name)
+
+    # Then rescale, first establishing min value as half of the first value > 0
+    # if that exists. This ensures that log-scaled distributions are
+    # appropriately spaced.
+    metrics <- metrics |>
+        dplyr::group_by (name) |>
+        dplyr::mutate (minval0 = min (value, na.rm = TRUE)) |>
+        dplyr::mutate (minval1 = sort (unique (value)) [2]) |>
+        dplyr::mutate (
+            minval = dplyr::if_else (!is.na (minval1), minval1 / 2, minval0)
+        ) |>
+        dplyr::select (-minval0, -minval1) |>
+        dplyr::mutate (value = dplyr::if_else (
+            (is.na (value) | is.nan (value) | value == 0), minval, value
+        )) |>
+        dplyr::select (-minval) |>
+        dplyr::mutate (value = dplyr::if_else (
+            value == 0 & scale == "log", 0.001, value
+        )) |>
+        dplyr::mutate (value = dplyr::if_else (
+            scale == "log", log10 (value), value
+        )) |>
+        dplyr::mutate (value = scale (value) [, 1]) |>
+        dplyr::mutate (value = dplyr::if_else (
+            better == "lower", -value, value
+        )) |>
+        dplyr::select (-what, -scale, -better)
+
+    return (metrics)
 }
 
 #' Pre-process organization data by converting all model values to standard

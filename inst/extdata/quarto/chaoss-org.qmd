@@ -35,7 +35,41 @@ modelsTable = {
         ...row,
     }));
 }
+availableColumns = Object.keys(modelsTable[0]).filter(k => k !== 'package')
+```
 
+```{ojs}
+viewof columnGroups = {
+    const input =  Inputs.checkbox(
+        availableColumns,
+        {
+            value: availableColumns,
+            label: htl.html`<b>Node types:</b>`,
+        }
+    );
+
+    // Modification ideas from
+    // https://talk.observablehq.com/t/what-is-the-best-way-to-style-an-input-checkbox/7690/2
+    const scope = DOM.uid().id;
+    input.classList.add(scope);
+
+    input.append(htl.html`<style>
+    .${scope} > div, .${scope} > div label { display: flex; flex-wrap: wrap; gap: 10px; width: 300px }
+    `)
+
+    return input;
+}
+
+filteredModelsTable = modelsTable.map(item => {
+    const filteredTable = {package: item.package};
+    for (const col of columnGroups) {
+        filteredTable[col] = item[col];
+    }
+    return filteredTable
+})
+```
+
+```{ojs}
 function sparkbar(max) {
   return (x) => htl.html`<div style="
     background: #00ff64;
@@ -49,7 +83,7 @@ function sparkbar(max) {
     justify-content: end;">${x.toLocaleString("en-US")}`
 }
 
-Inputs.table(modelsTable, {
+Inputs.table(filteredModelsTable, {
     format: {
         dev_responsiveness: sparkbar(d3.max(modelsTable, d => d.dev_responsiveness)),
         proj_engagement: sparkbar(d3.max(modelsTable, d => d.proj_engagement)),

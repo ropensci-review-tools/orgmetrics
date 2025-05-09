@@ -30,21 +30,17 @@ ojs_define (models_table_in = m)
 ```
 
 ```{ojs}
-modelsTable = {
-    return transpose(models_table_in).map(row => ({
-        ...row,
-    }));
-}
-availableColumns = Object.keys(modelsTable[0]).filter(k => k !== 'package')
-```
-
-```{ojs}
-viewof columnGroups = {
+modelColumnTypes = FileAttachment('model-column-types.csv')
+    .csv({typed: false})
+    .then(rows => {
+        return [...new Set(rows.map(row => row.group))]
+    })
+viewof columnTypesSelected = {
     const input =  Inputs.checkbox(
-        availableColumns,
+        modelColumnTypes,
         {
-            value: availableColumns,
-            label: htl.html`<b>Node types:</b>`,
+            value: modelColumnTypes,
+            label: htl.html`<b>Categories:</b>`,
         }
     );
 
@@ -59,10 +55,30 @@ viewof columnGroups = {
 
     return input;
 }
+columnModels = FileAttachment('model-column-types.csv')
+    .csv({typed: false})
+    .then(rows => {
+        return rows
+            .filter(row => columnTypesSelected.includes(row.group))
+            .map(row => row.model)
+    })
+```
 
+
+
+```{ojs}
+modelsTable = {
+    return transpose(models_table_in).map(row => ({
+        ...row,
+    }));
+}
+// availableColumns = Object.keys(modelsTable[0]).filter(k => k !== 'package')
+```
+
+```{ojs}
 filteredModelsTable = modelsTable.map(item => {
     const filteredTable = {package: item.package};
-    for (const col of columnGroups) {
+    for (const col of columnModels) {
         filteredTable[col] = item[col];
     }
     return filteredTable

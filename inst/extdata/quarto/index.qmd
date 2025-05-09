@@ -345,15 +345,3 @@ The dashboard currently has three main pages:
 
 There is also an additional [network diagram page](./network.html), showing
 strengths of relationship between each repository.
-
-:::{.grid}
-
-:::{.g-col-12 .g-col-md-6}
-<div class="card" style="background-color:powderblue; text-align:center;"><h1>First Card</h1></div>
-:::
-
-:::{.g-col-12 .g-col-md-6}
-<div class="card"><h1>Second Card</h1></div>
-:::
-
-:::

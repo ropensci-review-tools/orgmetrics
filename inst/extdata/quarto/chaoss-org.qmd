@@ -30,12 +30,62 @@ ojs_define (models_table_in = m)
 ```
 
 ```{ojs}
+modelColumnTypes = FileAttachment('model-column-types.csv')
+    .csv({typed: false})
+    .then(rows => {
+        return [...new Set(rows.map(row => row.group))]
+    })
+viewof columnTypesSelected = {
+    const input =  Inputs.checkbox(
+        modelColumnTypes,
+        {
+            value: modelColumnTypes,
+            label: htl.html`<b>Categories:</b>`,
+        }
+    );
+
+    // Modification ideas from
+    // https://talk.observablehq.com/t/what-is-the-best-way-to-style-an-input-checkbox/7690/2
+    const scope = DOM.uid().id;
+    input.classList.add(scope);
+
+    input.append(htl.html`<style>
+    .${scope} > div, .${scope} > div label { display: flex; flex-wrap: wrap; gap: 10px; width: 300px }
+    `)
+
+    return input;
+}
+columnModels = FileAttachment('model-column-types.csv')
+    .csv({typed: false})
+    .then(rows => {
+        return rows
+            .filter(row => columnTypesSelected.includes(row.group))
+            .map(row => row.model)
+    })
+```
+
+
+
+```{ojs}
 modelsTable = {
     return transpose(models_table_in).map(row => ({
         ...row,
     }));
 }
+// availableColumns = Object.keys(modelsTable[0]).filter(k => k !== 'package')
+```
 
+```{ojs}
+filteredModelsTable = modelsTable.map(item => {
+    const filteredTable = {package: item.package};
+    for (const col of columnModels) {
+        filteredTable[col] = item[col];
+    }
+    return filteredTable
+})
+```
+
+```{ojs}
 function sparkbar(max) {
   return (x) => htl.html`<div style="
     background: #00ff64;
@@ -49,10 +99,21 @@ function sparkbar(max) {
     justify-content: end;">${x.toLocaleString("en-US")}`
 }
 
-Inputs.table(modelsTable, {
+Inputs.table(filteredModelsTable, {
     format: {
         dev_responsiveness: sparkbar(d3.max(modelsTable, d => d.dev_responsiveness)),
         proj_engagement: sparkbar(d3.max(modelsTable, d => d.proj_engagement)),
+        proj_awareness: sparkbar(d3.max(modelsTable, d => d.proj_awareness)),
+        community_activity: sparkbar(d3.max(modelsTable, d => d.community_activity)),
+        oss_compliance: sparkbar(d3.max(modelsTable, d => d.oss_compliance)),
+        viability_community: sparkbar(d3.max(modelsTable, d => d.viability_community)),
+        viability_starter: sparkbar(d3.max(modelsTable, d => d.viability_starter)),
+        viability_gov: sparkbar(d3.max(modelsTable, d => d.viability_gov)),
+        viability_strategy: sparkbar(d3.max(modelsTable, d => d.viability_strategy)),
+        collab_devel_index: sparkbar(d3.max(modelsTable, d => d.collab_devel_index)),
+        comm_serv_support: sparkbar(d3.max(modelsTable, d => d.comm_serv_support)),
+        starter_health: sparkbar(d3.max(modelsTable, d => d.starter_health)),
+        comm_welcoming: sparkbar(d3.max(modelsTable, d => d.comm_welcoming)),
     }
 })
 ```

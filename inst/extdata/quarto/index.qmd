@@ -216,13 +216,14 @@ m <- readRDS ("results-metrics.Rds") |>
     dplyr::select (-lower, -upper) |>
     dplyr::filter (below) |>
     dplyr::arrange (name) |>
-    dplyr::left_join (repo_urls, by = "package")
+    dplyr::left_join (repo_urls, by = "package", relationship = "many-to-many")
 
 # Update metrics names to descriptions:
 desc <- data.frame (
     name = limits$name,
     desc = limits$name
 )
+desc$desc [desc$name == "burstiness"] <- "Development too 'bursty':"
 desc$desc [desc$name == "dependency_count"] <- "Potentially excessive dependencies:"
 desc$desc [desc$name == "has_ci"] <- "Lacking continuous integration:"
 desc$desc [desc$name == "issues_to_prs"] <- "High ratio of issues-to-PRs:"

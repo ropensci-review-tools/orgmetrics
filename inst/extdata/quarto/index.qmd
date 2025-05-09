@@ -26,6 +26,109 @@ repo_orgs <- gsub ("\\/.*$", "", repo_data$orgrepo) |>
     head (n = 2L)
 ```
 
+
+```{r}
+# This code identifies packages with high community engagement yet low
+# developer responsiveness. It identifies packages lying in the lower-right
+# corner of the quadrant frormed by the regerssion and its perpendicular
+# through the mid-point of the entire plane, and lying below the 90% CI.
+ci_level <- 0.9
+m <- readRDS ("results-maintenance-org.Rds") |>
+    dplyr::rename (x = comm_engage, y = dev_resp)
+x_mid <- min (m$x) + diff (range (m$x)) / 2
+y_mid <- min (m$y) + diff (range (m$y)) / 2
+
+mod <- lm (y ~ x, data = m)
+slope <- coefficients (mod) [2]
+intercept <- coefficients (mod) [1]
+perp_slope <- -1 / slope
+perp_intercept <- y_mid - perp_slope * x_mid
+
+ci <- predict (mod, interval = "confidence", level = ci_level) |>
+    as.data.frame ()
+data <- cbind (m, ci) |>
+    dplyr::mutate (
+        below_ci = y < lwr,
+        pos_reg = y - (slope * x + intercept),
+        pos_perp = y - (perp_slope * x + perp_intercept),
+        index_lr_quad = pos_reg < 0 & pos_perp > 0,
+        target_points = index_lr_quad & below_ci
+    ) |>
+    dplyr::filter (target_points) |>
+    dplyr::select (package, x, y) |>
+    dplyr::rename (comm_engage = x, dev_resp = y)
+repo_urls <- repo_data |>
+    dplyr::select (package, url)
+data <- dplyr::left_join (data, repo_urls, by = "package")
+
+npkgs_requiring_maintenance <- nrow (data)
+
+# library (ggplot2)
+# ggplot (m, aes (x = x, y = y)) +
+#     geom_point (cex = 2, col = "yellow") +
+#     geom_smooth (method = "lm", formula = "y ~ x", se = TRUE) +
+#     geom_abline (slope = perp_slope, intercept = perp_intercept, col = "blue", lty = 2) +
+#     geom_point (data = data, col = "red", cex = 2) +
+#     ggplot2::theme_minimal ()
+```
+
+
+
+```{r}
+lines <- paste0 (unname (repo_orgs), " from ", names (repo_orgs))
+bslib::page_fillable (
+    bslib::layout_columns (
+        bslib::value_box (
+            full_screen = FALSE,
+            fill = TRUE,
+            title = "There are",
+            value = paste0 (format (num_repos, big.mark = ","), " repositories"),
+            showcase = bsicons::bs_icon ("clipboard-data"),
+            showcase_layout = "top right",
+            theme = "bg-gradient-blue-orange",
+            htmltools::p ("including"),
+            htmltools::p (bsicons::bs_icon ("1-square"), lines [1]),
+            htmltools::p (bsicons::bs_icon ("2-square"), lines [2])
+        ),
+        bslib::value_box (
+            full_screen = FALSE,
+            fill = FALSE,
+            title = "Urgent maintance required on",
+            value = paste0 (npkgs_requiring_maintenance, " packages"),
+            # showcase = bsicons::bs_icon ("heart-pulse"),
+            showcase = bsicons::bs_icon ("tools"),
+            showcase_layout = "top right",
+            htmltools::div (
+                htmltools::p (paste0 (
+                    "with high community engagement, ",
+                    "yet low developer responsiveness:"
+                )),
+                htmltools::br (),
+                if (nrow (data) == 1L) {
+                    tags$p (
+                        bsicons::bs_icon ("caret-right"),
+                        tags$a (href = data$url, data$package)
+                    )
+                } else {
+                    htmltools::tagList (
+                        lapply (seq_len (nrow (data)), function (i) {
+                            tags$p (
+                                bsicons::bs_icon ("caret-right"),
+                                tags$a (href = data$url [i], data$package [i])
+                            )
+                        })
+                    )
+                }
+            ),
+            theme = "bg-yellow"
+        ),
+        col_widths = c (6, 6)
+    )
+)
+```
+
+
+
 ```{r sparkline-plot-commits, echo = FALSE}
 sparkline_plot_commits_in <- function (annual_commits) {
     x <- as.integer (annual_commits$year)
@@ -111,16 +214,6 @@ lines <- paste0 (unname (repo_orgs), " from ", names (repo_orgs))
 bslib::page_fillable (
     bslib::layout_columns (
         bslib::value_box (
-            title = "There are",
-            value = paste0 (format (num_repos, big.mark = ","), " repositories"),
-            showcase = bsicons::bs_icon ("clipboard-data"),
-            showcase_layout = "top right",
-            theme = "bg-gradient-blue-orange",
-            htmltools::p ("including"),
-            htmltools::p (bsicons::bs_icon ("1-square"), lines [1]),
-            htmltools::p (bsicons::bs_icon ("2-square"), lines [2])
-        ),
-        bslib::value_box (
             title = "Total commits:",
             value = format (sum (annual_commits$num_commits), big.mark = ","),
             htmltools::p (
@@ -144,57 +237,9 @@ bslib::page_fillable (
             showcase_layout = "bottom",
             theme = "bg-teal"
         ),
-        col_widths = c (4, 4, 4)
+        col_widths = c (6, 6),
     )
 )
-```
-
-
-## Maintenance Priorities
-
-```{r}
-# This code identifies packages with high community engagement yet low
-# developer responsiveness. It identifies packages lying in the lower-right
-# corner of the quadrant frormed by the regerssion and its perpendicular
-# through the mid-point of the entire plane, and lying below the 90% CI.
-ci_level <- 0.9
-m <- readRDS ("results-maintenance-org.Rds") |>
-    dplyr::rename (x = comm_engage, y = dev_resp)
-x_mid <- min (m$x) + diff (range (m$x)) / 2
-y_mid <- min (m$y) + diff (range (m$y)) / 2
-
-mod <- lm (y ~ x, data = m)
-slope <- coefficients (mod) [2]
-intercept <- coefficients (mod) [1]
-perp_slope <- -1 / slope
-perp_intercept <- y_mid - perp_slope * x_mid
-
-ci <- predict (mod, interval = "confidence", level = ci_level) |>
-    as.data.frame ()
-data <- cbind (m, ci) |>
-    dplyr::mutate (
-        below_ci = y < lwr,
-        pos_reg = y - (slope * x + intercept),
-        pos_perp = y - (perp_slope * x + perp_intercept),
-        index_lr_quad = pos_reg < 0 & pos_perp > 0,
-        target_points = index_lr_quad & below_ci
-    ) |>
-    dplyr::filter (target_points) |>
-    dplyr::select (package, x, y) |>
-    dplyr::rename (comm_engage = x, dev_resp = y)
-repo_urls <- repo_data |>
-    dplyr::select (package, url)
-data <- dplyr::left_join (data, repo_urls, by = "package")
-
-npkgs_requiring_maintenance <- nrow (data)
-
-# library (ggplot2)
-# ggplot (m, aes (x = x, y = y)) +
-#     geom_point (cex = 2, col = "yellow") +
-#     geom_smooth (method = "lm", formula = "y ~ x", se = TRUE) +
-#     geom_abline (slope = perp_slope, intercept = perp_intercept, col = "blue", lty = 2) +
-#     geom_point (data = data, col = "red", cex = 2) +
-#     ggplot2::theme_minimal ()
 ```
 
 
@@ -261,65 +306,30 @@ metrics_data <- lapply (metrics, function (i) {
 
 ```{r}
 bslib::page_fillable (
-    bslib::layout_columns (
-        bslib::value_box (
-            full_screen = FALSE,
-            fill = FALSE,
-            title = "Urgent maintance required on",
-            value = paste0 (npkgs_requiring_maintenance, " packages"),
-            # showcase = bsicons::bs_icon ("heart-pulse"),
-            showcase = bsicons::bs_icon ("tools"),
-            showcase_layout = "top right",
-            htmltools::div (
-                htmltools::p (paste0 (
-                    "with high community engagement, ",
-                    "yet low developer responsiveness:"
-                )),
-                htmltools::br (),
-                if (nrow (data) == 1L) {
-                    tags$p (
-                        bsicons::bs_icon ("caret-right"),
-                        tags$a (href = data$url, data$package)
-                    )
-                } else {
-                    htmltools::tagList (
-                        lapply (seq_len (nrow (data)), function (i) {
+    bslib::card (
+        full_screen = FALSE,
+        bslib::card_header ("Maintenance priorities:"),
+        bslib::card_body (
+            lapply (metrics_data, function (i) {
+                htmltools::div (
+                    htmltools::h3 (i$h),
+                    if (length (i$text) == 1L) {
+                        tags$p (
+                            bsicons::bs_icon ("caret-right"),
+                            tags$a (href = i$url, i$text)
+                        )
+                    } else {
+                        htmltools::tagList (lapply (seq_along (i$text), function (j) {
                             tags$p (
                                 bsicons::bs_icon ("caret-right"),
-                                tags$a (href = data$url [i], data$package [i])
+                                tags$a (href = i$url [j], i$text [j])
                             )
-                        })
-                    )
-                }
-            ),
-            theme = "bg-yellow"
-        ),
-        bslib::card (
-            full_screen = TRUE,
-            bslib::card_header ("Maintenance priorities:"),
-            bslib::card_body (
-                lapply (metrics_data, function (i) {
-                    htmltools::div (
-                        htmltools::h3 (i$h),
-                        if (length (i$text) == 1L) {
-                            tags$p (
-                                bsicons::bs_icon ("caret-right"),
-                                tags$a (href = i$url, i$text)
-                            )
-                        } else {
-                            htmltools::tagList (lapply (seq_along (i$text), function (j) {
-                                tags$p (
-                                    bsicons::bs_icon ("caret-right"),
-                                    tags$a (href = i$url [j], i$text [j])
-                                )
-                            }))
-                        },
-                        style = "padding-bottom: 1rem; padding-top: 0px; border-bottom: 1px solid #eee;"
-                    )
-                })
-            )
-        ),
-        col_widths = c (4, 8)
+                        }))
+                    },
+                    style = "padding-bottom: 1rem; padding-top: 0px; border-bottom: 1px solid #eee;"
+                )
+            })
+        )
     )
 )
 ```

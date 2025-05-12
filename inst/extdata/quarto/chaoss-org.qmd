@@ -119,7 +119,11 @@ Inputs.table(filteredModelsTable, {
 ```
 
 
-
+<iframe class="airtable-embed"
+    src="https://airtable.com/embed/appegDLtrNVgkWROB/shrEcBOUoO9nqjyZE?viewControls=on"
+    frameborder="0" onmousewheel="" width="100%" height="533"
+    style="background: transparent; border: 1px solid #ccc;">
+</iframe>
 
 
 The following graph converts the models into a single measure of "maintainer

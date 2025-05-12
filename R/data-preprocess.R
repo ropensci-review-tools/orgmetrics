@@ -122,6 +122,18 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
         dplyr::select (-what, -scale, -better) |>
         dplyr::ungroup ()
 
+    if (longer) {
+        # Table output for airtable
+        requireNamespace ("tidyr", quietly = TRUE)
+
+        metrics <- tidyr::pivot_wider (
+            metrics,
+            names_from = name,
+            values_from = value
+        )
+    }
+
+
     return (metrics)
 }
 

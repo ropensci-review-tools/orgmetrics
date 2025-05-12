@@ -51,9 +51,12 @@ data_metrics_to_df <- function (data_metrics) {
 
     # And until data are updated to new repometric structure, need to manually
     # remove these columns:
-    data_metrics_df <- data_metrics_df |>
-        dplyr::select (-pr_reviews_approved) |>
-        dplyr::rename (pr_reviews_approved = pr_revs_approved)
+    if (all (c ("pr_revs_approved", "pr_reviews_approved") %in%
+        names (data_metrics_df))) {
+        data_metrics_df <- data_metrics_df |>
+            dplyr::select (-pr_reviews_approved) |>
+            dplyr::rename (pr_reviews_approved = pr_revs_approved)
+    }
 
     return (data_metrics_df)
 }
@@ -132,7 +135,7 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
         dplyr::select (-what, -scale, -better) |>
         dplyr::ungroup ()
 
-    if (longer) {
+    if (!longer) {
         # Table output for airtable
         requireNamespace ("tidyr", quietly = TRUE)
 

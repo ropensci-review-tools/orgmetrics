@@ -46,8 +46,16 @@ data_metrics_to_df <- function (data_metrics) {
 
     # Suppress no visible binding note:
     package <- NULL
-    do.call (rbind, data_metrics_df) |>
+    data_metrics_df <- do.call (rbind, data_metrics_df) |>
         dplyr::arrange (package, dplyr::desc (date))
+
+    # And until data are updated to new repometric structure, need to manually
+    # remove these columns:
+    data_metrics_df <- data_metrics_df |>
+        dplyr::select (-pr_reviews_approved) |>
+        dplyr::rename (pr_reviews_approved = pr_revs_approved)
+
+    return (data_metrics_df)
 }
 
 #' Convert `data.frame` of metrics data returned from `data_metrics_to_df` to
@@ -88,7 +96,9 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
     chk <- metrics |>
         dplyr::group_by (name) |>
         dplyr::summarise (allna = dplyr::if_else (
-            all (is.na (value)) || length (unique (value)) == 1L, TRUE, FALSE
+            all (is.na (value)) ||
+                dplyr::n_distinct (value, na.rm = TRUE) == 1L,
+            TRUE, FALSE
         )) |>
         dplyr::filter (!allna)
     metrics <- metrics |> dplyr::filter (name %in% chk$name)

@@ -27,6 +27,11 @@ airtable_update_schema <- function (base_id = at_base_id) {
     field_names_orig <- field_names_updated <- fields$name
     field_names_updated [index [, 1]] <- metrics_metadata$airtable_name [index [, 2]]
 
+    if (any (duplicated (field_names_updated))) {
+        dup <- field_names_updated [which (duplicated (field_names_updated))]
+        cli::cli_abort ("Duplicated name of original field in airtable data: '{dup}'")
+    }
+
     index <- which (field_names_updated != field_names_orig)
     updates <- lapply (index, function (i) {
         f_i <- match (field_names_orig [i], fields$name)

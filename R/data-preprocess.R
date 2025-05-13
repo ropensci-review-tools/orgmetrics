@@ -133,6 +133,7 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
         )) |>
         dplyr::mutate (value = (value - min (value, na.rm = TRUE)) / diff (range (value, na.rm = TRUE))) |>
         dplyr::select (-what, -scale, -better) |>
+        dplyr::select (-airtable_name, -description, -url) |>
         dplyr::ungroup ()
 
     if (!longer) {

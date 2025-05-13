@@ -1,6 +1,6 @@
 Package: orgmetrics
 Title: Metrics for Your GitHub Organization
-Version: 0.0.3.102
+Version: 0.0.3.103
 Authors@R: 
     person("Mark", "Padgham", , "mark.padgham@email.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2172-5265"))
@@ -23,6 +23,7 @@ Imports:
     pbapply,
     repometrics
 Suggests:
+    airtabler,
     bsicons,
     bslib,
     desc,
@@ -36,6 +37,7 @@ Suggests:
     withr,
     zoo
 Remotes:
+    One-Health-Research-Consulting/airtabler,
     ropensci-review-tools/pkgmatch,
     ropensci-review-tools/repometrics
 Config/testthat/edition: 3

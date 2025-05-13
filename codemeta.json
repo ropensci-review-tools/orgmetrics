@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/ropensci-review-tools/orgmetrics",
   "issueTracker": "https://github.com/ropensci-review-tools/orgmetrics/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.3.102",
+  "version": "0.0.3.103",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -34,6 +34,12 @@
     }
   ],
   "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "airtabler",
+      "name": "airtabler",
+      "sameAs": "https://github.com/One-Health-Research-Consulting/airtabler"
+    },
     {
       "@type": "SoftwareApplication",
       "identifier": "bsicons",
@@ -243,6 +249,18 @@
     },
     "7": {
       "@type": "SoftwareApplication",
+      "identifier": "git2r",
+      "name": "git2r",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=git2r"
+    },
+    "8": {
+      "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
       "provider": {
@@ -253,7 +271,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "8": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "memoise",
       "name": "memoise",
@@ -265,7 +283,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=memoise"
     },
-    "9": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "pbapply",
       "name": "pbapply",
@@ -277,19 +295,16 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=pbapply"
     },
-    "10": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "repometrics",
       "name": "repometrics",
       "sameAs": "https://github.com/ropensci-review-tools/repometrics"
     },
-    "SystemRequirements": {}
+    "SystemRequirements": null
   },
-  "fileSize": "18900.122KB",
+  "fileSize": "18823.655KB",
   "readme": "https://github.com/ropensci-review-tools/orgmetrics/blob/main/README.md",
-  "contIntegration": [
-    "https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check.yaml",
-    "https://app.codecov.io/gh/ropensci-review-tools/orgmetrics"
-  ],
+  "contIntegration": ["https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check.yaml", "https://app.codecov.io/gh/ropensci-review-tools/orgmetrics"],
   "developmentStatus": "https://www.repostatus.org/#active"
 }

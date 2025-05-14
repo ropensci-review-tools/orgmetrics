@@ -114,7 +114,22 @@ Inputs.table(filteredModelsTable, {
         comm_serv_support: sparkbar(d3.max(modelsTable, d => d.comm_serv_support)),
         starter_health: sparkbar(d3.max(modelsTable, d => d.starter_health)),
         comm_welcoming: sparkbar(d3.max(modelsTable, d => d.comm_welcoming)),
-    }
+    },
+    header: {
+        dev_responsiveness: htl.html`<th title="Explanation">Development responsivness</th>`,
+        proj_engagement: "Project engagement",
+        proj_awareness: "Project awareness",
+        community_activity: "Community activity",
+        oss_compliance: "OSS compliance",
+        viability_community: "Viability: community",
+        viability_starter: "Viability: starter",
+        viability_gov: "Viability: governance",
+        viability_strategy: "Viability: strategy",
+        collab_devel_index: "Collaboration development index",
+        comm_serv_support: "Community service and support",
+        starter_health: "Starter health",
+        comm_welcoming: "Community welcoming"
+    },
 })
 ```
 

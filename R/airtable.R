@@ -1,5 +1,12 @@
 at_base_id <- "appegDLtrNVgkWROB"
 
+#' Update the schema data of the airtable "CHAOSS Metrics" table.
+#'
+#' The only schema data currently able to be updated by 'airtabler' are the
+#' name and description of each field. Note also that this updates all fields
+#' listed in the 'repometrics' JSON schema, even though not all of these may
+#' actually be present in the data.
+#' @noRd
 airtable_update_schema <- function (at_base_id = at_base_id) {
 
     metrics_metadata <- load_model_json_data ()$metrics

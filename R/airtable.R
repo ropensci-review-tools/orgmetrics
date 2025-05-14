@@ -1,6 +1,6 @@
 at_base_id <- "appegDLtrNVgkWROB"
 
-airtable_update_schema <- function (base_id = at_base_id) {
+airtable_update_schema <- function (at_base_id = at_base_id) {
 
     metrics_metadata <- load_model_json_data ()$metrics
 

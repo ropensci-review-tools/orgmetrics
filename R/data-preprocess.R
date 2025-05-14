@@ -73,7 +73,8 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
     # Suppress no visible binding notes:
     org <- date <- package <- NULL
 
-    metric_direction <- load_model_json_data ()$metrics
+    metric_direction <- load_model_json_data ()$metrics |>
+        dplyr::select (-airtable_name, -description, -url, -field_group)
 
     metrics <- data_metrics |>
         dplyr::mutate (
@@ -133,7 +134,6 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
         )) |>
         dplyr::mutate (value = (value - min (value, na.rm = TRUE)) / diff (range (value, na.rm = TRUE))) |>
         dplyr::select (-what, -scale, -better) |>
-        dplyr::select (-airtable_name, -description, -url) |>
         dplyr::ungroup ()
 
     if (!longer) {

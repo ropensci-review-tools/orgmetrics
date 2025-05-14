@@ -46,8 +46,19 @@ data_metrics_to_df <- function (data_metrics) {
 
     # Suppress no visible binding note:
     package <- NULL
-    do.call (rbind, data_metrics_df) |>
+    data_metrics_df <- do.call (rbind, data_metrics_df) |>
         dplyr::arrange (package, dplyr::desc (date))
+
+    # And until data are updated to new repometric structure, need to manually
+    # remove these columns:
+    if (all (c ("pr_revs_approved", "pr_reviews_approved") %in%
+        names (data_metrics_df))) {
+        data_metrics_df <- data_metrics_df |>
+            dplyr::select (-pr_reviews_approved) |>
+            dplyr::rename (pr_reviews_approved = pr_revs_approved)
+    }
+
+    return (data_metrics_df)
 }
 
 #' Convert `data.frame` of metrics data returned from `data_metrics_to_df` to
@@ -88,7 +99,9 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
     chk <- metrics |>
         dplyr::group_by (name) |>
         dplyr::summarise (allna = dplyr::if_else (
-            all (is.na (value)) || length (unique (value)) == 1L, TRUE, FALSE
+            all (is.na (value)) ||
+                dplyr::n_distinct (value, na.rm = TRUE) == 1L,
+            TRUE, FALSE
         )) |>
         dplyr::filter (!allna)
     metrics <- metrics |> dplyr::filter (name %in% chk$name)
@@ -118,7 +131,22 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
         dplyr::mutate (value = dplyr::if_else (
             better == "lower", -value, value
         )) |>
-        dplyr::select (-what, -scale, -better)
+        dplyr::mutate (value = (value - min (value, na.rm = TRUE)) / diff (range (value, na.rm = TRUE))) |>
+        dplyr::select (-what, -scale, -better) |>
+        dplyr::select (-airtable_name, -description, -url) |>
+        dplyr::ungroup ()
+
+    if (!longer) {
+        # Table output for airtable
+        requireNamespace ("tidyr", quietly = TRUE)
+
+        metrics <- tidyr::pivot_wider (
+            metrics,
+            names_from = name,
+            values_from = value
+        )
+    }
+
 
     return (metrics)
 }

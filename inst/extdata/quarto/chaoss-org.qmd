@@ -99,6 +99,14 @@ function sparkbar(max) {
     justify-content: end;">${x.toLocaleString("en-US")}`
 }
 
+function tooltip(title, expl) {
+    return htl.html`<th
+        title=${expl}
+        onmouseover="this.style.background='#d0e8ff'"
+        onmouseout="this.style.background='#f0f8ff'"
+    >${title}</th>`
+}
+
 Inputs.table(filteredModelsTable, {
     format: {
         dev_responsiveness: sparkbar(d3.max(modelsTable, d => d.dev_responsiveness)),
@@ -116,8 +124,8 @@ Inputs.table(filteredModelsTable, {
         comm_welcoming: sparkbar(d3.max(modelsTable, d => d.comm_welcoming)),
     },
     header: {
-        dev_responsiveness: htl.html`<th title="Explanation">Development responsivness</th>`,
-        proj_engagement: "Project engagement",
+        dev_responsiveness: tooltip("Developer responsiveness", "Explain that"),
+        proj_engagement: tooltip("Project engagement", "Some explainy stuff"),
         proj_awareness: "Project awareness",
         community_activity: "Community activity",
         oss_compliance: "OSS compliance",

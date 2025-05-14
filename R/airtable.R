@@ -78,6 +78,11 @@ airtable_update_schema_names <- function (at_base_id,
     })
 }
 
+#' Update airtable schema "descriptions" for each field.
+#'
+#' This must be run AFTER 'airtable_update_schema_names' as it presumes that
+#' all names equal the 'airtable_name' fields of 'metrics_metadata'.
+#' @noRd
 airtable_update_schema_desc <- function (at_base_id,
                                          table_id,
                                          fields,
@@ -92,7 +97,11 @@ airtable_update_schema_desc <- function (at_base_id,
     metrics_metadata$description <-
         gsub ("\\s+$", "", metrics_metadata$description)
 
-    field_desc_orig <- field_desc_updated <- fields$description
+    if ("description" %in% names (fields)) {
+        field_desc_orig <- field_desc_updated <- fields$description
+    } else {
+        field_desc_orig <- field_desc_updated <- rep ("", nrow (fields))
+    }
     index_to_fields <- match (metrics_metadata$airtable_name, fields$name)
     field_desc_updated [index_to_fields] <- metrics_metadata$description
 

@@ -48,4 +48,39 @@ airtable_update_schema <- function (base_id = at_base_id) {
     })
 
     # ------ Update airtable field descriptions -----
+    # Re-fetch schema:
+    schema <- airtabler::air_get_schema (at_base_id)
+
+    table_num <- which (schema$tables$name == "CHAOSS Metrics")
+    table_id <- schema$tables$id [table_num]
+    fields <- schema$tables$fields [[table_num]]
+
+    # Reduce metadata to ones with names in metadata only:
+    index <- which (metrics_metadata$airtable_name %in% fields$name)
+    metrics_metadata <- metrics_metadata [index, ]
+    # paste URLs on to descriptions:
+    metrics_metadata$description <-
+        paste (metrics_metadata$description, metrics_metadata$url)
+    metrics_metadata$description <-
+        gsub ("\\s+$", "", metrics_metadata$description)
+
+    field_desc_orig <- field_desc_updated <- fields$description
+    index_to_fields <- match (metrics_metadata$airtable_name, fields$name)
+    field_desc_updated [index_to_fields] <- metrics_metadata$description
+
+    # Rm NAs for equality comparison
+    field_desc_orig [which (is.na (field_desc_orig))] <- ""
+    field_desc_updated [which (is.na (field_desc_updated))] <- ""
+    index <- which (field_desc_updated != field_desc_orig)
+    fields_update <- fields [index, ]
+    fields_update$description <- field_desc_updated [index]
+
+    updates <- lapply (seq_len (nrow (fields_update)), function (i) {
+        airtabler::air_update_field (
+            base = at_base_id,
+            table_id = table_id,
+            field_id = fields_update$id [i],
+            description = fields_update$description [i]
+        )
+    })
 }

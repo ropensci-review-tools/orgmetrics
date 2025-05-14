@@ -119,7 +119,7 @@ Inputs.table(filteredModelsTable, {
 ```
 
 <iframe class="airtable-embed"
-    src="https://airtable.com/embed/app5rHNzxrTuoGB4u/shrfbeNXtK8JDJ5tV?viewControls=on"
+    src="https://airtable.com/embed/app5rHNzxrTuoGB4u/shrOzCSDhxO7zlfD0?viewControls=on"
     frameborder="0" onmousewheel="" width="100%" height="533"
     style="background: transparent; border: 1px solid #ccc;"
 ></iframe>

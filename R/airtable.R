@@ -1,5 +1,35 @@
 at_base_id <- "app5rHNzxrTuoGB4u"
 
+#' Functions to manage orgmetrics data on airtable.
+#'
+#' These largely rely on the {airtabler} package. That package does not expose
+#' the entire airtable API, and so some steps must still be manually
+#' implemented.  In particular, the field types must be initially manually
+#' entered, almost all of which are defined as "percentage" to allow "progress
+#' bars" (sparklines).
+#'
+#' @section Updating data
+#'
+#' Data can be manually replaced in their entirety in the airtable interface by
+#' deleting all previous data, and then importing directly from csv.
+#' Alternatively, the airtabler package allows updating of individual records,
+#' although functionality for that has no yet been implemented here.
+#'
+#' @section Tables
+#'
+#' The main table in airtable is "Metrics", which has all individaul metrics.
+#' These are then aggregated into separate tables, both of "CHAOSS models", and
+#' "Metric groups". The latter are custom-defined for the dashboard produced
+#' here. Aggregation is not performed in airtable, both because that is only
+#' possible on a professional plan, and to ensure all analytic routines remain
+#' in the single location here.
+#'
+#' This means that the data updating steps require updating of three separate
+#' tables.
+#'
+#' @noRd
+NULL
+
 #' Update the schema data of the airtable "CHAOSS Metrics" table.
 #'
 #' The only schema data currently able to be updated by 'airtabler' are the

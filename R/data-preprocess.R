@@ -151,6 +151,32 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
     return (metrics)
 }
 
+#' Group metrics into categories defined in repometrics JSON schema
+#'
+#' @param metrics Output of `data_metrics() |> data_metrics_preprocess()`
+#' @noRd
+data_metrics_group <- function (metrics) {
+
+    metrics_metadata <- load_model_json_data ()$metrics
+    index <- which (metrics_metadata$name %in% names (data_metrics))
+    metrics_metadata <- metrics_metadata [index, ]
+
+    field_groups <- unique (metrics_metadata$field_group)
+    grouped_metrics <- lapply (field_groups, function (group) {
+        metrics_in <- metrics_metadata |> dplyr::filter (field_group == group)
+        metrics_out <- metrics_metadata |> dplyr::filter (field_group != group)
+        data_group <- data_metrics |>
+            dplyr::select (-dplyr::all_of (metrics_out$name), -package) |>
+            as.matrix ()
+        rowMeans (data_group, na.rm = TRUE)
+    })
+    grouped_metrics <- cbind (data_metrics$package, data.frame (do.call (cbind, grouped_metrics)))
+    names (grouped_metrics) <- c ("package", field_groups)
+    grouped_metrics$total <- rowMeans (grouped_metrics [, -1])
+
+    return (grouped_metrics)
+}
+
 #' Pre-process organization data by converting all model values to standard
 #' z-scores, retrieving the latest value only for each package, and generating
 #' a "final" score from the sum across all model scores. Higher values of this

@@ -73,7 +73,8 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
     # Suppress no visible binding notes:
     org <- date <- package <- NULL
 
-    metric_direction <- load_model_json_data ()$metrics
+    metric_direction <- load_model_json_data ()$metrics |>
+        dplyr::select (-airtable_name, -description, -url, -field_group)
 
     metrics <- data_metrics |>
         dplyr::mutate (
@@ -133,7 +134,6 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
         )) |>
         dplyr::mutate (value = (value - min (value, na.rm = TRUE)) / diff (range (value, na.rm = TRUE))) |>
         dplyr::select (-what, -scale, -better) |>
-        dplyr::select (-airtable_name, -description, -url) |>
         dplyr::ungroup ()
 
     if (!longer) {
@@ -149,6 +149,32 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
 
 
     return (metrics)
+}
+
+#' Group metrics into categories defined in repometrics JSON schema
+#'
+#' @param metrics_all Output of `data_metrics_to_df() |> data_metrics_preprocess()`
+#' @noRd
+data_metrics_group <- function (metrics_all) {
+
+    metrics_metadata <- load_model_json_data ()$metrics
+    index <- which (metrics_metadata$name %in% names (metrics_all))
+    metrics_metadata <- metrics_metadata [index, ]
+
+    field_groups <- unique (metrics_metadata$field_group)
+    grouped_metrics <- lapply (field_groups, function (group) {
+        metrics_in <- metrics_metadata |> dplyr::filter (field_group == group)
+        metrics_out <- metrics_metadata |> dplyr::filter (field_group != group)
+        data_group <- metrics_all |>
+            dplyr::select (-dplyr::all_of (metrics_out$name), -package) |>
+            as.matrix ()
+        rowMeans (data_group, na.rm = TRUE)
+    })
+    grouped_metrics <- cbind (metrics_all$package, data.frame (do.call (cbind, grouped_metrics)))
+    names (grouped_metrics) <- c ("package", field_groups)
+    grouped_metrics$total <- rowMeans (grouped_metrics [, -1])
+
+    return (grouped_metrics)
 }
 
 #' Pre-process organization data by converting all model values to standard

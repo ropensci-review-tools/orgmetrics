@@ -36,21 +36,32 @@ function sparkbar(max) {
 }
 
 function tooltip(title, expl) {
-    return htl.html`<th
-        title=${expl}
-        onmouseover="this.style.background='#d0e8ff'"
-        onmouseout="this.style.background='#f0f8ff'"
-    >${title}</th>`
+    const th = document.createElement("th");
+    th.title = expl
+    th.style.background = "#f0f8ff";
+    th.textContent = title;
+
+    th.addEventListener("mouseover", () => th.style.background = "#d0e8ff");
+    th.addEventListener("mouseout", () => th.style.background = "#f0f8ff");
+
+    return th;
 }
 
 function pkgfmt(pkg) {
-    return htl.html`<th
-        title="hover"
-        style.background='#f0f8ff'
-        onmouseover="this.style.background='#d0e8ff'"
-        onmouseout="this.style.background='#f0f8ff'"
-        onclick="localStorage.setItem('orgmetricsRepo', '${pkg}'); this.style.background='#a0f8ff'"
-    >${pkg}</th>`
+    const th = document.createElement("th");
+    th.title = "hover"
+    th.style.background = "#f0f8ff";
+    th.textContent = pkg;
+
+    th.addEventListener("mouseover", () => th.style.background = "#d0e8ff");
+    th.addEventListener("mouseout", () => th.style.background = "#f0f8ff");
+
+    th.addEventListener("click", () => {
+        localStorage.setItem("orgmetricsRepo", pkg);
+        th.style.background = "#a0f8ff";
+    });
+
+    return th;
 }
 ```
 

@@ -153,9 +153,9 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
 
 #' Group metrics into categories defined in repometrics JSON schema
 #'
-#' @param metrics Output of `data_metrics() |> data_metrics_preprocess()`
+#' @param data_metrics Output of `data_metrics() |> data_metrics_preprocess()`
 #' @noRd
-data_metrics_group <- function (metrics) {
+data_metrics_group <- function (data_metrics) {
 
     metrics_metadata <- load_model_json_data ()$metrics
     index <- which (metrics_metadata$name %in% names (data_metrics))

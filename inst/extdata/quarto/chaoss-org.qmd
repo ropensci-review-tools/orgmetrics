@@ -71,6 +71,8 @@ function pkgfmt(pkg) {
 
 ```{r}
 data_metrics <- readRDS ("results-metrics.Rds")
+
+# Main table of most recent metrics:
 # which.max does not work for dates, but max does
 index1 <- which (names (data_metrics) == max (names (data_metrics)))
 m <- data_metrics [[index1]] |>
@@ -116,6 +118,41 @@ Inputs.table(metricsGroupedTable, {
     },
 })
 ```
+
+
+This shows the average values for these groups of metrics over time:
+
+```{r}
+data_metrics <- readRDS ("results-metrics.Rds")
+
+# Grouped metrics over dates
+metrics_dates <- lapply (data_metrics, function (m) {
+    m |>
+        tidyr::pivot_wider (names_from = name, values_from = value) |>
+        orgmetrics:::data_metrics_group () |>
+        dplyr::select (-dplyr::any_of ("none")) |>
+        dplyr::relocate (total, .after = package) |>
+        dplyr::arrange (by = desc (total)) |>
+        dplyr::summarise (dplyr::across (dplyr::where (is.numeric), mean))
+})
+metrics_dates <- do.call (rbind, metrics_dates)
+metrics_dates <- cbind (date = rownames (metrics_dates), metrics_dates) |>
+    tidyr::pivot_longer (-date) |>
+    dplyr::mutate (date = as.Date (date))
+
+ggplot2::ggplot (metrics_dates, ggplot2::aes (x = date, y = value, colour = name)) +
+    ggplot2::geom_line (lty = 2) +
+    ggplot2::geom_smooth (method = "lm", formula = "y ~ x", se = FALSE) +
+    ggplot2::ylab ("Average metrics") +
+    ggplot2::theme_minimal () +
+    ggplot2::theme (
+        legend.location = "plot",
+        legend.position = "bottom",
+        legend.title = ggplot2::element_blank ()
+    )
+```
+
+
 
 The following graph converts the models into a single measure of "maintainer
 deficit", which is a ratio of community engagement to developer responsiveness.

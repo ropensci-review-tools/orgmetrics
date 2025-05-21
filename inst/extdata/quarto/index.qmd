@@ -249,14 +249,17 @@ bslib::page_fillable (
 threshold <- 0.8
 threshold <- 0.5 + threshold / 2
 num_sds <- qnorm (threshold, 0, 1)
-limits <- readRDS ("results-metrics.Rds") |>
+data_metrics <- readRDS ("results-metrics.Rds")
+# which.max does not work for dates, but max does
+index1 <- which (names (data_metrics) == max (names (data_metrics)))
+limits <- data_metrics [[index1]] |>
     dplyr::group_by (name) |>
     dplyr::filter (!is.na (value)) |>
     dplyr::summarise (
         lower = mean (value) - num_sds * sd (value),
         upper = mean (value) + num_sds * sd (value)
     )
-m <- readRDS ("results-metrics.Rds") |>
+m <- data_metrics [[index1]] |>
     dplyr::left_join (limits, by = "name") |>
     dplyr::group_by (name) |>
     dplyr::filter (!is.na (value)) |>

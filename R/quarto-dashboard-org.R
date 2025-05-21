@@ -22,8 +22,16 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     data_models <- data_models_preprocess (data_org$models) |>
         dplyr::select (-org, -date) |>
         tidyr::pivot_longer (-package)
-    data_metrics <- data_metrics_to_df (data_org$metrics) |>
-        data_metrics_preprocess ()
+
+    data_metrics <- data_metrics_to_df (data_org$metrics)
+    dates <- sort (unique (data_metrics$date), decreasing = TRUE)
+    data_metrics <- lapply (dates, function (d) {
+        data_metrics |>
+            dplyr::filter (date == d) |>
+            data_metrics_preprocess ()
+    })
+    names (data_metrics) <- dates
+
     data_maintenance <- org_maintenance_metric (data_org)
     data_abs <- ctb_absence (data_org)
     data_resp <- issue_responses (data_org)

@@ -70,7 +70,10 @@ function pkgfmt(pkg) {
 ```
 
 ```{r}
-m <- readRDS ("results-metrics.Rds") |>
+data_metrics <- readRDS ("results-metrics.Rds")
+# which.max does not work for dates, but max does
+index1 <- which (names (data_metrics) == max (names (data_metrics)))
+m <- data_metrics [[index1]] |>
     tidyr::pivot_wider (names_from = name, values_from = value) |>
     orgmetrics:::data_metrics_group () |>
     dplyr::relocate (total, .after = package) |>
@@ -88,6 +91,14 @@ metricsGroupedTable = {
 
 ```{ojs}
 Inputs.table(metricsGroupedTable, {
+    width: {
+        package: 100,
+        total: 200,
+        development: 200,
+        issues: 200,
+        popularity: 200,
+        meta: 200,
+    },
     format: {
         package: d => pkgfmt(d),
         development: sparkbar(d3.max(metricsGroupedTable, d => d.development)),
@@ -105,7 +116,6 @@ Inputs.table(metricsGroupedTable, {
     },
 })
 ```
-
 
 The following graph converts the models into a single measure of "maintainer
 deficit", which is a ratio of community engagement to developer responsiveness.

@@ -28,6 +28,9 @@ library (orgmetrics)
 
 ```{r load-data}
 data_metrics <- readRDS ("results-metrics.Rds")
+# which.max does not work for dates, but max does
+index1 <- which (names (data_metrics) == max (names (data_metrics)))
+data_metrics <- data_metrics [[index1]]
 data_metrics$value [which (is.na (data_metrics$value))] <- 0
 data_models <- readRDS ("results-models.Rds")
 data_repo_src <- readRDS ("results-data-repo-src.Rds")

@@ -11,8 +11,13 @@ org_maintenance_metric <- function (data_org) {
     # Suppress no visible binding notes:
     value <- name <- package <- comm_engage <- dev_resp <- maintenance <- NULL
 
-    data_metrics <- data_metrics_to_df (data_org$metrics) |>
-        data_metrics_preprocess ()
+    data_metrics <- data_metrics_to_df (data_org$metrics)
+    dates <- sort (unique (data_metrics$date), decreasing = TRUE)
+    data_metrics <- lapply (dates, function (d) {
+        data_metrics |>
+            dplyr::filter (date == d) |>
+            data_metrics_preprocess ()
+    })
 
     mod_dat <- load_model_json_data ()$models
     stopifnot (all (models_comm_engage %in% names (mod_dat)))
@@ -27,22 +32,34 @@ org_maintenance_metric <- function (data_org) {
         function (h) mod_dat [[h]]
     )))
 
-    data_metrics_comm_engage <- data_metrics |>
-        dplyr::filter (name %in% metrics_comm_engage) |>
-        dplyr::group_by (package) |>
-        dplyr::summarise (comm_engage = mean (value, na.rm = TRUE))
-    data_metrics_dev_resp <- data_metrics |>
-        dplyr::filter (name %in% metrics_dev_resp) |>
-        dplyr::group_by (package) |>
-        dplyr::summarise (dev_resp = mean (value, na.rm = TRUE))
+    data_metrics_comm_engage <- lapply (seq_along (dates), function (d) {
+        data_metrics [[d]] |>
+            dplyr::filter (name %in% metrics_comm_engage) |>
+            dplyr::group_by (package) |>
+            dplyr::summarise (comm_engage = mean (value, na.rm = TRUE)) |>
+            dplyr::ungroup () |>
+            dplyr::mutate (date = as.Date (dates [d]))
+    })
+    data_metrics_comm_engage <- do.call (rbind, data_metrics_comm_engage)
+
+    data_metrics_dev_resp <- lapply (seq_along (dates), function (d) {
+        data_metrics [[d]] |>
+            dplyr::filter (name %in% metrics_dev_resp) |>
+            dplyr::group_by (package) |>
+            dplyr::summarise (dev_resp = mean (value, na.rm = TRUE)) |>
+            dplyr::ungroup () |>
+            dplyr::mutate (date = as.Date (dates [d]))
+    })
+    data_metrics_dev_resp <- do.call (rbind, data_metrics_dev_resp)
+
     data_metrics_maintenance <-
         dplyr::left_join (
             data_metrics_comm_engage,
             data_metrics_dev_resp,
-            by = dplyr::join_by (package)
+            by = dplyr::join_by (package, date)
         ) |>
-        dplyr::mutate (maintenance = comm_engage - dev_resp) |>
-        dplyr::arrange (dplyr::desc (maintenance))
+        dplyr::mutate (maintenance = comm_engage - dev_resp)
+    # dplyr::arrange (dplyr::desc (maintenance))
 
     return (data_metrics_maintenance)
 }

@@ -8,17 +8,33 @@ format:
       - yeti
 ---
 
-This page details maintenance needs for each repository within the `reconhub`
-and `epiverse-trace` organizations. The initial section presents [CHAOSS
-(*Community Health Analytics in Open Source Software*) models and
-metrics](https://chaoss.community/kb-metrics-and-metrics-models/) for each
-repository. The metrics are direct repository-level measures of a variety of
-aspects indicative of open-source community or repository health. The models
-represent higher level conceptual aggregations of metrics, designed by the
-CHAOSS community to represent important and more abstracted aspects of
-community health.
+This page provides an organization-level overview of all repositories in both
+the [`reconhub`](https://github.com/reconhub) and
+[`epiverse-trace`](https://github.com/epiverse-trace) GitHub organizations.
+Statistics here are assessed for each repository, and aggregated across the
+organizations into four distinct categories:
+
+1. _Development_: Metrics of both code development and maintainer continuity
+   and diversity. High scores reflect repositories with high levels of code
+   development from a diverse community of maintainers.
+2. _GitHub_: Metrics derived from GitHub issues and pull requests. High scores
+   reflect repositories with active use of issues, pull requests, code reviews,
+   and rapid responses from core maintainers to issues or pull requests opened
+   by wider community members.
+3. _Popularity_: Metrics of repository popularity, derived from CRAN download
+   numbers (where applicable), GitHub stars and forks, and issue comments from
+   user communities beyond core maintainers.
+4. _Dependencies and Releases_: High scores reflect repositories with fewer
+   dependencies and frequent releases.
+
+The _Overall_ column is an average of all metrics across all of these four
+categorical groupings, and provides an overall metric of repository health.
 
 ---
+
+<!---
+******** START UTILITY FUNCTIONS ********
+--->
 
 
 ```{ojs}
@@ -68,6 +84,112 @@ function pkgfmt(pkg) {
     return th;
 }
 ```
+
+<!---
+******** END UTILITY FUNCTIONS ********
+--->
+
+## Aggregate metrics
+
+This chart shows the recent development of metrics aggregated into each of the
+four groups, plus the "Overall" metric averaged across all four groups.
+
+<!---
+******** START PLOT OF AVERAGE METRICS OVER DATES ********
+--->
+
+```{r}
+data_metrics <- readRDS ("results-metrics.Rds")
+
+# Grouped metrics over dates
+metrics_dates <- lapply (data_metrics, function (m) {
+    m |>
+        tidyr::pivot_wider (names_from = name, values_from = value) |>
+        orgmetrics:::data_metrics_group () |>
+        dplyr::select (-dplyr::any_of ("none")) |>
+        dplyr::relocate (total, .after = package) |>
+        dplyr::arrange (by = desc (total)) |>
+        dplyr::summarise (dplyr::across (dplyr::where (is.numeric), mean))
+})
+metrics_dates <- do.call (rbind, metrics_dates)
+# dplyr::add_rownames is now tibble::rownames_to_column(), but no tibble here
+metrics_dates <- cbind (date = rownames (metrics_dates), metrics_dates)
+rownames (metrics_dates) <- NULL
+metrics_dates <- metrics_dates |>
+    tidyr::pivot_longer (-date) |>
+    dplyr::mutate (date = as.Date (date))
+metrics_dates$name [metrics_dates$name == "total"] <- "Overall"
+metrics_dates$name [metrics_dates$name == "development"] <- "Development"
+metrics_dates$name [metrics_dates$name == "issues"] <- "GitHub"
+metrics_dates$name [metrics_dates$name == "popularity"] <- "Popularity"
+metrics_dates$name [metrics_dates$name == "meta"] <- "Dep.+Rel."
+
+ojs_define (metrics_dates_in = metrics_dates)
+```
+
+
+```{ojs}
+metricsData = {
+    return transpose(metrics_dates_in).map(row => ({
+        ...row,
+        date: new Date(row.date)
+    }));
+}
+```
+
+```{ojs}
+Plot.plot({
+    color: {
+        legend: true,
+        label: "name",
+        swatchHeight: 4,
+        domain: ["Development", "GitHub", "Popularity", "Dep.+Rel.", "Overall"],
+    },
+    marks: [
+        Plot.lineY(metricsData, {
+            x: "date",
+            y: "value",
+            stroke: "name",
+            strokeWidth:  2,
+            strokeDasharray: "2,5",
+        }),
+        Plot.linearRegressionY(metricsData, {
+            x: "date",
+            y: "value",
+            stroke: "name",
+            strokeWidth: 2,
+            ci: 0
+        }),
+        Plot.axisY({
+            label: null,
+        }),
+    ],
+    x: {
+        grid: true,
+        type: "utc",
+        domain: [d3.min(metricsData, d => d.date), d3.max(metricsData, d => d.date)],
+        tickFormat: "%Y", 
+        ticks: [...new Set(metricsData.map(d => d.date.getFullYear()))].map(year => new Date(`${year}-01-01`)),
+    },
+    y: { grid: true },
+    style: {
+        fontSize: '16px',
+    }
+})
+```
+
+<!---
+******** END PLOT OF AVERAGE METRICS OVER DATES ********
+--->
+
+<!---
+******** START REPO-LEVEL METRICS TABLE ********
+--->
+
+And table shows metrics for each package, for the latest time period only
+aggregated into each of the four groups. Clicking on the "package" values will
+lead to the repository maintenance page with further details of the selected
+package or repository.
 
 ```{r}
 data_metrics <- readRDS ("results-metrics.Rds")
@@ -119,48 +241,147 @@ Inputs.table(metricsGroupedTable, {
 })
 ```
 
+<!---
+******** END REPO-LEVEL METRICS TABLE ********
+--->
 
-This shows the average values for these groups of metrics over time:
+<!---
+******** START PLOT OF MAINTENANCE DEFICIT OVER DATES ********
+--->
+
+## Maintenance deficit
+
+This next graph shows the maintenance deficit over time, as the difference
+between community engagement and developer responsiveness. Repositories with
+high community engagement yet low developer responsiveness have a high
+maintenance deficit, and vice-versa. The "Deficit" scores are scaled to fix
+within the same range as the metrics of community engagement and developer
+responsiveness.
 
 ```{r}
-data_metrics <- readRDS ("results-metrics.Rds")
-
-# Grouped metrics over dates
-metrics_dates <- lapply (data_metrics, function (m) {
-    m |>
-        tidyr::pivot_wider (names_from = name, values_from = value) |>
-        orgmetrics:::data_metrics_group () |>
-        dplyr::select (-dplyr::any_of ("none")) |>
-        dplyr::relocate (total, .after = package) |>
-        dplyr::arrange (by = desc (total)) |>
-        dplyr::summarise (dplyr::across (dplyr::where (is.numeric), mean))
-})
-metrics_dates <- do.call (rbind, metrics_dates)
-metrics_dates <- cbind (date = rownames (metrics_dates), metrics_dates) |>
-    tidyr::pivot_longer (-date) |>
-    dplyr::mutate (date = as.Date (date))
-
-ggplot2::ggplot (metrics_dates, ggplot2::aes (x = date, y = value, colour = name)) +
-    ggplot2::geom_line (lty = 2) +
-    ggplot2::geom_smooth (method = "lm", formula = "y ~ x", se = FALSE) +
-    ggplot2::ylab ("Average metrics") +
-    ggplot2::theme_minimal () +
-    ggplot2::theme (
-        legend.location = "plot",
-        legend.position = "bottom",
-        legend.title = ggplot2::element_blank ()
+maintenance_ts <- readRDS ("results-maintenance-org.Rds") |>
+    dplyr::group_by (date) |>
+    dplyr::summarise (
+        comm_engage = mean (comm_engage),
+        dev_resp = mean (dev_resp),
+        maintenance = mean (maintenance)
     )
+maintenance_ts$maintenance <- maintenance_ts$maintenance -
+    mean (maintenance_ts$maintenance) +
+    mean ((maintenance_ts$comm_engage + maintenance_ts$dev_resp) / 2)
+maintenance_ts <- maintenance_ts |> tidyr::pivot_longer (-date)
+maintenance_ts$name [maintenance_ts$name == "comm_engage"] <- "Comm. Engage."
+maintenance_ts$name [maintenance_ts$name == "dev_resp"] <- "Dev. Resp."
+maintenance_ts$name [maintenance_ts$name == "maintenance"] <- "Deficit"
+
+ojs_define (maintenance_ts_in = maintenance_ts)
+```
+
+```{ojs}
+maintenanceData = {
+    return transpose(maintenance_ts_in).map(row => ({
+        ...row,
+        date: new Date(row.date)
+    }));
+}
+```
+
+```{ojs}
+Plot.plot({
+    color: {
+        legend: true,
+        label: "name",
+        swatchHeight: 4,
+        domain: ["Comm. Engage.", "Dev. Resp.", "Deficit"],
+    },
+    marks: [
+        Plot.lineY(maintenanceData, {
+            x: "date",
+            y: "value",
+            stroke: "name",
+            strokeWidth:  2,
+            strokeDasharray: "2,5",
+        }),
+        Plot.linearRegressionY(maintenanceData, {
+            x: "date",
+            y: "value",
+            stroke: "name",
+            strokeWidth: 2,
+            ci: 0
+        }),
+        Plot.axisY({
+            label: null,
+        }),
+    ],
+    x: {
+        grid: true,
+        type: "utc",
+        domain: [d3.min(metricsData, d => d.date), d3.max(metricsData, d => d.date)],
+        tickFormat: "%Y",
+        ticks: [...new Set(metricsData.map(d => d.date.getFullYear()))].map(year => new Date(`${year}-01-01`)),
+    },
+    y: { grid: true },
+    style: {
+        fontSize: '16px',
+    }
+})
+```
+
+And these are maintenance deficit values for individual repositories
+(packages), for the latest time period only.
+
+```{r}
+maintenance_repo <- readRDS ("results-maintenance-org.Rds") |>
+    dplyr::filter (date == max (date)) |>
+    dplyr::select (-date) |>
+    dplyr::mutate (
+        maintenance = maintenance -
+            mean (maintenance) + mean (c (comm_engage + dev_resp) / 2)
+    ) |>
+    dplyr::arrange (dplyr::desc (maintenance))
+ojs_define (maintenance_repo_in = maintenance_repo)
 ```
 
 
+```{ojs}
+maintenanceRepoData = {
+    return transpose(maintenance_repo_in).map(row => ({
+        ...row,
+    }));
+}
+```
 
-The following graph converts the models into a single measure of "maintainer
-deficit", which is a ratio of community engagement to developer responsiveness.
-The [*Community Health* page](./models.html) provides full detail of individual
-models and metrics.
+```{ojs}
+Inputs.table(maintenanceRepoData, {
+    width: {
+        package: 100,
+        comm_engage: 200,
+        dev_resp: 200,
+        maintenance: 200,
+    },
+    format: {
+        package: d => pkgfmt(d),
+        comm_engage: sparkbar(d3.max(maintenanceRepoData, d => d.comm_engage)),
+        dev_resp: sparkbar(d3.max(maintenanceRepoData, d => d.dev_resp)),
+        maintenance: sparkbar(d3.max(maintenanceRepoData, d => d.maintenance)),
+    },
+    header: {
+        comm_engage: tooltip("Community Engagement", "Community Engagement metrics"),
+        dev_resp: tooltip("Developer Responsivness", "Developer Responsiveness metrics"),
+        maintenance: tooltip(
+            "Maintenance Deficit",
+            "Community Engagment minus Developer Responsivess (rescaled)"
+        ),
+    },
+})
+```
 
-Following that graph are several more distinct indicators of maintenance need,
-all of which are assessed over the previous year of repository activity:
+---
+
+## Additional metrics and indicators
+
+The following show several more distinct indicators of maintenance need, all of
+which are assessed over the previous year of repository activity:
 
 - The proportion of new issues opened that were bug reports
 - The proportion of issues with labels
@@ -173,42 +394,14 @@ worse than lighter, more green colours. Graphs are also generally displayed
 with repositories with greater maintenance need plotted near the top, and those
 with less maintenance need near the bottom (or not included at all).
 
-## CHAOSS metrics and models
-
-This page uses CHAOSS metrics and models to identify maintenance deficits
-across all repositories within the `reconhub` and `epiverse-trace`
-organizations. These deficits are higher for projects with more community
-engagement yet less developer responsiveness or activity. Repositories with
-higher maintenance deficits are presented first, with maintenance deficit
-decreasing down the page. Lengths of bars indicate community engagement minus
-developer responsiveness, so that:
-
-- More positive bars are higher up the page, and have high engagement yet lower
-developer responsiveness.
-- More negative bars are lower down the page, and have high developer activity
-yet low community engagement.
-
-Bars are coloured to provide insight into the relative contributions of
-community engagement versus developer responsiveness. Because organizations
-generally have more direct control over the latter than the former, bars are
-coloured by developer responsiveness. This means that:
-
-- Bars with colours tending towards bright green have greater developer
-responsiveness.
-- Bars tending toward darker purple have lower developer responsiveness.
-
-Maintenance priorities should likely be focussed on repositories with high
-values of maintenance deficit yet lower levels of developer responsiveness.
-These repositories will be higher up in the graph (more positive values), yet
-with more dark purple colours.
-
 
 ```{r load-pkg, echo = FALSE, message = FALSE}
 library (orgmetrics)
 ```
 
 ```{r load-data}
-data_maintenance <- readRDS ("results-maintenance-org.Rds")
+data_maintenance <- readRDS ("results-maintenance-org.Rds") |>
+    dplyr::filter (date == max (date))
 
 data_ctb_abs <- readRDS ("results-data-ctb-absence.Rds")
 data_ctb_change <- dplyr::filter (data_ctb_abs, what == "change") |>
@@ -241,13 +434,6 @@ Plot = import("https://esm.sh/@observablehq/plot")
 ```
 
 ```{ojs}
-models = {
-    return transpose(models_in).map(row => ({
-        ...row,
-    }));
-}
-models_len = models.length;
-
 ctb_change = {
     return transpose(ctb_change_in).map(row => ({
         ...row,
@@ -281,57 +467,7 @@ issue_bugs = {
 ```
 
 
-```{ojs plot-all-community-health-vars}
-Plot.plot({
-    height: 20 * models_len,
-    marginLeft: 60,
-    marginRight: 160,
-    marginTop: 50,
-    marginBottom: 50,
-    axis: null,
-    x: {
-        axis: "top",
-        grid: true,
-        label: "Maintenance Deficit"
-    },
-    y: { grid: true },
-    marks: [
-        Plot.barX(models, {
-            y: "package",
-            x: "maintenance",
-            sort: {y: "-x" },
-            fill: "dev_resp",
-        }),
-        Plot.barX(models,
-            Plot.pointer(
-            {
-                y: "package",
-                x: "maintenance",
-                sort: {y: "-x" },
-                stroke: "gray",
-                fill: "maintenance",
-                strokeWidth: 2,
-            })
-        ),
-        Plot.text(models, {
-            x: (d) => d.maintenance < 0 ? 0 : d.maintenance,
-            y: "package",
-            text: "package",
-            textAnchor: "start",
-            fontSize: 16,
-            dx: 5
-        })
-    ],
-    color: {
-        scheme: "Cool",
-        type: "ordinal"
-    }
-})
-```
-
------
-
-## Proportion of bugs
+### Proportion of bugs
 
 This plot shows the proportion of all recent issues that are bug reports. Values
 are only shown for repositories for which > 25% of all issues are bugs.
@@ -396,7 +532,7 @@ Plot.plot({
 })
 ```
 
-## Issue labelling
+### Issue labelling
 
 And this shows the proportion of all issues that are labelled. Values are only
 shown for repositories with poor issue labelling (< 50%).
@@ -450,7 +586,7 @@ Plot.plot({
 })
 ```
 
-## Issue response time
+### Issue response time
 
 This graph shows average response times (in days) to issues reported by people
 other than main repository maintainers.
@@ -504,13 +640,13 @@ Plot.plot({
 })
 ```
 
-## Contributor Absence
+### Contributor Absence
 
 The next two graphs show a metric of main contributor absence. Values are only
 shown for which main contributors have not recently contributed. The metric is
 the proportion of overall commits made by now absent contributors.
 
-### Absence for repositories
+#### Absence for repositories
 
 ```{ojs plot-all-ctb-abs-repo}
 Plot.plot({
@@ -561,7 +697,7 @@ Plot.plot({
 })
 ```
 
-### Absence for Contributors
+#### Absence for Contributors
 
 Values are shown here for contributors who have been recently absent from
 repositories. Values are the maximal proportion of historical commits across

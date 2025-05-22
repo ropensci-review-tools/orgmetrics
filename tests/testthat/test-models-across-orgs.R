@@ -85,8 +85,8 @@ test_that ("org data preprocessing", {
 
     data_maintenance <- org_maintenance_metric (data_org)
     expect_s3_class (data_maintenance, "data.frame")
-    expect_equal (ncol (data_maintenance), 4L)
-    col_nms <- c ("package", "comm_engage", "dev_resp", "maintenance")
+    expect_equal (ncol (data_maintenance), 5L)
+    col_nms <- c ("package", "comm_engage", "date", "dev_resp", "maintenance")
     expect_equal (names (data_maintenance), col_nms)
     expect_type (data_maintenance$package, "character")
     for (n in col_nms [-1]) {

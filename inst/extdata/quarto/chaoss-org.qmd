@@ -139,14 +139,14 @@ metrics_dates <- do.call (rbind, metrics_dates)
 # dplyr::add_rownames is now tibble::rownames_to_column(), but no tibble here
 metrics_dates <- cbind (date = rownames (metrics_dates), metrics_dates)
 rownames (metrics_dates) <- NULL
-ojs_define (metrics_dates_in = metrics_dates)
-```
-
-```{r}
 metrics_dates <- metrics_dates |>
     tidyr::pivot_longer (-date) |>
     dplyr::mutate (date = as.Date (date))
 
+ojs_define (metrics_dates_in = metrics_dates)
+```
+
+```{r}
 ggplot2::ggplot (metrics_dates, ggplot2::aes (x = date, y = value, colour = name)) +
     ggplot2::geom_line (lty = 2) +
     ggplot2::geom_smooth (method = "lm", formula = "y ~ x", se = FALSE) +
@@ -184,15 +184,15 @@ Plot.plot({
     marks: [
         Plot.lineY(metricsData, {
             x: "date",
-            y: "total",
-            stroke: "orange",
-            strokeWidth:  1,
+            y: "value",
+            stroke: "name",
+            strokeWidth:  2,
             strokeDasharray: "2,5",
         }),
         Plot.linearRegressionY(metricsData, {
             x: "date",
-            y: "total",
-            stroke: "red",
+            y: "value",
+            stroke: "name",
             strokeWidth: 2,
             ci: 0
         }),

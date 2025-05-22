@@ -443,16 +443,16 @@ Inputs.table(extraMetricsTable, {
 
 ### Contributor Absence
 
-The next two graphs show a metric of main contributor absence. Values are only
-shown for which main contributors have not recently contributed. The metric is
-the proportion of overall commits made by now absent contributors.
-
-Values are shown here for contributors who have been recently absent from
-repositories. Values are the maximal proportion of historical commits across
-all repositories from which they have been absent, with bars coloured by
-numbers of repositories, so darker, more purple colours indicate greater number
-of absent repositories.
-
+Finally, this table shows a metric of main contributor absence. Values are only
+and whose absence is equivalent to comp. A contributor who has been entirely
+absent during the most recent period, and was responsible for 100% of the
+commits within a single repository, would have a contributor absence score of
+one. A contributor absence of one could also reflect somebody contributing
+exactly 50% of the code to two repositories, and being entirely absent during
+the recent period. Any contributions by that contributor during the recent
+period would reduce the absence factor. In general, high absence factors
+describe recently absent contributors who have previously been major
+contributors to numerous repositories.
 
 ```{r load-data}
 data_ctb_abs_ctb <- readRDS ("results-data-ctb-absence.Rds") |>

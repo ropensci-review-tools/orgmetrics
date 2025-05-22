@@ -89,7 +89,7 @@ function pkgfmt(pkg) {
 ******** END UTILITY FUNCTIONS ********
 --->
 
-## Recent development
+## Aggregate metrics
 
 This chart shows the recent development of metrics aggregated into each of the
 four groups, plus the "Overall" metric averaged across all four groups.
@@ -183,6 +183,69 @@ Plot.plot({
 --->
 
 <!---
+******** START REPO-LEVEL METRICS TABLE ********
+--->
+
+And table shows metrics for each package, for the latest time period only
+aggregated into each of the four groups. Clicking on the "package" values will
+lead to the repository maintenance page with further details of the selected
+package or repository.
+
+```{r}
+data_metrics <- readRDS ("results-metrics.Rds")
+
+# Main table of most recent metrics:
+# which.max does not work for dates, but max does
+index1 <- which (names (data_metrics) == max (names (data_metrics)))
+m <- data_metrics [[index1]] |>
+    tidyr::pivot_wider (names_from = name, values_from = value) |>
+    orgmetrics:::data_metrics_group () |>
+    dplyr::relocate (total, .after = package) |>
+    dplyr::arrange (by = desc (total))
+ojs_define (metrics_table_in = m)
+```
+
+```{ojs}
+metricsGroupedTable = {
+    return transpose(metrics_table_in).map(row => ({
+        ...row,
+    }));
+}
+```
+
+```{ojs}
+Inputs.table(metricsGroupedTable, {
+    width: {
+        package: 100,
+        total: 200,
+        development: 200,
+        issues: 200,
+        popularity: 200,
+        meta: 200,
+    },
+    format: {
+        package: d => pkgfmt(d),
+        development: sparkbar(d3.max(metricsGroupedTable, d => d.development)),
+        issues: sparkbar(d3.max(metricsGroupedTable, d => d.issues)),
+        popularity: sparkbar(d3.max(metricsGroupedTable, d => d.popularity)),
+        meta: sparkbar(d3.max(metricsGroupedTable, d => d.meta)),
+        total: sparkbar(d3.max(metricsGroupedTable, d => d.total)),
+    },
+    header: {
+        development: tooltip("Development", "Code development and maintenance metrics"),
+        issues: tooltip("Issues", "GitHub issues and pull request activity"),
+        popularity: tooltip("Popularity", "Project popularity on CRAN (where applicable) and GitHub"),
+        meta: tooltip("Dependencies and releases", ""),
+        total: tooltip("Overall", "Average across all four categories of metrics."),
+    },
+})
+```
+
+<!---
+******** END REPO-LEVEL METRICS TABLE ********
+--->
+
+<!---
 ******** START PLOT OF MAINTENANCE DEFICIT OVER DATES ********
 --->
 
@@ -264,75 +327,61 @@ Plot.plot({
 })
 ```
 
-<!---
-******** START REPO-LEVEL METRICS TABLE ********
---->
-
-## Grouped metrics for each repository
-
-This table shows the metrics for each repository aggregated into each of the
-four groups.
+And these are maintenance deficit values for individual repositories
+(packages), for the latest time period only.
 
 ```{r}
-data_metrics <- readRDS ("results-metrics.Rds")
-
-# Main table of most recent metrics:
-# which.max does not work for dates, but max does
-index1 <- which (names (data_metrics) == max (names (data_metrics)))
-m <- data_metrics [[index1]] |>
-    tidyr::pivot_wider (names_from = name, values_from = value) |>
-    orgmetrics:::data_metrics_group () |>
-    dplyr::relocate (total, .after = package) |>
-    dplyr::arrange (by = desc (total))
-ojs_define (metrics_table_in = m)
+maintenance_repo <- readRDS ("results-maintenance-org.Rds") |>
+    dplyr::filter (date == max (date)) |>
+    dplyr::select (-date) |>
+    dplyr::mutate (
+        maintenance = maintenance -
+            mean (maintenance) + mean (c (comm_engage + dev_resp) / 2)
+    ) |>
+    dplyr::arrange (dplyr::desc (maintenance))
+ojs_define (maintenance_repo_in = maintenance_repo)
 ```
 
+
 ```{ojs}
-metricsGroupedTable = {
-    return transpose(metrics_table_in).map(row => ({
+maintenanceRepoData = {
+    return transpose(maintenance_repo_in).map(row => ({
         ...row,
     }));
 }
 ```
 
 ```{ojs}
-Inputs.table(metricsGroupedTable, {
+Inputs.table(maintenanceRepoData, {
     width: {
         package: 100,
-        total: 200,
-        development: 200,
-        issues: 200,
-        popularity: 200,
-        meta: 200,
+        comm_engage: 200,
+        dev_resp: 200,
+        maintenance: 200,
     },
     format: {
         package: d => pkgfmt(d),
-        development: sparkbar(d3.max(metricsGroupedTable, d => d.development)),
-        issues: sparkbar(d3.max(metricsGroupedTable, d => d.issues)),
-        popularity: sparkbar(d3.max(metricsGroupedTable, d => d.popularity)),
-        meta: sparkbar(d3.max(metricsGroupedTable, d => d.meta)),
-        total: sparkbar(d3.max(metricsGroupedTable, d => d.total)),
+        comm_engage: sparkbar(d3.max(maintenanceRepoData, d => d.comm_engage)),
+        dev_resp: sparkbar(d3.max(maintenanceRepoData, d => d.dev_resp)),
+        maintenance: sparkbar(d3.max(maintenanceRepoData, d => d.maintenance)),
     },
     header: {
-        development: tooltip("Development", "Code development and maintenance metrics"),
-        issues: tooltip("Issues", "GitHub issues and pull request activity"),
-        popularity: tooltip("Popularity", "Project popularity on CRAN (where applicable) and GitHub"),
-        meta: tooltip("Dependencies and releases", ""),
-        total: tooltip("Overall", "Average across all four categories of metrics."),
+        comm_engage: tooltip("Community Engagement", "Community Engagement metrics"),
+        dev_resp: tooltip("Developer Responsivness", "Developer Responsiveness metrics"),
+        maintenance: tooltip(
+            "Maintenance Deficit",
+            "Community Engagment minus Developer Responsivess (rescaled)"
+        ),
     },
 })
 ```
 
-<!---
-******** END REPO-LEVEL METRICS TABLE ********
---->
-The following graph converts the models into a single measure of "maintainer
-deficit", which is a ratio of community engagement to developer responsiveness.
-The [*Community Health* page](./models.html) provides full detail of individual
-models and metrics.
+---
 
-Following that graph are several more distinct indicators of maintenance need,
-all of which are assessed over the previous year of repository activity:
+## Additional metrics and indicators
+
+The following show several more distinct indicators of maintenance need, all of
+which are assessed over the previous year of repository activity:
 
 - The proportion of new issues opened that were bug reports
 - The proportion of issues with labels
@@ -344,35 +393,6 @@ All graphs on this page are displayed such that darker, more purple colours are
 worse than lighter, more green colours. Graphs are also generally displayed
 with repositories with greater maintenance need plotted near the top, and those
 with less maintenance need near the bottom (or not included at all).
-
-## CHAOSS metrics and models
-
-This page uses CHAOSS metrics and models to identify maintenance deficits
-across all repositories within the `reconhub` and `epiverse-trace`
-organizations. These deficits are higher for projects with more community
-engagement yet less developer responsiveness or activity. Repositories with
-higher maintenance deficits are presented first, with maintenance deficit
-decreasing down the page. Lengths of bars indicate community engagement minus
-developer responsiveness, so that:
-
-- More positive bars are higher up the page, and have high engagement yet lower
-developer responsiveness.
-- More negative bars are lower down the page, and have high developer activity
-yet low community engagement.
-
-Bars are coloured to provide insight into the relative contributions of
-community engagement versus developer responsiveness. Because organizations
-generally have more direct control over the latter than the former, bars are
-coloured by developer responsiveness. This means that:
-
-- Bars with colours tending towards bright green have greater developer
-responsiveness.
-- Bars tending toward darker purple have lower developer responsiveness.
-
-Maintenance priorities should likely be focussed on repositories with high
-values of maintenance deficit yet lower levels of developer responsiveness.
-These repositories will be higher up in the graph (more positive values), yet
-with more dark purple colours.
 
 
 ```{r load-pkg, echo = FALSE, message = FALSE}
@@ -414,13 +434,6 @@ Plot = import("https://esm.sh/@observablehq/plot")
 ```
 
 ```{ojs}
-models = {
-    return transpose(models_in).map(row => ({
-        ...row,
-    }));
-}
-models_len = models.length;
-
 ctb_change = {
     return transpose(ctb_change_in).map(row => ({
         ...row,
@@ -454,57 +467,7 @@ issue_bugs = {
 ```
 
 
-```{ojs plot-all-community-health-vars}
-Plot.plot({
-    height: 20 * models_len,
-    marginLeft: 60,
-    marginRight: 160,
-    marginTop: 50,
-    marginBottom: 50,
-    axis: null,
-    x: {
-        axis: "top",
-        grid: true,
-        label: "Maintenance Deficit"
-    },
-    y: { grid: true },
-    marks: [
-        Plot.barX(models, {
-            y: "package",
-            x: "maintenance",
-            sort: {y: "-x" },
-            fill: "dev_resp",
-        }),
-        Plot.barX(models,
-            Plot.pointer(
-            {
-                y: "package",
-                x: "maintenance",
-                sort: {y: "-x" },
-                stroke: "gray",
-                fill: "maintenance",
-                strokeWidth: 2,
-            })
-        ),
-        Plot.text(models, {
-            x: (d) => d.maintenance < 0 ? 0 : d.maintenance,
-            y: "package",
-            text: "package",
-            textAnchor: "start",
-            fontSize: 16,
-            dx: 5
-        })
-    ],
-    color: {
-        scheme: "Cool",
-        type: "ordinal"
-    }
-})
-```
-
------
-
-## Proportion of bugs
+### Proportion of bugs
 
 This plot shows the proportion of all recent issues that are bug reports. Values
 are only shown for repositories for which > 25% of all issues are bugs.
@@ -569,7 +532,7 @@ Plot.plot({
 })
 ```
 
-## Issue labelling
+### Issue labelling
 
 And this shows the proportion of all issues that are labelled. Values are only
 shown for repositories with poor issue labelling (< 50%).
@@ -623,7 +586,7 @@ Plot.plot({
 })
 ```
 
-## Issue response time
+### Issue response time
 
 This graph shows average response times (in days) to issues reported by people
 other than main repository maintainers.
@@ -677,13 +640,13 @@ Plot.plot({
 })
 ```
 
-## Contributor Absence
+### Contributor Absence
 
 The next two graphs show a metric of main contributor absence. Values are only
 shown for which main contributors have not recently contributed. The metric is
 the proportion of overall commits made by now absent contributors.
 
-### Absence for repositories
+#### Absence for repositories
 
 ```{ojs plot-all-ctb-abs-repo}
 Plot.plot({
@@ -734,7 +697,7 @@ Plot.plot({
 })
 ```
 
-### Absence for Contributors
+#### Absence for Contributors
 
 Values are shown here for contributors who have been recently absent from
 repositories. Values are the maximal proportion of historical commits across

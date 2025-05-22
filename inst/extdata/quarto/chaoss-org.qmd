@@ -295,7 +295,8 @@ library (orgmetrics)
 ```
 
 ```{r load-data}
-data_maintenance <- readRDS ("results-maintenance-org.Rds")
+data_maintenance <- readRDS ("results-maintenance-org.Rds") |>
+    dplyr::filter (date == max (date))
 
 data_ctb_abs <- readRDS ("results-data-ctb-absence.Rds")
 data_ctb_change <- dplyr::filter (data_ctb_abs, what == "change") |>

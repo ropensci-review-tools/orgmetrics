@@ -12,6 +12,9 @@
 #' @noRd
 data_metrics_to_df <- function (data_metrics) {
 
+    # Suppress no visible binding notes:
+    pr_reviews_approved <- pr_revs_approved <- NULL
+
     # Convert vectors to single values:
     nms_counts <- c ("watchers", "issues", "prs") # committer_count
     nms_msms <- c ("mean", "sd", "median", "sum") # pr_cmt_count, response_time
@@ -71,7 +74,9 @@ data_metrics_to_df <- function (data_metrics) {
 data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
 
     # Suppress no visible binding notes:
-    org <- date <- package <- NULL
+    org <- date <- package <- airtable_name <- description <- url <-
+        field_group <- name <- value <- allna <-
+        minval <- minval0 <- minval1 <- better <- what <- NULL
 
     metric_direction <- load_model_json_data ()$metrics |>
         dplyr::select (-airtable_name, -description, -url, -field_group)
@@ -94,7 +99,7 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
     is_test_env <- Sys.getenv ("ORGMETRICS_TESTS") == "true"
     if (is_test_env) {
         set.seed (1L)
-        metrics$value <- runif (nrow (metrics))
+        metrics$value <- stats::runif (nrow (metrics))
     }
     # Remove any metrics which have no non-NA values, or all identical values
     chk <- metrics |>
@@ -156,6 +161,9 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
 #' @param metrics_all Output of `data_metrics_to_df() |> data_metrics_preprocess()`
 #' @noRd
 data_metrics_group <- function (metrics_all) {
+
+    # Suppress no visible binding notes:
+    package <- field_group <- NULL
 
     metrics_metadata <- load_model_json_data ()$metrics
     index <- which (metrics_metadata$name %in% names (metrics_all))

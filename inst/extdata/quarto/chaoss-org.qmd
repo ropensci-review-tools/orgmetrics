@@ -17,7 +17,7 @@ organizations into four distinct categories:
 1. _Development_: Metrics of both code development and maintainer continuity
    and diversity. High scores reflect repositories with high levels of code
    development from a diverse community of maintainers.
-2. _Issues_: Metrics derived from GitHub issues and pull requests. High scores
+2. _GitHub_: Metrics derived from GitHub issues and pull requests. High scores
    reflect repositories with active use of issues, pull requests, code reviews,
    and rapid responses from core maintainers to issues or pull requests opened
    by wider community members.
@@ -92,7 +92,7 @@ function pkgfmt(pkg) {
 ## Recent development
 
 This chart shows the recent development of metrics aggregated into each of the
-four groups.
+four groups, plus the "Overall" metric averaged across all four groups.
 
 <!---
 ******** START PLOT OF AVERAGE METRICS OVER DATES ********
@@ -118,6 +118,11 @@ rownames (metrics_dates) <- NULL
 metrics_dates <- metrics_dates |>
     tidyr::pivot_longer (-date) |>
     dplyr::mutate (date = as.Date (date))
+metrics_dates$name [metrics_dates$name == "total"] <- "Overall"
+metrics_dates$name [metrics_dates$name == "development"] <- "Development"
+metrics_dates$name [metrics_dates$name == "issues"] <- "GitHub"
+metrics_dates$name [metrics_dates$name == "popularity"] <- "Popularity"
+metrics_dates$name [metrics_dates$name == "meta"] <- "Dev.+Rel."
 
 ojs_define (metrics_dates_in = metrics_dates)
 ```
@@ -134,8 +139,6 @@ metricsData = {
 
 ```{ojs}
 Plot.plot({
-    title: "Grouped metrics",
-    subtitle: "Time series of each group plus average across all groups ('total')",
     color: {
         legend: true,
         label: "name",
@@ -178,6 +181,86 @@ Plot.plot({
 ******** END PLOT OF AVERAGE METRICS OVER DATES ********
 --->
 
+<!---
+******** START PLOT OF MAINTENANCE DEFICIT OVER DATES ********
+--->
+
+## Maintenance deficit
+
+This next graph shows the maintenance deficit over time, as the difference
+between community engagement and developer responsivness. Repositories with
+high community engagement yet low developer responsiveness have a high
+maintenance deficit, and vice-versa. The "Deficit" scores are scaled to fix
+within the same range as the metrics of community engagement and developer
+responsiveness.
+
+```{r}
+maintenance_ts <- readRDS ("results-maintenance-org.Rds") |>
+    dplyr::group_by (date) |>
+    dplyr::summarise (
+        comm_engage = mean (comm_engage),
+        dev_resp = mean (dev_resp),
+        maintenance = mean (maintenance)
+    )
+maintenance_ts$maintenance <- maintenance_ts$maintenance -
+    mean (maintenance_ts$maintenance) +
+    mean ((maintenance_ts$comm_engage + maintenance_ts$dev_resp) / 2)
+maintenance_ts <- maintenance_ts |> tidyr::pivot_longer (-date)
+maintenance_ts$name [maintenance_ts$name == "comm_engage"] <- "Comm. Engage."
+maintenance_ts$name [maintenance_ts$name == "dev_resp"] <- "Dev. Resp."
+maintenance_ts$name [maintenance_ts$name == "maintenance"] <- "Deficit"
+
+ojs_define (maintenance_ts_in = maintenance_ts)
+```
+
+```{ojs}
+maintenanceData = {
+    return transpose(maintenance_ts_in).map(row => ({
+        ...row,
+        date: new Date(row.date)
+    }));
+}
+```
+
+```{ojs}
+Plot.plot({
+    color: {
+        legend: true,
+        label: "name",
+        swatchHeight: 4,
+    },
+    marks: [
+        Plot.lineY(maintenanceData, {
+            x: "date",
+            y: "value",
+            stroke: "name",
+            strokeWidth:  2,
+            strokeDasharray: "2,5",
+        }),
+        Plot.linearRegressionY(maintenanceData, {
+            x: "date",
+            y: "value",
+            stroke: "name",
+            strokeWidth: 2,
+            ci: 0
+        }),
+        Plot.axisY({
+            label: null,
+        }),
+    ],
+    x: {
+        grid: true,
+        type: "utc",
+        domain: [d3.min(metricsData, d => d.date), d3.max(metricsData, d => d.date)],
+        tickFormat: "%Y",
+        ticks: [...new Set(metricsData.map(d => d.date.getFullYear()))].map(year => new Date(`${year}-01-01`)),
+    },
+    y: { grid: true },
+    style: {
+        fontSize: '16px',
+    }
+})
+```
 
 <!---
 ******** START REPO-LEVEL METRICS TABLE ********

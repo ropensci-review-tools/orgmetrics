@@ -51,7 +51,7 @@ function sparkbar(max) {
     box-sizing: border-box;
     overflow: visible;
     display: flex;
-    justify-content: end;">${x.toLocaleString("en-US")}`
+    justify-content: end;">${x.toFixed(2).toLocaleString("en-US")}`
 }
 
 function tooltip(title, expl) {
@@ -481,7 +481,6 @@ ctb_abs_ctb = {
     }));
 }
 ctb_abs_ctb_len = ctb_abs_ctb.length;
-console.log("-------" + JSON.stringify(ctb_abs_ctb));
 ```
 
 

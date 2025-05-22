@@ -122,7 +122,7 @@ metrics_dates$name [metrics_dates$name == "total"] <- "Overall"
 metrics_dates$name [metrics_dates$name == "development"] <- "Development"
 metrics_dates$name [metrics_dates$name == "issues"] <- "GitHub"
 metrics_dates$name [metrics_dates$name == "popularity"] <- "Popularity"
-metrics_dates$name [metrics_dates$name == "meta"] <- "Dev.+Rel."
+metrics_dates$name [metrics_dates$name == "meta"] <- "Dep.+Rel."
 
 ojs_define (metrics_dates_in = metrics_dates)
 ```
@@ -143,6 +143,7 @@ Plot.plot({
         legend: true,
         label: "name",
         swatchHeight: 4,
+        domain: ["Development", "GitHub", "Popularity", "Dep.+Rel.", "Overall"],
     },
     marks: [
         Plot.lineY(metricsData, {
@@ -188,7 +189,7 @@ Plot.plot({
 ## Maintenance deficit
 
 This next graph shows the maintenance deficit over time, as the difference
-between community engagement and developer responsivness. Repositories with
+between community engagement and developer responsiveness. Repositories with
 high community engagement yet low developer responsiveness have a high
 maintenance deficit, and vice-versa. The "Deficit" scores are scaled to fix
 within the same range as the metrics of community engagement and developer
@@ -228,6 +229,7 @@ Plot.plot({
         legend: true,
         label: "name",
         swatchHeight: 4,
+        domain: ["Comm. Engage.", "Dev. Resp.", "Deficit"],
     },
     marks: [
         Plot.lineY(maintenanceData, {

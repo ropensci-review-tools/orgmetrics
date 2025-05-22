@@ -1,5 +1,5 @@
 ---
-title: "Maintenance: Org"
+title: "Organization"
 execute:
   echo: false
 format: 
@@ -51,7 +51,7 @@ function sparkbar(max) {
     box-sizing: border-box;
     overflow: visible;
     display: flex;
-    justify-content: end;">${x.toLocaleString("en-US")}`
+    justify-content: end;">${x.toFixed(2).toLocaleString("en-US")}`
 }
 
 function tooltip(title, expl) {
@@ -78,7 +78,7 @@ function pkgfmt(pkg) {
     th.addEventListener("click", () => {
         localStorage.setItem("orgmetricsRepo", pkg);
         th.style.background = "#a0f8ff";
-        window.location.href = "/chaoss-repo.html";
+        window.location.href = "/repo.html";
     });
 
     return th;
@@ -381,52 +381,93 @@ Inputs.table(maintenanceRepoData, {
 ## Additional metrics and indicators
 
 The following show several more distinct indicators of maintenance need, all of
-which are assessed over the previous year of repository activity:
+which are assessed over the most recent period of repository activity:
 
-- The proportion of new issues opened that were bug reports
-- The proportion of issues with labels
-- The average time for a core maintainer to respond to a new issue
-- A couple of metrics of "contributor absence" for each repository, indicating
-maintenance deficit arising through absence of primary contributors.
+- _Ctb. Absence_: A measure of "contributor absence" for each repository,
+    indicating maintenance deficit arising through absence of primary
+    contributors.
+- _Resp. Time_: The average time for a core maintainer to respond to a new
+    issue or pull request
+- _Issue Labels_: The proportion of issues with labels
+- _Prop. Bugs_: The proportion of new issues opened that were bug reports
 
-All graphs on this page are displayed such that darker, more purple colours are
-worse than lighter, more green colours. Graphs are also generally displayed
-with repositories with greater maintenance need plotted near the top, and those
-with less maintenance need near the bottom (or not included at all).
-
-
-```{r load-pkg, echo = FALSE, message = FALSE}
-library (orgmetrics)
+```{r load-table-data}
+data_extra_metrics <- readRDS ("results-data-ctb-absence.Rds") |>
+    dplyr::filter (what == "absence") |>
+    dplyr::group_by (repo) |>
+    dplyr::summarise (ctb_absence = max (measure)) |>
+    dplyr::full_join (readRDS ("results-data-issue-resp.Rds"), by = "repo") |>
+    dplyr::full_join (readRDS ("results-data-issue-bugs.Rds"), by = "repo")
+# data_ctb_abs_ctb <- dplyr::group_by (data_ctb_abs, name) |>
+#     dplyr::summarise (measure = mean (measure), n = dplyr::n ())
 ```
 
+```{r ojs-in-extra-metrics}
+ojs_define (data_extra_metrics_in = data_extra_metrics)
+```
+
+```{ojs}
+extraMetricsTable = {
+    return transpose(data_extra_metrics_in).map(row => ({
+        ...row,
+    }));
+}
+```
+
+```{ojs}
+Inputs.table(extraMetricsTable, {
+    width: {
+        repo: 100,
+        ctb_absence: 200,
+        response: 200,
+        labels: 200,
+        bugs: 200,
+    },
+    format: {
+        repo: d => pkgfmt(d),
+        ctb_absence: sparkbar(d3.max(extraMetricsTable, d => d.ctb_absence)),
+        response: sparkbar(d3.max(extraMetricsTable, d => d.response)),
+        labels: sparkbar(d3.max(extraMetricsTable, d => d.labels)),
+        bugs: sparkbar(d3.max(extraMetricsTable, d => d.bugs)),
+    },
+    header: {
+        ctb_absence: tooltip("Ctb. Absence", "Contributor absence factor"),
+        response: tooltip("Resp. Time", "Time to respond to GitHub issues and pull requests"),
+        labels: tooltip("Issue Labels", "Proportion of labelled issues"),
+        bugs: tooltip("Prop. Bugs", "Proportion of issues and PRs which are about bugs."),
+    },
+})
+```
+
+---
+
+### Contributor Absence
+
+Finally, this table shows a metric of main contributor absence. Values are only
+and whose absence is equivalent to comp. A contributor who has been entirely
+absent during the most recent period, and was responsible for 100% of the
+commits within a single repository, would have a contributor absence score of
+one. A contributor absence of one could also reflect somebody contributing
+exactly 50% of the code to two repositories, and being entirely absent during
+the recent period. Any contributions by that contributor during the recent
+period would reduce the absence factor. In general, high absence factors
+describe recently absent contributors who have previously been major
+contributors to numerous repositories.
+
 ```{r load-data}
-data_maintenance <- readRDS ("results-maintenance-org.Rds") |>
-    dplyr::filter (date == max (date))
-
-data_ctb_abs <- readRDS ("results-data-ctb-absence.Rds")
-data_ctb_change <- dplyr::filter (data_ctb_abs, what == "change") |>
-    dplyr::group_by (repo) |>
-    dplyr::summarise (measure = max (measure))
-# That is then not actually used any further, as data are secondary to main
-# measures of contributor absence.
-data_ctb_abs <- dplyr::filter (data_ctb_abs, what == "absence")
-data_ctb_abs_repo <- dplyr::group_by (data_ctb_abs, repo) |>
-    dplyr::summarise (measure = max (measure), name = head (name, 1L)) |>
-    dplyr::filter (measure >= 0.5)
-data_ctb_abs_ctb <- dplyr::group_by (data_ctb_abs, name) |>
-    dplyr::summarise (measure = mean (measure), n = dplyr::n ())
-
-data_issue_resp <- readRDS ("results-data-issue-resp.Rds")
-data_issue_bugs <- readRDS ("results-data-issue-bugs.Rds")
+data_ctb_abs_ctb <- readRDS ("results-data-ctb-absence.Rds") |>
+    dplyr::filter (what == "absence") |>
+    dplyr::group_by (name) |>
+    dplyr::summarise (measure = sum (measure))
+# Then only include contributors with an absence factor of 1, equivalent to
+# complete absence from a single repo:
+data_ctb_abs_ctb <- data_ctb_abs_ctb |>
+    dplyr::filter (measure >= 1) |>
+    dplyr::arrange (dplyr::desc (measure))
 ```
 
 ```{r ojs-in-models}
-ojs_define (models_in = data_maintenance)
-ojs_define (ctb_change_in = data_ctb_change)
-ojs_define (ctb_abs_repo_in = data_ctb_abs_repo)
 ojs_define (ctb_abs_ctb_in = data_ctb_abs_ctb)
-ojs_define (issue_resp_in = data_issue_resp)
-ojs_define (issue_bugs_in = data_issue_bugs)
 ```
 
 ```{ojs plot-latest}
@@ -434,326 +475,22 @@ Plot = import("https://esm.sh/@observablehq/plot")
 ```
 
 ```{ojs}
-ctb_change = {
-    return transpose(ctb_change_in).map(row => ({
-        ...row,
-    }));
-}
-ctb_change_len = ctb_change.length;
-ctb_abs_repo = {
-    return transpose(ctb_abs_repo_in).map(row => ({
-        ...row,
-    }));
-}
-ctb_abs_repo_len = ctb_abs_repo.length;
 ctb_abs_ctb = {
     return transpose(ctb_abs_ctb_in).map(row => ({
         ...row,
     }));
 }
 ctb_abs_ctb_len = ctb_abs_ctb.length;
-
-issue_resp = {
-    return transpose(issue_resp_in).map(row => ({
-        ...row,
-    }));
-}
-issue_resp_len = issue_resp.length;
-issue_bugs = {
-    return transpose(issue_bugs_in).map(row => ({
-        ...row,
-    }));
-}
 ```
 
-
-### Proportion of bugs
-
-This plot shows the proportion of all recent issues that are bug reports. Values
-are only shown for repositories for which > 25% of all issues are bugs.
 
 ```{ojs}
-issue_bugs_filt = issue_bugs.filter(function(i) {
-    return i.bugs >= 0.25
-});
-bugs_len = issue_bugs_filt.length;
-issue_labs_filt = issue_bugs.filter(function(i) {
-    return i.labels <= 0.5
-});
-labs_len = issue_labs_filt.length;
-```
-
-```{ojs plot-all-issue-bugs}
-Plot.plot({
-    height: 20 * bugs_len,
-    marginLeft: 60,
-    marginRight: 160,
-    marginTop: 50,
-    marginBottom: 50,
-    axis: null,
-    x: {
-        axis: "top",
-        grid: true,
-        label: "Proportion Bugs"
+Inputs.table(ctb_abs_ctb, {
+    format: {
+        measure: sparkbar(d3.max(ctb_abs_ctb, d => d.measure)),
     },
-    y: { grid: true },
-    marks: [
-        Plot.barX(issue_bugs_filt, {
-            y: "repo",
-            x: "bugs",
-            sort: {y: "-x" },
-            fill: "bugs",
-        }),
-        Plot.barX(issue_bugs_filt,
-            Plot.pointer(
-            {
-                y: "repo",
-                x: "bugs",
-                sort: {y: "-x" },
-                stroke: "gray",
-                fill: "bugs",
-                strokeWidth: 2,
-            })
-        ),
-        Plot.text(issue_bugs_filt, {
-            x: "bugs",
-            y: "repo",
-            text: "repo",
-            textAnchor: "start",
-            fontSize: 16,
-            dx: 5
-        })
-    ],
-    color: {
-        scheme: "Cool",
-        type: "ordinal",
-        reverse: true
-    }
-})
-```
-
-### Issue labelling
-
-And this shows the proportion of all issues that are labelled. Values are only
-shown for repositories with poor issue labelling (< 50%).
-
-
-```{ojs plot-all-issue-labels}
-Plot.plot({
-    height: 20 * labs_len,
-    marginLeft: 60,
-    marginRight: 160,
-    marginTop: 50,
-    marginBottom: 50,
-    axis: null,
-    x: {
-        axis: "top",
-        grid: true,
-        label: "Proportion Labelled"
+    header: {
+        measure: tooltip("Ctb. Absence", "Contributor absence factor"),
     },
-    y: { grid: true },
-    marks: [
-        Plot.barX(issue_labs_filt, {
-            y: "repo",
-            x: "labels",
-            sort: {y: "x" },
-            fill: "labels",
-        }),
-        Plot.barX(issue_labs_filt,
-            Plot.pointer(
-            {
-                y: "repo",
-                x: "labels",
-                sort: {y: "x" },
-                stroke: "gray",
-                fill: "labels",
-                strokeWidth: 2,
-            })
-        ),
-        Plot.text(issue_labs_filt, {
-            x: "labels",
-            y: "repo",
-            text: "repo",
-            textAnchor: "start",
-            fontSize: 16,
-            dx: 5
-        })
-    ],
-    color: {
-        scheme: "Cool",
-        type: "ordinal"
-    }
-})
-```
-
-### Issue response time
-
-This graph shows average response times (in days) to issues reported by people
-other than main repository maintainers.
-
-```{ojs plot-all-issue-resp-time}
-Plot.plot({
-    height: 20 * issue_resp_len,
-    marginLeft: 60,
-    marginRight: 160,
-    marginTop: 50,
-    marginBottom: 50,
-    axis: null,
-    x: {
-        axis: "top",
-        grid: true,
-        label: "Issue response time (days)"
-    },
-    y: { grid: true },
-    marks: [
-        Plot.barX(issue_resp, {
-            y: "repo",
-            x: "response",
-            sort: {y: "-x" },
-            fill: "response",
-        }),
-        Plot.barX(issue_resp,
-            Plot.pointer(
-            {
-                y: "repo",
-                x: "response",
-                sort: {y: "-x" },
-                stroke: "gray",
-                fill: "response",
-                strokeWidth: 2,
-            })
-        ),
-        Plot.text(issue_resp, {
-            x: "response",
-            y: "repo",
-            text: "repo",
-            textAnchor: "start",
-            fontSize: 16,
-            dx: 5
-        })
-    ],
-    color: {
-        scheme: "Cool",
-        type: "ordinal",
-        reverse: true
-    }
-})
-```
-
-### Contributor Absence
-
-The next two graphs show a metric of main contributor absence. Values are only
-shown for which main contributors have not recently contributed. The metric is
-the proportion of overall commits made by now absent contributors.
-
-#### Absence for repositories
-
-```{ojs plot-all-ctb-abs-repo}
-Plot.plot({
-    height: 20 * ctb_abs_repo_len,
-    marginLeft: 60,
-    marginRight: 160,
-    marginTop: 50,
-    marginBottom: 50,
-    axis: null,
-    x: {
-        axis: "top",
-        grid: true,
-        label: "Proportion of overall commits"
-    },
-    y: { grid: true },
-    marks: [
-        Plot.barX(ctb_abs_repo, {
-            y: "repo",
-            x: "measure",
-            sort: {y: "-x" },
-            fill: "measure",
-        }),
-        Plot.barX(ctb_abs_repo,
-            Plot.pointer(
-            {
-                y: "repo",
-                x: "measure",
-                sort: {y: "-x" },
-                stroke: "gray",
-                fill: "measure",
-                strokeWidth: 2,
-            })
-        ),
-        Plot.text(ctb_abs_repo, {
-            x: "measure",
-            y: "repo",
-            text: "repo",
-            textAnchor: "start",
-            fontSize: 16,
-            dx: 5
-        })
-    ],
-    color: {
-        scheme: "Cool",
-        type: "ordinal",
-        reverse: true
-    }
-})
-```
-
-#### Absence for Contributors
-
-Values are shown here for contributors who have been recently absent from
-repositories. Values are the maximal proportion of historical commits across
-all repositories from which they have been absent, with bars coloured by
-numbers of repositories, so darker, more purple colours indicate greater number
-of absent repositories.
-
-```{ojs plot-all-ctb-abs-ctb}
-fullScaleValues = ctb_abs_ctb.map(d => d.n);
-minVal = Math.min(...fullScaleValues);
-maxVal = Math.max(...fullScaleValues);
-Plot.plot({
-    height: 20 * ctb_abs_ctb_len,
-    marginLeft: 60,
-    marginRight: 160,
-    marginTop: 50,
-    marginBottom: 50,
-    axis: null,
-    x: {
-        axis: "top",
-        grid: true,
-        label: "Proportion of overall commits"
-    },
-    y: { grid: true },
-    marks: [
-        Plot.barX(ctb_abs_ctb, {
-            y: "name",
-            x: "measure",
-            sort: {y: "-x" },
-            fill: "n",
-        }),
-        Plot.barX(ctb_abs_ctb,
-            Plot.pointer(
-            {
-                y: "name",
-                x: "measure",
-                sort: {y: "-x" },
-                stroke: "gray",
-                fill: "measure",
-                strokeWidth: 2,
-            })
-        ),
-        Plot.text(ctb_abs_ctb, {
-            x: "measure",
-            y: "name",
-            text: "name",
-            textAnchor: "start",
-            fontSize: 16,
-            dx: 5
-        })
-    ],
-    color: {
-        scheme: "Cool",
-        type: "linear",
-        domain: [minVal, maxVal],
-        reverse: true
-    }
 })
 ```

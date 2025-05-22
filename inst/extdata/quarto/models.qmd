@@ -9,8 +9,8 @@ format:
     code-fold: false
 ---
 
-The [*Organizational Maintenance*](./chaoss-org.html) and [*Repository
-Maintenance*](./chaoss-repo.html) pages provide various insights into
+The [*Organizational Maintenance*](./org.html) and [*Repository
+Maintenance*](./repo.html) pages provide various insights into
 maintenance deficits and needs across the whole organization and within
 individual repositories. This page provides more detail on the various [CHAOSS
 (*Community Health Analytics in Open Source Software*)
@@ -20,7 +20,7 @@ aggregates various individual metrics, and aims to synthesise prominent aspects
 of community health. This page provides insights into a range of those models,
 assessed for each repository in the `epiverse-trace` and `reconhub` GitHub
 organizations. Details of individual metrics can be seen on the [*Repository
-Maintenance* page](./chaoss-repo.html).
+Maintenance* page](./repo.html).
 
 ## Aggregate Community Health
 

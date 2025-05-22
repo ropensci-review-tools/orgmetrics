@@ -186,7 +186,15 @@ Plot.plot({
             x: "date",
             y: "total",
             stroke: "orange",
-            strokeWidth:  2,
+            strokeWidth:  1,
+            strokeDasharray: "2,5",
+        }),
+        Plot.linearRegressionY(metricsData, {
+            x: "date",
+            y: "total",
+            stroke: "red",
+            strokeWidth: 2,
+            ci: 0
         }),
         Plot.axisY({
             label: null,

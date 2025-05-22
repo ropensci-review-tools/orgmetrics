@@ -1,5 +1,5 @@
 ---
-title: "Maintenance: Org"
+title: "Organization"
 execute:
   echo: false
 format: 
@@ -78,7 +78,7 @@ function pkgfmt(pkg) {
     th.addEventListener("click", () => {
         localStorage.setItem("orgmetricsRepo", pkg);
         th.style.background = "#a0f8ff";
-        window.location.href = "/chaoss-repo.html";
+        window.location.href = "/repo.html";
     });
 
     return th;

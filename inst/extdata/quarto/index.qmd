@@ -505,9 +505,9 @@ clicking on the symbol on the top right.
 
 The dashboard currently has three main pages:
 
-1. An [organization maintenance](./chaoss-org.html) page identifying
+1. An [organization maintenance](./org.html) page identifying
    maintenance priorities across all repositories.
-2. A [repository maintenance](./chaoss-repo.html) page providing additional
+2. A [repository maintenance](./repo.html) page providing additional
    detail on maintenance needs of a selected repository.
 3. A [*Community Health*](./models.html) summarising scores for the various
    [CHAOSS (*Community Health Analytics in Open Source Software*)

@@ -1,5 +1,5 @@
 ---
-title: "Maintenance: Repo"
+title: "Repositories"
 execute:
   echo: false
 format: 
@@ -15,7 +15,7 @@ models](https://chaoss.community/kbtopic/all-metrics-models/), and the
 individual [CHAOSS metrics](https://chaoss.community/kbtopic/all-metrics/)
 which comprise those models. In its present state, this is mostly a
 proof-of-concept, and is not as well developed as the accompanying
-[*Organizational Maintenance* page](./chaoss-org.html).
+[*Organizational Maintenance* page](./org.html).
 
 The "Outliers only" selector immediate below determines whether values shown
 for both models and metrics are outliers only (default of "true"), or whether

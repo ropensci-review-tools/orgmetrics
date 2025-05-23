@@ -60,9 +60,9 @@ pkgs_are_r <- function (pkgs) {
         }
         httr2::resp_check_status (resp)
 
-        body_files <- httr2::resp_body_json (resp, simplify = TRUE) |>
-            dplyr::filter (type == "file")
-        return ("DESCRIPTION" %in% body_files$name)
+        body_files <- httr2::resp_body_json (resp, simplify = TRUE)
+        return ("DESCRIPTION" %in% body_files$name &&
+            "NAMESPACE" %in% body_files$name)
     }, logical (1L))
 
     return (is_r_pkg)

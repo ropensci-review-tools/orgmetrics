@@ -8,7 +8,16 @@ models_over_end_dates <-
 orgmetrics_collate_org_data <- function (org_paths, end_date = Sys.Date (), num_years = 3) {
 
     pkgs <- fs::dir_ls (org_paths, type = "directory")
+    org_repo <- t (vapply (pkgs, function (p) {
+        p_s <- fs::path_split (p) [[1]]
+        n <- length (p_s)
+        p_s [(n - 1):n]
+    }, character (2L), USE.NAMES = FALSE))
+
     data <- lapply (seq_along (pkgs), function (i) {
+
+        is_r <- pkgs_are_r (paste0 (org_repo [i, ], collapse = "/"))
+
         cli::cli_alert_info ("[{i} / {length(pkgs)}]: {pkgs[i]}")
         path_i <- pkgs [i]
         pkg_i <- basename (path_i)

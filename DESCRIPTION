@@ -1,6 +1,6 @@
 Package: orgmetrics
 Title: Metrics for Your GitHub Organization
-Version: 0.0.3.148
+Version: 0.0.3.149
 Authors@R: 
     person("Mark", "Padgham", , "mark.padgham@email.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2172-5265"))
@@ -34,6 +34,7 @@ Suggests:
     quarto,
     testthat (>= 3.0.0),
     tidyr,
+    visNetwork,
     withr,
     zoo
 Remotes:

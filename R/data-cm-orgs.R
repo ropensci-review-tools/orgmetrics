@@ -17,6 +17,9 @@ orgmetrics_collate_org_data <- function (org_paths, end_date = Sys.Date (), num_
     data <- lapply (seq_along (pkgs), function (i) {
 
         is_r <- pkgs_are_r (paste0 (org_repo [i, ], collapse = "/"))
+        if (!is_r) {
+            return (NULL)
+        }
 
         cli::cli_alert_info ("[{i} / {length(pkgs)}]: {pkgs[i]}")
         path_i <- pkgs [i]

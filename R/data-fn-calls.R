@@ -58,7 +58,8 @@ get_all_pkg_names <- function (org_paths = NULL) {
     pkg_names <- vapply (pkgs, function (i) {
         get_pkg_name (i)
     }, character (1L), USE.NAMES = FALSE)
-    data.frame (path = as.character (pkgs), pkg_name = pkg_names)
+    res <- data.frame (path = as.character (pkgs), pkg_name = pkg_names)
+    res <- res [which (nzchar (pkg_names)), ]
 }
 
 get_pkg_name <- function (path) {

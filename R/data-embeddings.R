@@ -4,7 +4,7 @@ rm_org_data_embeddings <- function (org_paths) {
 
     pkg_names <- get_all_pkg_names (org_paths)
 
-    embeddings <- pkgmatch::pkgmatch_embeddings_from_pkgs (pkg_names$paths)
+    embeddings <- pkgmatch::pkgmatch_embeddings_from_pkgs (pkg_names$path)
 
     return (embeddings)
 }

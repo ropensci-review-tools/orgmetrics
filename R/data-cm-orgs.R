@@ -46,6 +46,10 @@ orgmetrics_collate_org_data <- function (org_paths, end_date = Sys.Date (), num_
         return (dat_i)
     })
 
+    index <- which (vapply (data, length, integer (1L)) > 0L)
+    pkgs <- pkgs [index]
+    data <- data [index]
+
     pkgs_repos <- lapply (data, function (i) i$repo)
     pkgs_metrics <- lapply (data, function (i) i$metrics)
     pkgs_models <- lapply (data, function (i) i$models)

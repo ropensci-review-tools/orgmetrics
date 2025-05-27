@@ -31,7 +31,7 @@ generate_test_org_data <- function () {
 
 #' This uses the repometrics memoisations to enable 'collate_org_data' to be
 #' run on the org path without re-calculating.
-mock_collate_org_data <- function () {
+mock_collate_org_data <- function (end_date = Sys.Date ()) {
 
     dat <- mock_rm_data ()
     path <- generate_test_pkg ()

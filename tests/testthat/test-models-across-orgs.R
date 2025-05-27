@@ -8,7 +8,7 @@ get_end_date_seq <- utils::getFromNamespace ("get_end_date_seq", "repometrics")
 test_that ("collate_org_data output", {
 
     Sys.setenv ("REPOMETRICS_TESTS" = "true")
-    org_dir <- mock_collate_org_data ()
+    org_dir <- mock_collate_org_data (end_date = end_date)
 
     org_data <- orgmetrics_collate_org_data (
         org_dir,
@@ -38,7 +38,7 @@ test_that ("collate_org_data output", {
 test_that ("org data preprocessing", {
 
     Sys.setenv ("REPOMETRICS_TESTS" = "true")
-    org_dir <- mock_collate_org_data ()
+    org_dir <- mock_collate_org_data (end_date = end_date)
 
     data_org <- orgmetrics_collate_org_data (
         org_dir,

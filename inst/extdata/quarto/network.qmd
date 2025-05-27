@@ -37,17 +37,20 @@ slider.
 
 ```{r fn-calls-pre-process}
 fn_calls <- readRDS ("fn-calls.Rds")
+
 fn_call_nodes_pkg <- fn_calls |>
     dplyr::group_by (package) |>
-    dplyr::summarise (num_calls = sum (num_calls)) |>
+    dplyr::summarise (num_calls = sum (num_calls), .groups = "keep") |>
     dplyr::rename (id = package) |>
     dplyr::mutate (group = "depends")
+
 fn_call_nodes_src <- fn_calls |>
     dplyr::group_by (source) |>
-    dplyr::summarise (num_calls = sum (num_calls)) |>
+    dplyr::summarise (num_calls = sum (num_calls), .groups = "keep") |>
     dplyr::rename (id = source) |>
     dplyr::mutate (group = "uses") |>
     dplyr::filter (!id %in% fn_call_nodes_pkg$id)
+
 fn_call_nodes <- dplyr::bind_rows (
     fn_call_nodes_pkg,
     fn_call_nodes_src
@@ -78,9 +81,11 @@ emb_nodes <- data.frame (
 )
 # Embeddings don't exist for all nodes, so add extra:
 nodes_extra <- fn_call_nodes$id [which (!fn_call_nodes$id %in% emb_nodes$id)]
-emb_nodes <- rbind (emb_nodes, data.frame (id = nodes_extra, value = 0, group = "isolated"))
-index <- match (fn_call_nodes$id, emb_nodes$id)
-emb_nodes$group [index] <- fn_call_nodes$group
+if (length (nodes_extra) > 0L) {
+    emb_nodes <- rbind (emb_nodes, data.frame (id = nodes_extra, value = 0, group = "isolated"))
+    index <- match (fn_call_nodes$id, emb_nodes$id)
+    emb_nodes$group [index] <- fn_call_nodes$group
+}
 
 emb_nodes$group <- "depends"
 
@@ -92,7 +97,6 @@ emb_links <- emb_df |>
     dplyr::mutate (type = "depends", value = 10 * value) |>
     dplyr::filter (target %in% emb_nodes$id)
 ```
-
 
 
 ```{r ojs-definitions}

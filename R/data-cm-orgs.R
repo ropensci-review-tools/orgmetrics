@@ -28,8 +28,9 @@ orgmetrics_collate_org_data <- function (org_paths, end_date = Sys.Date (), num_
         if (fs::file_exists (f_tmp)) {
             dat_i <- readRDS (f_tmp)
         } else {
+            dat_repo <- repometrics::repometrics_data_repo (path_i)
             dat_i <- list (
-                repo = repometrics::repometrics_data_repo (path_i),
+                repo = dat_repo_to_end_date (dat_repo, end_date = end_date),
                 metrics = metrics_over_end_dates (
                     path_i,
                     end_date = end_date,
@@ -88,6 +89,39 @@ rm_tmp_pkg_files <- function (pkgs) {
     if (length (f_tmp_list) > 0L) {
         fs::file_delete (f_tmp_list)
     }
+}
+
+dat_repo_to_end_date <- function (dat_repo, end_date = Sys.Date ()) {
+
+    if (!inherits (end_date, "Date")) {
+        end_date <- as.Date (end_date)
+    }
+
+    dat_repo$pkgstats <- lapply (dat_repo$pkgstats, function (p) {
+        p |> dplyr::filter (as.Date (date) <= end_date)
+    })
+
+    dat_repo$rm$gh_repo_workflow <- dat_repo$rm$gh_repo_workflow |>
+        dplyr::filter (as.Date (created) <= end_date)
+    dat_repo$rm$gitlog <- dat_repo$rm$gitlog |>
+        dplyr::filter (as.Date (timestamp) <= end_date)
+    dat_repo$rm$issue_comments_from_gh_api <-
+        dat_repo$rm$issue_comments_from_gh_api |>
+        dplyr::filter (as.Date (created_at) <= end_date)
+    dat_repo$rm$issues_from_gh_api <-
+        dat_repo$rm$issues_from_gh_api |>
+        dplyr::filter (as.Date (created_at) <= end_date)
+    dat_repo$rm$prs_from_gh_api <- dat_repo$rm$prs_from_gh_api |>
+        dplyr::filter (as.Date (created_at) <= end_date)
+    dat_repo$rm$releases_from_gh_api <-
+        dat_repo$rm$releases_from_gh_api |>
+        dplyr::filter (as.Date (created_at) <= end_date)
+    dat_repo$rm$repo_forks <- dat_repo$rm$repo_forks |>
+        dplyr::filter (as.Date (created) <= end_date)
+    dat_repo$rm$repo_stargazers <- dat_repo$rm$repo_stargazers |>
+        dplyr::filter (as.Date (starred_at) <= end_date)
+
+    return (dat_repo)
 }
 
 org_annual_commits <- function (org_paths) {

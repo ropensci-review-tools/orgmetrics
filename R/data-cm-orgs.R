@@ -94,6 +94,9 @@ rm_tmp_pkg_files <- function (pkgs) {
 
 dat_repo_to_end_date <- function (dat_repo, end_date = Sys.Date ()) {
 
+    # Suppress no visible binding notes:
+    timestamp <- created_at <- created <- starred_at <- NULL
+
     if (!inherits (end_date, "Date")) {
         end_date <- as.Date (end_date)
     }

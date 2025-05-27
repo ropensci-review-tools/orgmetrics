@@ -35,8 +35,18 @@ ctb_absence <- function (data_org,
     login <- handle <- aut_name <- timestamp <- what <- measure <- NULL
 
     start_date <- end_date - as.integer (period)
+    obj_nms <- c ("pkgstats", "pkgcheck", "cran_checks", "rm")
 
     abs <- lapply (data_org$repos, function (repo) {
+
+        if (!identical (names (repo), obj_nms)) {
+            return (data.frame (
+                repo = character (0L),
+                name = character (0L),
+                measure = numeric (0L),
+                what = character (0L)
+            ))
+        }
 
         ctbs_gh <- repo$rm$contribs_from_gh_api |>
             dplyr::filter (login != "actions-user")
@@ -93,11 +103,22 @@ issue_responses <- function (data_org,
     # Suppress no visible binding checks:
     user_login <- issue_number <- issue_author <- created_at <- user_id <-
         updated_at <- issue_body <- opened_date <- responded_at <- repo <-
-            response <- response_duration <- NULL
+        response <- response_duration <- NULL
 
     start_date <- end_date - as.integer (period)
+    obj_nms <- c ("pkgstats", "pkgcheck", "cran_checks", "rm")
 
     response_dat_all <- lapply (data_org$repos, function (repo) {
+
+        if (!identical (names (repo), obj_nms)) {
+            return (data.frame (
+                repo = character (0L),
+                issue_number = integer (0L),
+                created_at = numeric (0L),
+                responded_at = numeric (0L),
+                response_duration = numeric (0L)
+            ))
+        }
 
         issues <- repo$rm$issues_from_gh_api
         prop_labelled <- length (which (nzchar (issues$labels))) / nrow (issues)
@@ -153,8 +174,13 @@ issue_bugs <- function (data_org,
     created_at <- bugs <- NULL
 
     start_date <- end_date - as.integer (period)
+    obj_nms <- c ("pkgstats", "pkgcheck", "cran_checks", "rm")
 
     label_dat <- t (vapply (data_org$repos, function (repo) {
+
+        if (!identical (names (repo), obj_nms)) {
+            return (rep (NA_real_, 2L))
+        }
 
         issues <- repo$rm$issues_from_gh_api |>
             dplyr::filter (created_at >= start_date)

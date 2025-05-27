@@ -13,11 +13,12 @@ orgmetrics_collate_org_data <- function (org_paths, end_date = Sys.Date (), num_
         n <- length (p_s)
         p_s [(n - 1):n]
     }, character (2L), USE.NAMES = FALSE))
+    is_test_env <- Sys.getenv ("ORGMETRICS_TESTS") == "true"
 
     data <- lapply (seq_along (pkgs), function (i) {
 
         is_r <- pkgs_are_r (paste0 (org_repo [i, ], collapse = "/"))
-        if (!is_r) {
+        if (!is_r && !is_test_env) {
             return (NULL)
         }
 
@@ -163,7 +164,9 @@ org_annual_gh_activity <- function (pkgs_repos) {
     })
 
     years <- unlist (lapply (annual_gh, function (i) i$issues))
-    years <- seq (min (years), max (years))
+    if (length (years) > 0L) {
+        years <- seq (min (years), max (years))
+    }
     res <- lapply (c ("issues", "prs", "cmts"), function (what) {
         data <- lapply (annual_gh, function (i) i [[what]]) |>
             unlist () |>

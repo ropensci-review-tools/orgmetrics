@@ -137,7 +137,11 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
         dplyr::mutate (value = dplyr::if_else (
             better == "lower", -value, value
         )) |>
-        dplyr::mutate (value = (value - min (value, na.rm = TRUE)) / diff (range (value, na.rm = TRUE))) |>
+        dplyr::mutate (value = if (all (is.na (value))) {
+            NA_real_
+        } else {
+            (value - min (value, na.rm = TRUE)) / diff (range (value, na.rm = TRUE))
+        }) |>
         dplyr::select (-what, -scale, -better) |>
         dplyr::ungroup ()
 

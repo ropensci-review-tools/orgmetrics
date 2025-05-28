@@ -102,6 +102,9 @@ dat_repo_to_end_date <- function (dat_repo, end_date = Sys.Date ()) {
     }
 
     dat_repo$pkgstats <- lapply (dat_repo$pkgstats, function (p) {
+        if (length (p) == 0L) {
+            return (p)
+        }
         p |> dplyr::filter (as.Date (date) <= end_date)
     })
 

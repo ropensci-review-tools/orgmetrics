@@ -124,7 +124,7 @@ pkgcheck_stats <- lapply (data_pkgcheck, function (d) {
             measure == "loc_per_fn_r_exp" ~ "LOC per exported fn: R",
             measure == "loc_per_fn_r_non_exp" ~ "LOC per non-exported fn: R",
             measure == "doclines_per_fn_exp" ~ "Doc. lines per exported fn.",
-            measure == "doclines_per_fn_non_exp" ~ "Doc. lines per non-exported fn.",
+            measure == "doclines_per_fn_not_exp" ~ "Doc. lines per non-exported fn.",
             measure == "fn_call_network_size" ~ "Nr. nodes in fn. call network",
             .default = measure
         ))
@@ -242,13 +242,26 @@ htl.html`
 
 ### Statistical properties
 
-"LOC" = "Lines-of-Code"
+The "Limits" slider below can be used to reduce statistical properties to only
+those lying in the lower or upper percentiles of the specified value. Note in
+the measures that "LOC" = "Lines-of-Code".
+
+```{ojs}
+viewof statsLimit = Inputs.range(
+    [0,50],
+    {value: 10, step: 5, label: htl.html`<b>Limits:</b>`}
+);
+```
+
+<div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
 ```{ojs}
 pkgStatsData = {
     return transpose(pkgcheck_stats_in[repo]).map(row => ({
         ...row,
-    }));
+    })).filter(function(m) {
+        return m.percentile <= statsLimit || m.percentile >= (100 - statsLimit)
+    });
 }
 ```
 

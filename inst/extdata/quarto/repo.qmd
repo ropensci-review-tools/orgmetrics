@@ -9,6 +9,33 @@ format:
     code-fold: false
 ---
 
+<!---
+******** START UTILITY FUNCTIONS ********
+--->
+
+
+```{ojs}
+function sparkbar(max) {
+  const colourScale = d3.scaleSequential(d3.interpolateCool)
+    .domain([0, max]);
+
+  return (x) => htl.html`<div style="
+    background: ${colourScale(x)};
+    color: black;
+    width: ${100 * x / max}%;
+    float: right;
+    padding-right: 3px;
+    box-sizing: border-box;
+    overflow: visible;
+    display: flex;
+    justify-content: end;">${x.toFixed(2).toLocaleString("en-US")}`
+}
+```
+
+<!---
+******** END UTILITY FUNCTIONS ********
+--->
+
 This page identifies maintenance priorities for a selected repository, in
 terms of both [CHAOSS
 models](https://chaoss.community/kbtopic/all-metrics-models/), and the
@@ -69,6 +96,39 @@ pkgcheck_summaries <- lapply (data_pkgcheck, function (d) {
     out <- gsub ("\\:eyes\\:", "&#128064;", out)
     gsub ("^\\-(\\s?)", "", grep ("^\\-", out, value = TRUE))
 })
+measures_rm <- c (
+    "loc_vignettes", "data_size_median", "n_fns_r_not_exported",
+    "rel_whitespace_R", "rel_whitespace_vignettes", "rel_whitespace_tests"
+)
+pkgcheck_stats <- lapply (data_pkgcheck, function (d) {
+    d$info$pkgstats |>
+        dplyr::select (-noteworthy) |>
+        dplyr::filter (!measure %in% measures_rm) |>
+        dplyr::mutate (value = dplyr::case_when (
+            measure == "data_size_total" ~ round (value / 1024),
+            .default = value
+        )) |>
+        dplyr::mutate (measure = dplyr::case_when (
+            measure == "files_R" ~ "Nr. Files: R",
+            measure == "files_vignettes" ~ "Nr. Vignettes",
+            measure == "files_tests" ~ "Nr. Files: tests",
+            measure == "loc_R" ~ "LOC: R",
+            measure == "loc_tests" ~ "LOC: tests",
+            measure == "num_vignettes" ~ "Nr. vignettes",
+            measure == "data_size_total" ~ "Data size (kB)",
+            measure == "n_fns_r" ~ "Nr. fns: R",
+            measure == "n_fns_r_exported" ~ "Nr. exported fns: R",
+            measure == "n_fns_per_file_r" ~ "Nr. fns per file",
+            measure == "num_params_per_fn" ~ "Nr. params per fn",
+            measure == "loc_per_fn_r" ~ "LOC per fn: R",
+            measure == "loc_per_fn_r_exp" ~ "LOC per exported fn: R",
+            measure == "loc_per_fn_r_non_exp" ~ "LOC per non-exported fn: R",
+            measure == "doclines_per_fn_exp" ~ "Doc. lines per exported fn.",
+            measure == "doclines_per_fn_non_exp" ~ "Doc. lines per non-exported fn.",
+            measure == "fn_call_network_size" ~ "Nr. nodes in fn. call network",
+            .default = measure
+        ))
+})
 ```
 
 ```{r ojs-in-metrics}
@@ -79,6 +139,7 @@ ojs_define (ctb_abs_in = data_ctb_abs)
 ojs_define (issue_resp_in = data_issue_resp)
 ojs_define (issue_bugs_in = data_issue_bugs)
 ojs_define (pkgcheck_in = pkgcheck_summaries)
+ojs_define (pkgcheck_stats_in = pkgcheck_stats)
 ```
 
 ```{ojs plot-latest}
@@ -178,6 +239,32 @@ htl.html`
   </ul>`)}</div>`
 ```
 
+
+### Statistical properties
+
+"LOC" = "Lines-of-Code"
+
+```{ojs}
+pkgStatsData = {
+    return transpose(pkgcheck_stats_in[repo]).map(row => ({
+        ...row,
+    }));
+}
+```
+
+```{ojs}
+Inputs.table(pkgStatsData, {
+    format: {
+        percentile: sparkbar(100),
+        noteworth: null,
+    },
+    header: {
+        measure: "Measure",
+        value: "Value",
+        percentile: "Percentile"
+    }
+})
+```
 
 
 ## CHAOSS models

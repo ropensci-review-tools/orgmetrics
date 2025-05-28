@@ -159,7 +159,9 @@ issue_bugs = issue_bugsTranspose.filter(function(r) {
 ## pkgcheck Summary
 
 This shows the summary output from [rOpenSci's `pkgcheck`
-package](https://docs.ropensci.org/pkgcheck).
+package](https://docs.ropensci.org/pkgcheck). Passing checks are marked by
+&#9989;; failing checks by &#10060;; and optional checks that may be worth
+examining with &#128064;.
 
 ```{ojs}
 this_pkg_summary = pkgcheck_in[repo];

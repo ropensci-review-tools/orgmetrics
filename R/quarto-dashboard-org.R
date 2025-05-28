@@ -45,6 +45,8 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
         url = paste0 ("https://github.com/", data_repo_src)
     )
 
+    data_pkgcheck <- lapply (data_org$repos, function (i) i$pkgcheck)
+
     requireNamespace ("jsonlite")
     requireNamespace ("quarto")
     requireNamespace ("withr")
@@ -64,6 +66,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (data_abs, fs::path (dir, "results-data-ctb-absence.Rds"))
     saveRDS (data_resp, fs::path (dir, "results-data-issue-resp.Rds"))
     saveRDS (data_bugs, fs::path (dir, "results-data-issue-bugs.Rds"))
+    saveRDS (data_pkgcheck, fs::path (dir, "results-pkgcheck.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))
 

@@ -50,6 +50,7 @@ data_metrics <- data_metrics |>
             dplyr::row_number (value) >= dplyr::n () * threshold
     ) |>
     dplyr::arrange (package, dplyr::desc (value))
+
 data_models <- data_models |>
     dplyr::group_by (name) |>
     dplyr::arrange (value) |>
@@ -58,8 +59,17 @@ data_models <- data_models |>
             dplyr::row_number (value) >= dplyr::n () * threshold
     ) |>
     dplyr::arrange (package, dplyr::desc (value))
-```
 
+data_pkgcheck <- readRDS ("results-pkgcheck.Rds")
+names (data_pkgcheck) <- gsub ("^.*\\/", "", names (data_pkgcheck))
+pkgcheck_summaries <- lapply (data_pkgcheck, function (d) {
+    out <- pkgcheck:::summarise_all_checks (d)
+    out <- gsub ("\\:heavy\\_check\\_mark\\:", "&#9989;", out)
+    out <- gsub ("\\:heavy\\_multiplication\\_x\\:", "&#10060;", out)
+    out <- gsub ("\\:eyes\\:", "&#128064;", out)
+    grep ("^\\-", out, value = TRUE)
+})
+```
 
 ```{r ojs-in-metrics}
 ojs_define (metrics_in = data_metrics)
@@ -68,6 +78,7 @@ ojs_define (repo_src_in = data_repo_src)
 ojs_define (ctb_abs_in = data_ctb_abs)
 ojs_define (issue_resp_in = data_issue_resp)
 ojs_define (issue_bugs_in = data_issue_bugs)
+ojs_define (pkgcheck_in = pkgcheck_summaries)
 ```
 
 ```{ojs plot-latest}
@@ -133,16 +144,6 @@ htl.html`<div>Click here to see the <a href=${repoURL} target="_blank">${repo} r
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
 ```{ojs}
-viewof outliersOnly = Inputs.radio(
-    ["true", "false"],
-    {
-        value: "true",
-        label: htl.html`<b>Outliers only:</b>`,
-    }
-)
-```
-
-```{ojs}
 ctb_abs = ctb_absTranspose.filter(function(r) {
     return r.repo === repo
 })
@@ -155,6 +156,27 @@ issue_bugs = issue_bugsTranspose.filter(function(r) {
 ```
 
 
+## pkgcheck Summary
+
+This shows the summary output from [rOpenSci's `pkgcheck`
+package](https://docs.ropensci.org/pkgcheck).
+
+```{ojs}
+this_pkg_summary = pkgcheck_in[repo];
+
+function unescapeHtml(unsafe) {
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = unsafe;
+  return textarea.value;
+}
+
+htl.html`<table>
+  <tbody>${this_pkg_summary.map((item) => htl.html.fragment`<tr>
+    <td>${unescapeHtml(item)}</td>
+  </tr>`)}</tbody>
+</table>`
+```
+
 
 
 ## CHAOSS models
@@ -165,6 +187,16 @@ models](https://chaoss.community/kbtopic/all-metrics-models/) for a selected
 repository. Each of these models is an aggregation of several underlying
 [metrics](https://chaoss.community/kbtopic/all-metrics/), which can be examined
 in the following sub-section.
+
+```{ojs}
+viewof outliersOnly = Inputs.radio(
+    ["true", "false"],
+    {
+        value: "true",
+        label: htl.html`<b>Outliers only:</b>`,
+    }
+)
+```
 
 ```{ojs}
 models_all = {

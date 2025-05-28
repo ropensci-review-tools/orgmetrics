@@ -67,7 +67,7 @@ pkgcheck_summaries <- lapply (data_pkgcheck, function (d) {
     out <- gsub ("\\:heavy\\_check\\_mark\\:", "&#9989;", out)
     out <- gsub ("\\:heavy\\_multiplication\\_x\\:", "&#10060;", out)
     out <- gsub ("\\:eyes\\:", "&#128064;", out)
-    grep ("^\\-", out, value = TRUE)
+    gsub ("^\\-(\\s?)", "", grep ("^\\-", out, value = TRUE))
 })
 ```
 
@@ -170,11 +170,10 @@ function unescapeHtml(unsafe) {
   return textarea.value;
 }
 
-htl.html`<table>
-  <tbody>${this_pkg_summary.map((item) => htl.html.fragment`<tr>
-    <td>${unescapeHtml(item)}</td>
-  </tr>`)}</tbody>
-</table>`
+htl.html`
+  <div>${this_pkg_summary.map((item) => htl.html.fragment`<ul>
+    <li>${unescapeHtml(item)}</li>
+  </ul>`)}</div>`
 ```
 
 

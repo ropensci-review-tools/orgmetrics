@@ -100,6 +100,20 @@ four groups, plus the "Overall" metric averaged across all four groups.
 
 ```{r}
 data_metrics <- readRDS ("results-metrics.Rds")
+# These currently have too many datees, and will be fixed with next update
+# (already fixed via #27). These lines can then be deleted.
+# ----- START DATE FIX -----
+dates <- as.Date (names (data_metrics))
+latest <- as.Date (max (names (data_metrics)))
+date_seq <- repometrics:::get_end_date_seq (end_date = latest, num_years = 3)
+index <- vapply (
+    date_seq,
+    function (i) which.min (abs (difftime (dates, i))),
+    integer (1L)
+)
+# cli::cli_inform ("reducing metrics from {length(dates)} to {length(index)}")
+data_metrics <- data_metrics [index]
+# ----- END DATE FIX -----
 
 # Grouped metrics over dates
 metrics_dates <- lapply (data_metrics, function (m) {
@@ -193,6 +207,20 @@ package or repository.
 
 ```{r}
 data_metrics <- readRDS ("results-metrics.Rds")
+# These currently have too many datees, and will be fixed with next update
+# (already fixed via #27). These lines can then be deleted.
+# ----- START DATE FIX -----
+dates <- as.Date (names (data_metrics))
+latest <- as.Date (max (names (data_metrics)))
+date_seq <- repometrics:::get_end_date_seq (end_date = latest, num_years = 3)
+index <- vapply (
+    date_seq,
+    function (i) which.min (abs (difftime (dates, i))),
+    integer (1L)
+)
+cli::cli_inform ("reducing metrics from {length(data_metrics)} to {length(index)}")
+data_metrics <- data_metrics [index]
+# ----- END DATE FIX -----
 
 # Main table of most recent metrics:
 # which.max does not work for dates, but max does
@@ -273,6 +301,21 @@ maintenance_ts <- maintenance_ts |> tidyr::pivot_longer (-date)
 maintenance_ts$name [maintenance_ts$name == "comm_engage"] <- "Comm. Engage."
 maintenance_ts$name [maintenance_ts$name == "dev_resp"] <- "Dev. Resp."
 maintenance_ts$name [maintenance_ts$name == "maintenance"] <- "Deficit"
+
+# ----- START DATE FIX -----
+# Date fixes as for metrics data above:
+dates <- unique (maintenance_ts$date)
+latest <- as.Date (max (dates))
+date_seq <- repometrics:::get_end_date_seq (end_date = latest, num_years = 3)
+index <- vapply (
+    date_seq,
+    function (i) which.min (abs (difftime (dates, i))),
+    integer (1L)
+)
+# cli::cli_inform ("reducing metrics from {length(dates)} to {length(index)}")
+maintenance_ts <- maintenance_ts |>
+    dplyr::filter (date %in% dates [index])
+# ----- END DATE FIX -----
 
 ojs_define (maintenance_ts_in = maintenance_ts)
 ```

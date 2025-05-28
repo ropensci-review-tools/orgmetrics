@@ -117,7 +117,7 @@ viewof repo = Inputs.select(
         label: htl.html`<b>Repository:</b>`
     }
 )
-localStorage.setItem("orgmetricsRepo", repo.toString());
+s = localStorage.setItem("orgmetricsRepo", repo.toString());
 ```
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>

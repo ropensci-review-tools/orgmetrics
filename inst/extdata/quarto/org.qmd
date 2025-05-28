@@ -100,6 +100,19 @@ four groups, plus the "Overall" metric averaged across all four groups.
 
 ```{r}
 data_metrics <- readRDS ("results-metrics.Rds")
+# These currently have too many datees, and will be fixed with next update
+# (already fixed via #27). These lines can then be deleted.
+# ----- START DATE FIX -----
+dates <- as.Date (names (data_metrics))
+latest <- as.Date (max (names (data_metrics)))
+date_seq <- repometrics:::get_end_date_seq (end_date = latest, num_years = 3)
+index <- vapply (
+    date_seq,
+    function (i) which.min (abs (difftime (dates, i))),
+    integer (1L)
+)
+data_metrics <- data_metrics [index]
+# ----- END DATE FIX -----
 
 # Grouped metrics over dates
 metrics_dates <- lapply (data_metrics, function (m) {

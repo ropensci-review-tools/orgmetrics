@@ -129,6 +129,8 @@ pkgcheck_stats <- lapply (data_pkgcheck, function (d) {
             .default = measure
         ))
 })
+
+repo_metrics_data <- readRDS ("results-repo-metrics.Rds")
 ```
 
 ```{r ojs-in-metrics}
@@ -140,6 +142,7 @@ ojs_define (issue_resp_in = data_issue_resp)
 ojs_define (issue_bugs_in = data_issue_bugs)
 ojs_define (pkgcheck_in = pkgcheck_summaries)
 ojs_define (pkgcheck_stats_in = pkgcheck_stats)
+ojs_define (repo_metrics_in = repo_metrics_data)
 ```
 
 ```{ojs plot-latest}
@@ -215,6 +218,74 @@ issue_bugs = issue_bugsTranspose.filter(function(r) {
     return r.repo === repo
 })
 ```
+
+```{ojs}
+repoMetrics = {
+    return transpose(repo_metrics_in[repo]).map(row => ({
+        ...row,
+    }))
+}
+maintainer_count = repoMetrics.filter(function(m) {
+    return m.name == "maintainer_count"
+})[0].value;
+ctb_count = repoMetrics.filter(function(m) {
+    return m.name == "ctb_count"
+})[0].value;
+num_commits = repoMetrics.filter(function(m) {
+    return m.name == "num_commits"
+})[0].value;
+test_coverage = repoMetrics.filter(function(m) {
+    return m.name == "test_coverage"
+})[0].value * 100;
+num_stars = repoMetrics.filter(function(m) {
+    return m.name == "num_stars"
+})[0].value * 100;
+num_forks = repoMetrics.filter(function(m) {
+    return m.name == "num_forks"
+})[0].value * 100;
+stars_forks = num_stars + num_forks
+num_dl = repoMetrics.filter(function(m) {
+    return m.name == "cran_downloads"
+})[0].value * 100;
+```
+
+
+:::{.grid}
+
+:::{.g-col-12 .g-col-md-6}
+
+<div class="card" style="background-color:powderblue; text-align:center;">
+<h2>Maintainers:</h2>
+<div style="text-align:left;">
+```{ojs}
+htl.html`<ul>
+    <li>${maintainer_count} primary maintainers</li>
+    <li>${ctb_count} additional contributors</li>
+</ul>`
+```
+</div>
+</div>
+
+
+:::
+
+:::{.g-col-12 .g-col-md-6}
+
+<div class="card" style="background-color:powderblue; text-align:center;">
+<h2>Popularity</h2>
+<div style="text-align:left;">
+```{ojs}
+htl.html`<ul>
+    <li>${stars_forks} GitHub stars and forks</li>
+    <li>${num_dl} CRAN downloads</li>
+</ul>`
+```
+</div>
+</div>
+
+:::
+
+:::
 
 
 ## pkgcheck Summary

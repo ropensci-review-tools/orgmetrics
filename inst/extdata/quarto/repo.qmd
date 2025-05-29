@@ -243,10 +243,10 @@ num_stars = repoMetrics.filter(function(m) {
 num_forks = repoMetrics.filter(function(m) {
     return m.name == "num_forks"
 })[0].value * 100;
-stars_forks = num_stars + num_forks
+stars_forks = (num_stars + num_forks).toLocaleString();
 num_dl = repoMetrics.filter(function(m) {
     return m.name == "cran_downloads"
-})[0].value * 100;
+})[0].value.toLocaleString();
 ```
 
 
@@ -254,7 +254,8 @@ num_dl = repoMetrics.filter(function(m) {
 
 :::{.g-col-12 .g-col-md-6}
 
-<div class="card" style="background-color:powderblue; text-align:center;">
+<div class="card" style="background: linear-gradient(to bottom, #33ccff 0%, #ff99cc 100%); text-align:center;">
+<img src="bs-icons/tools.svg" alt="Bootstrap" width="32" height="32" style="margin-left:auto; margin-top:5px; margin-right:5px;">
 <h2>Maintainers:</h2>
 <div style="text-align:left;">
 ```{ojs}
@@ -272,6 +273,7 @@ htl.html`<ul>
 :::{.g-col-12 .g-col-md-6}
 
 <div class="card" style="background-color:powderblue; text-align:center;">
+<img src="bs-icons/chat-square-heart.svg" alt="Bootstrap" width="32" height="32" style="margin-left:auto; margin-top:5px; margin-right:5px;">
 <h2>Popularity</h2>
 <div style="text-align:left;">
 ```{ojs}

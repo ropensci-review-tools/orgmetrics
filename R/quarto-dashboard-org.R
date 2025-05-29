@@ -97,7 +97,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (data_resp, fs::path (dir, "results-data-issue-resp.Rds"))
     saveRDS (data_bugs, fs::path (dir, "results-data-issue-bugs.Rds"))
     saveRDS (data_pkgcheck, fs::path (dir, "results-pkgcheck.Rds"))
-    saveRDS (repo_metrics, fs::path (dir, "repo-metrics.Rds"))
+    saveRDS (repo_metrics, fs::path (dir, "results-repo-metrics.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))
 

@@ -251,7 +251,8 @@ num_commits = repoMetrics.filter(function(m) {
 })[0].value;
 test_coverage = repoMetrics.filter(function(m) {
     return m.name == "test_coverage"
-})[0].value * 100;
+})[0].value;
+test_coverage_txt = test_coverage ? (test_coverage * 100) + "%" : "none"
 
 num_stars = repoMetrics.filter(function(m) {
     return m.name == "num_stars"
@@ -321,7 +322,7 @@ htl.html`<ul>
 
 <div class="card" style="background: linear-gradient(to bottom, #33ccff 0%, #ffcc99 100%); text-align:center;">
 <img src="bs-icons/pencil-square.svg" alt="Bootstrap" class="text-pencil-square" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
-<h2>Test Coverage: `{ojs} test_coverage`%</h2>
+<h2>Test Coverage: `{ojs} test_coverage_txt`</h2>
 </div>
 
 

@@ -25,6 +25,36 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
 
     data_metrics <- data_metrics_to_df (data_org$metrics)
     dates <- sort (unique (data_metrics$date), decreasing = TRUE)
+    # Repo summaries for repo page:
+    repo_summary_vars <- c (
+        "change_req_n_opened",
+        "code_change_lines",
+        "commit_count",
+        "committer_count",
+        "cran_downloads",
+        "ctb_count",
+        "ctb_diversity",
+        "dependency_count",
+        "issues_active",
+        "issue_cmt_count",
+        "maintainer_count",
+        "num_commits",
+        "num_contributors",
+        "num_forks",
+        "num_stars",
+        "recent_releases",
+        "release_freq",
+        "test_coverage"
+    )
+    repo_metrics <- data_metrics |>
+        dplyr::filter (date == max (dates)) |>
+        dplyr::select (-org, -date) |>
+        tidyr::pivot_longer (-package) |>
+        dplyr::filter (name %in% repo_summary_vars)
+    pkgs <- unique (repo_metrics$package)
+    repo_metrics <- split (repo_metrics, f = as.factor (repo_metrics$package)) |>
+        lapply (function (m) dplyr::select (m, -package))
+
     data_metrics <- lapply (dates, function (d) {
         data_metrics |>
             dplyr::filter (date == d) |>
@@ -67,6 +97,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (data_resp, fs::path (dir, "results-data-issue-resp.Rds"))
     saveRDS (data_bugs, fs::path (dir, "results-data-issue-bugs.Rds"))
     saveRDS (data_pkgcheck, fs::path (dir, "results-pkgcheck.Rds"))
+    saveRDS (repo_metrics, fs::path (dir, "results-repo-metrics.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))
 

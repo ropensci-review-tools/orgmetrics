@@ -36,19 +36,6 @@ function sparkbar(max) {
 ******** END UTILITY FUNCTIONS ********
 --->
 
-This page identifies maintenance priorities for a selected repository, in
-terms of both [CHAOSS
-models](https://chaoss.community/kbtopic/all-metrics-models/), and the
-individual [CHAOSS metrics](https://chaoss.community/kbtopic/all-metrics/)
-which comprise those models. In its present state, this is mostly a
-proof-of-concept, and is not as well developed as the accompanying
-[*Organizational Maintenance* page](./org.html).
-
-The "Outliers only" selector immediate below determines whether values shown
-for both models and metrics are outliers only (default of "true"), or whether
-all values are shown ("false").
-
-
 ```{r load-pkg, echo = FALSE, message = FALSE}
 library (orgmetrics)
 ```
@@ -411,6 +398,22 @@ Inputs.table(pkgStatsData, {
     }
 })
 ```
+
+-----
+
+
+This page identifies maintenance priorities for a selected repository, in
+terms of both [CHAOSS
+models](https://chaoss.community/kbtopic/all-metrics-models/), and the
+individual [CHAOSS metrics](https://chaoss.community/kbtopic/all-metrics/)
+which comprise those models. In its present state, this is mostly a
+proof-of-concept, and is not as well developed as the accompanying
+[*Organizational Maintenance* page](./org.html).
+
+The "Outliers only" selector immediate below determines whether values shown
+for both models and metrics are outliers only (default of "true"), or whether
+all values are shown ("false").
+
 
 
 ## CHAOSS models

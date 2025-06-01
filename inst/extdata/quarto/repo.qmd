@@ -274,9 +274,11 @@ change_req_n_opened = repoMetrics.filter(function(m) {
 })[0].value;
 issue_count = pluraliseObjects(issues_active + change_req_n_opened, "Github Issue")
 
-issue_cmt_count = repoMetrics.filter(function(m) {
+// 'issue_cmt_count' from repometrics is *mean* value; convert back to
+// full count here:
+issue_cmt_count = Math.ceil(repoMetrics.filter(function(m) {
     return m.name == "issue_cmt_count"
-})[0].value;
+})[0].value * issues_active);
 issue_cmt_txt = pluraliseObjects(issue_cmt_count, "Issue comment")
 ```
 

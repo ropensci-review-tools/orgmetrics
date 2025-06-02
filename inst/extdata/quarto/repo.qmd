@@ -295,8 +295,8 @@ maintainer_count_txt = pluraliseObjects(maintainer_count, "primary maintainer");
 
 maintainer_gh = [].concat(ctbs_gh.slice(0, maintainer_count) || []);
 maintainer_gh_list = maintainer_gh.length == 0 ? undefined:
-    (maintainer_gh.length == 1 ? htl.html`<li>${maintainer_gh}</li>` :
-    maintainer_gh.map(m => htl.html`<li>${m}</li>`));
+    (maintainer_gh.length == 1 ? htl.html`<li><a href='https://github.com/${maintainer_gh}'>${maintainer_gh}</a></li>` :
+    maintainer_gh.map(m => htl.html`<li><a href='https://github.com/${m}'>${m}</a></li>`));
 maintainer_gh_list_txt = maintainer_gh.length > 0 ? htl.html`<ul>${maintainer_gh_list}</ul>` : undefined;
 
 ctb_count = repoMetrics.filter(function(m) {

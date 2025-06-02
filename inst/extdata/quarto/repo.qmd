@@ -327,8 +327,24 @@ issue_cmt_txt = pluraliseObjects(issue_cmt_count, "Issue comment")
 
 imp_txt = 'Imports: ' + deps[0]['imports'];
 sug_txt = 'Suggests: ' + deps[0]['suggests'];
-deps_in_org = deps[0]['deps_in_org'] ? ('Uses org pkgs: ' + deps[0]['deps_in_org']) : 'Uses no other pkgs in org';
-revdeps_in_org = deps[0]['revdeps'] ? ('Used by org pkgs: ' + deps[0]['revdeps']) : 'Not used by any other pkgs in org';
+
+deps_in_org = [].concat(deps[0]['deps_in_org'] || []);
+deps_in_org_txt = deps_in_org.length == 0 ?
+    'Depends on no other pkgs in org' :
+    'Depends on org pkgs:';
+deps_in_org_list = deps_in_org.length == 0 ? undefined :
+    (deps_in_org.length == 1 ? htl.html`<li>${deps_in_org}</li>` :
+    deps_in_org.map(d => htl.html`<li>${d}</li>`));
+n_deps_in_org_txt = deps_in_org.length > 0 ? htl.html`<ul>${deps_in_org_list}</ul>` : undefined;
+
+revdeps = [].concat(deps[0]['revdeps'] || []);
+revdeps_list = revdeps.length == 0 ? undefined :
+    (revdeps.length == 1 ? htl.html`<li>${revdeps}</li>` :
+    revdeps.map(d => htl.html`<li>${d}</li>`));
+revdeps_in_org = revdeps.length > 0 ?
+    'Dependend on by org pkgs:' :
+    'Not depended on by any other pkgs in org';
+revdeps_list_txt = revdeps.length > 0 ? htl.html`<ul>${revdeps_list}</ul>` : undefined;
 ```
 
 
@@ -380,8 +396,12 @@ htl.html`<ul>
 htl.html`<ul>
     <li>${imp_txt}</li>
     <li>${sug_txt}</li>
-    <li>${deps_in_org}</li>
-    <li>${revdeps_in_org}</li>
+    <li>${deps_in_org_txt}
+        ${n_deps_in_org_txt}
+    </li>
+    <li>${revdeps_in_org}
+        ${revdeps_list_txt}
+    </li>
 </ul>`
 ```
 </div>

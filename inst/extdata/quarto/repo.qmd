@@ -117,6 +117,27 @@ pkgcheck_stats <- lapply (data_pkgcheck, function (d) {
         ))
 })
 
+all_pkgs <- names (data_pkgcheck)
+deps <- lapply (data_pkgcheck, function (d) {
+    deps <- d$pkg$dependencies |> dplyr::filter (package != "NA")
+    imp <- length (which (deps$type == "imports"))
+    sug <- length (which (deps$type == "suggests"))
+    deps_in_org <- deps$package [which (deps$package %in% all_pkgs)]
+    if (length (deps_in_org) == 0L) {
+        deps_in_org <- NA
+    }
+    data.frame (imports = imp, suggests = sug, deps_in_org = I (list (deps_in_org)))
+})
+deps <- do.call (rbind, deps) |>
+    dplyr::mutate (package = all_pkgs, .before = "imports")
+
+deps_in_org <- table (unlist (deps$deps_in_org)) |>
+    data.frame () |>
+    dplyr::rename (package = "Var1", n = "Freq")
+deps <- dplyr::left_join (deps, deps_in_org, by = "package") |>
+    dplyr::mutate (n = ifelse (is.na (n), 0L, n)) |>
+    dplyr::rename (num_imports_in_org = "n")
+
 repo_metrics_data <- readRDS ("results-repo-metrics.Rds")
 ```
 
@@ -130,6 +151,7 @@ ojs_define (issue_bugs_in = data_issue_bugs)
 ojs_define (pkgcheck_in = pkgcheck_summaries)
 ojs_define (pkgcheck_stats_in = pkgcheck_stats)
 ojs_define (repo_metrics_in = repo_metrics_data)
+ojs_define (deps_in = deps)
 ```
 
 ```{ojs plot-latest}
@@ -159,6 +181,11 @@ issue_respTranspose = {
 }
 issue_bugsTranspose = {
     return transpose(issue_bugs_in).map(row => ({
+        ...row,
+    }));
+}
+depsTranspose = {
+    return transpose(deps_in).map(row => ({
         ...row,
     }));
 }
@@ -204,6 +231,10 @@ issue_resp = issue_respTranspose.filter(function(r) {
 issue_bugs = issue_bugsTranspose.filter(function(r) {
     return r.repo === repo
 })
+deps = depsTranspose.filter(function(r) {
+    return r.package === repo
+})
+console.log("------" + JSON.stringify(deps));
 ```
 
 ```{ojs}
@@ -239,7 +270,7 @@ num_commits = repoMetrics.filter(function(m) {
 test_coverage = repoMetrics.filter(function(m) {
     return m.name == "test_coverage"
 })[0].value;
-test_coverage_txt = test_coverage ? (test_coverage * 100) + "%" : "none"
+test_coverage_txt = "Test coverage: " + (test_coverage ? (test_coverage * 100) + "%" : "none");
 
 num_stars = repoMetrics.filter(function(m) {
     return m.name == "num_stars"
@@ -267,6 +298,9 @@ issue_cmt_count = Math.ceil(repoMetrics.filter(function(m) {
     return m.name == "issue_cmt_count"
 })[0].value * issues_active);
 issue_cmt_txt = pluraliseObjects(issue_cmt_count, "Issue comment")
+
+imp_txt = 'Imports: ' + deps[0]['imports'];
+sug_txt = 'Suggests: ' + deps[0]['suggests'];
 ```
 
 
@@ -276,12 +310,13 @@ issue_cmt_txt = pluraliseObjects(issue_cmt_count, "Issue comment")
 
 <div class="card" style="background: linear-gradient(to bottom, #33ccff 0%, #ffcc99 100%); text-align:center;">
 <img src="bs-icons/tools.svg" alt="Bootstrap" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
-<h2 style="margin-top:-20px;">Maintainers:</h2>
+<h2 style="margin-top:-20px;">Maintainance:</h2>
 <div style="text-align:left;">
 ```{ojs}
 htl.html`<ul>
     <li>${maintainer_count_txt}</li>
     <li>${ctb_count_txt}</li>
+    <li>${test_coverage_txt}</li>
 </ul>`
 ```
 </div>
@@ -311,7 +346,15 @@ htl.html`<ul>
 
 <div class="card" style="background: linear-gradient(to bottom, #33ccff 0%, #ffcc99 100%); text-align:center;">
 <img src="bs-icons/pencil-square.svg" alt="Bootstrap" class="text-pencil-square" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
-<h2 style="margin-top:-20px;">Test Coverage: `{ojs} test_coverage_txt`</h2>
+<h2 style="margin-top:-20px;">Dependencies</h2>
+<div style="text-align:left;">
+```{ojs}
+htl.html`<ul>
+    <li>${imp_txt}</li>
+    <li>${sug_txt}</li>
+</ul>`
+```
+</div>
 </div>
 
 

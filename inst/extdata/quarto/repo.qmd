@@ -147,6 +147,16 @@ deps$revdeps <- I (revdeps)
 rownames (deps) <- NULL
 
 repo_metrics_data <- readRDS ("results-repo-metrics.Rds")
+
+fn_calls <- readRDS ("fn-calls.Rds")$fn_calls |>
+    dplyr::group_by (name, package) |>
+    dplyr::summarise (n = sum (n), .groups = "keep") |>
+    dplyr::ungroup () |>
+    dplyr::mutate (name = gsub ("^.*\\:\\:", "", name)) |>
+    dplyr::group_by (package) |>
+    dplyr::arrange (dplyr::desc (n), .by_group = TRUE) |>
+    dplyr::ungroup () |>
+    dplyr::rename (fn_name = name)
 ```
 
 ```{r ojs-in-metrics}
@@ -160,6 +170,7 @@ ojs_define (pkgcheck_in = pkgcheck_summaries)
 ojs_define (pkgcheck_stats_in = pkgcheck_stats)
 ojs_define (repo_metrics_in = repo_metrics_data)
 ojs_define (deps_in = deps)
+ojs_define (fn_calls_in = fn_calls)
 ```
 
 ```{ojs plot-latest}
@@ -194,6 +205,11 @@ issue_bugsTranspose = {
 }
 depsTranspose = {
     return transpose(deps_in).map(row => ({
+        ...row,
+    }));
+}
+fnCallsTranspose = {
+    return transpose(fn_calls_in).map(row => ({
         ...row,
     }));
 }
@@ -240,6 +256,9 @@ issue_bugs = issue_bugsTranspose.filter(function(r) {
     return r.repo === repo
 })
 deps = depsTranspose.filter(function(r) {
+    return r.package === repo
+})
+fn_calls = fnCallsTranspose.filter(function(r) {
     return r.package === repo
 })
 ```
@@ -391,6 +410,8 @@ htl.html`<ul>
 :::
 
 
+<div style="margin-top: 20px; margin-bottom: 20px;"></div>
+
 ## pkgcheck Summary
 
 This shows the summary output from [rOpenSci's `pkgcheck`
@@ -451,6 +472,29 @@ Inputs.table(pkgStatsData, {
         percentile: "Percentile"
     }
 })
+```
+
+<div style="margin-top: 20px; margin-bottom: 20px;"></div>
+
+```{ojs}
+h1 = fn_calls.length > 0 ? htl.html`<div><h3>Function usage in other packages</h3>
+The following table shows the number of times different functions are used in
+other packages. Numbers may be less than total numbers of packages listed above
+in <q><i>Dependencies: Used by org pkgs</i></q> because some of those usages may be only
+in tests, whereas the following usage counts are within actual R code only.
+</div>` : null;
+```
+
+<div style="margin-top: 20px; margin-bottom: 20px;"></div>
+
+```{ojs}
+h2 = fn_calls.length > 0 ? Inputs.table(fn_calls, {
+    columns: ["fn_name", "n"],
+    header: {
+        fn_name: "Function name",
+        n: "Usage"
+    }
+}) : undefined;
 ```
 
 -----

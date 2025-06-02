@@ -12,8 +12,10 @@ rm_org_data_fn_call_network <- function (org_paths) {
     package <- n <- NULL
 
     fn_calls <- rm_org_data_fn_calls (org_paths)
+
+    fn_call_summary <- NULL
     if (!is.null (fn_calls)) {
-        fn_calls <- fn_calls |>
+        fn_call_summary <- fn_calls |>
             dplyr::group_by (source, package) |>
             dplyr::summarise (
                 num_fns = dplyr::n (),
@@ -22,7 +24,7 @@ rm_org_data_fn_call_network <- function (org_paths) {
             )
     }
 
-    return (fn_calls)
+    return (list (fn_calls = fn_calls, summary = fn_call_summary))
 }
 
 #' Collate calls to all functions defined within packages of an organization.

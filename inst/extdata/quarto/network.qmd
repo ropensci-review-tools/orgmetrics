@@ -38,13 +38,13 @@ slider.
 ```{r fn-calls-pre-process}
 fn_calls <- readRDS ("fn-calls.Rds")
 
-fn_call_nodes_pkg <- fn_calls |>
+fn_call_nodes_pkg <- fn_calls$summary |>
     dplyr::group_by (package) |>
     dplyr::summarise (num_calls = sum (num_calls), .groups = "keep") |>
     dplyr::rename (id = package) |>
     dplyr::mutate (group = "depends")
 
-fn_call_nodes_src <- fn_calls |>
+fn_call_nodes_src <- fn_calls$summary |>
     dplyr::group_by (source) |>
     dplyr::summarise (num_calls = sum (num_calls), .groups = "keep") |>
     dplyr::rename (id = source) |>
@@ -64,7 +64,7 @@ fn_call_nodes <- rbind (
     data.frame (id = extra_pkgs, num_calls = 0L, group = "isolated")
 )
 
-fn_call_links <- fn_calls |>
+fn_call_links <- fn_calls$summary |>
     dplyr::select (-num_fns) |>
     dplyr::rename (target = package, value = num_calls)
 fn_call_links$type <- "depends"

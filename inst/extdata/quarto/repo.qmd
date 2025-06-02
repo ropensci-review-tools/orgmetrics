@@ -52,6 +52,7 @@ data_repo_src <- readRDS ("results-data-repo-src.Rds")
 data_ctb_abs <- readRDS ("results-data-ctb-absence.Rds")
 data_issue_resp <- readRDS ("results-data-issue-resp.Rds")
 data_issue_bugs <- readRDS ("results-data-issue-bugs.Rds")
+data_ctbs <- readRDS ("results-maintenance-contribs.Rds")
 ```
 
 ```{r data outliers}
@@ -171,6 +172,7 @@ ojs_define (pkgcheck_stats_in = pkgcheck_stats)
 ojs_define (repo_metrics_in = repo_metrics_data)
 ojs_define (deps_in = deps)
 ojs_define (fn_calls_in = fn_calls)
+ojs_define (ctbs_in = data_ctbs)
 ```
 
 ```{ojs plot-latest}
@@ -269,6 +271,12 @@ repoMetrics = {
         ...row,
     }))
 }
+ctbs = {
+    return transpose(ctbs_in[repo]).map(row => ({
+        ...row,
+    }))
+}
+ctbs_gh = ctbs.map((ctb) => ctb['gh_handle']);
 
 function pluraliseObjects(x, what) {
     if (x === 0) {
@@ -284,6 +292,12 @@ maintainer_count = repoMetrics.filter(function(m) {
     return m.name == "maintainer_count"
 })[0].value;
 maintainer_count_txt = pluraliseObjects(maintainer_count, "primary maintainer");
+
+maintainer_gh = [].concat(ctbs_gh.slice(0, maintainer_count) || []);
+maintainer_gh_list = maintainer_gh.length == 0 ? undefined:
+    (maintainer_gh.length == 1 ? htl.html`<li>${maintainer_gh}</li>` :
+    maintainer_gh.map(m => htl.html`<li>${m}</li>`));
+maintainer_gh_list_txt = maintainer_gh.length > 0 ? htl.html`<ul>${maintainer_gh_list}</ul>` : undefined;
 
 ctb_count = repoMetrics.filter(function(m) {
     return m.name == "ctb_count"
@@ -358,7 +372,7 @@ revdeps_list_txt = revdeps.length > 0 ? htl.html`<ul>${revdeps_list}</ul>` : und
 <div style="text-align:left;">
 ```{ojs}
 htl.html`<ul>
-    <li>${maintainer_count_txt}</li>
+    <li>${maintainer_count_txt}${maintainer_gh_list_txt}</li>
     <li>${ctb_count_txt}</li>
     <li>${test_coverage_txt}</li>
 </ul>`

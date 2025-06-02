@@ -67,6 +67,16 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     data_resp <- issue_responses (data_org)
     data_bugs <- issue_bugs (data_org)
 
+    data_contributors <- lapply (data_org$repos, function (repo) {
+        ctbs_gh <- repo$rm$contribs_from_gh_api |>
+            dplyr::select (login, name, contributions)
+        repo$rm$contributors |>
+            dplyr::left_join (ctbs_gh, by = c ("gh_handle" = "login", "name")) |>
+            dplyr::filter (!name == "GitHub Actions") |>
+            dplyr::arrange (dplyr::desc (contributions))
+    })
+    names (data_contributors) <- gsub ("^.*\\/", "", names (data_contributors))
+
     # Plus mapping from repos to org/repo:
     data_repo_src <- names (data_org$repos)
     data_repo_src <- data.frame (
@@ -92,6 +102,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (data_org$annual_commits, fs::path (dir, "results-annual-commits.Rds"))
     saveRDS (data_org$annual_gh_activity, fs::path (dir, "results-annual-gh-activity.Rds"))
     saveRDS (data_maintenance, fs::path (dir, "results-maintenance-org.Rds"))
+    saveRDS (data_contributors, fs::path (dir, "results-maintenance-contribs.Rds"))
     saveRDS (data_repo_src, fs::path (dir, "results-data-repo-src.Rds"))
     saveRDS (data_abs, fs::path (dir, "results-data-ctb-absence.Rds"))
     saveRDS (data_resp, fs::path (dir, "results-data-issue-resp.Rds"))

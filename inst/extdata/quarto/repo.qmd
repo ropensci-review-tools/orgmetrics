@@ -162,6 +162,8 @@ fn_calls <- readRDS ("fn-calls.Rds")$fn_calls |>
 cran_data <- readRDS ("results-cran-checks.Rds")
 not_cran <- gsub ("^.*\\/", "", attr (cran_data, "not_cran"))
 attr (cran_data, "not_cran") <- NULL
+
+gitlog_data <- readRDS ("results-gitlog.Rds")
 ```
 
 ```{r ojs-in-metrics}
@@ -179,6 +181,7 @@ ojs_define (fn_calls_in = fn_calls)
 ojs_define (ctbs_in = data_ctbs)
 ojs_define (cran_data_in = cran_data)
 ojs_define (not_cran_in = not_cran)
+ojs_define (gitlog_data_in = gitlog_data)
 ```
 
 ```{ojs plot-latest}
@@ -224,6 +227,12 @@ fnCallsTranspose = {
 cranDataTranspose = {
     return transpose(cran_data_in).map(row => ({
         ...row,
+    }));
+}
+gitlogDataTranspose = {
+    return transpose(gitlog_data_in).map(row => ({
+        ...row,
+        first_commit: new Date(row.first_commit)
     }));
 }
 ```
@@ -280,6 +289,14 @@ cran_data = cranDataTranspose.filter(function(r) {
 })
 has_cran_data = cran_data.length > 0;
 not_on_cran = not_cran_in.includes(repo);
+gitlog = gitlogDataTranspose.filter(function(r) {
+    return r.package === repo
+})
+gitlog_total_commits = gitlog[0]['num_commits'].toLocaleString();
+gitlog_first_commit = gitlog[0]['first_commit'].toLocaleDateString("en-GB", {
+    month: 'short',
+    year: 'numeric'
+});
 ```
 
 ```{ojs}
@@ -304,6 +321,8 @@ function pluraliseObjects(x, what) {
         return x + " " + what + "s";
     }
 }
+
+gitlog_txt = htl.html`<li>${gitlog_total_commits} commits since ${gitlog_first_commit}</li>`;
 
 maintainer_count = repoMetrics.filter(function(m) {
     return m.name == "maintainer_count"
@@ -389,6 +408,7 @@ revdeps_list_txt = revdeps.length > 0 ? htl.html`<ul>${revdeps_list}</ul>` : und
 <div style="text-align:left;">
 ```{ojs}
 htl.html`<ul>
+    <li>${gitlog_txt}</li>
     <li>${maintainer_count_txt}${maintainer_gh_list_txt}</li>
     <li>${ctb_count_txt}</li>
     <li>${test_coverage_txt}</li>

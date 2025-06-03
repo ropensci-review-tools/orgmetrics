@@ -51,6 +51,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
         dplyr::select (-org, -date) |>
         tidyr::pivot_longer (-package) |>
         dplyr::filter (name %in% repo_summary_vars)
+
     pkgs <- unique (repo_metrics$package)
     repo_metrics <- split (repo_metrics, f = as.factor (repo_metrics$package)) |>
         lapply (function (m) dplyr::select (m, -package))
@@ -103,6 +104,19 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     attr (data_cran, "not_cran") <- names (not_cran)
     rownames (data_cran) <- NULL
 
+    data_gitlog <- t (vapply (data_org$repos, function (i) {
+        c (
+            num_commits = as.character (nrow (i$rm$gitlog)),
+            first_commit = as.character (as.Date (min (i$rm$gitlog$timestamp)))
+        )
+    }, character (2L)))
+    data_gitlog <- data.frame (
+        package = gsub ("^.*\\/", "", rownames (data_gitlog)),
+        num_commits = as.integer (data_gitlog [, 1]),
+        first_commit = as.Date (data_gitlog [, 2]),
+        row.names = NULL
+    )
+
     requireNamespace ("jsonlite")
     requireNamespace ("quarto")
     requireNamespace ("withr")
@@ -125,6 +139,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (data_bugs, fs::path (dir, "results-data-issue-bugs.Rds"))
     saveRDS (data_pkgcheck, fs::path (dir, "results-pkgcheck.Rds"))
     saveRDS (data_cran, fs::path (dir, "results-cran-checks.Rds"))
+    saveRDS (data_gitlog, fs::path (dir, "results-gitlog.Rds"))
     saveRDS (repo_metrics, fs::path (dir, "results-repo-metrics.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))

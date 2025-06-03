@@ -87,6 +87,22 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
 
     data_pkgcheck <- lapply (data_org$repos, function (i) i$pkgcheck)
 
+    data_cran <- lapply (data_org$repos, function (i) {
+        if (!inherits (i$cran_checks, "data.frame")) {
+            return (i$cran_checks)
+        }
+        dplyr::filter (i$cran_checks, result != "OK")
+    })
+    not_cran <- which (vapply (
+        data_cran,
+        function (i) !inherits (i, "data.frame"),
+        logical (1L)
+    ))
+    index <- seq_along (data_cran) [-(not_cran)]
+    data_cran <- do.call (rbind, data_cran [index])
+    attr (data_cran, "not_cran") <- names (not_cran)
+    rownames (data_cran) <- NULL
+
     requireNamespace ("jsonlite")
     requireNamespace ("quarto")
     requireNamespace ("withr")
@@ -108,6 +124,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (data_resp, fs::path (dir, "results-data-issue-resp.Rds"))
     saveRDS (data_bugs, fs::path (dir, "results-data-issue-bugs.Rds"))
     saveRDS (data_pkgcheck, fs::path (dir, "results-pkgcheck.Rds"))
+    saveRDS (data_cran, fs::path (dir, "results-cran-checks.Rds"))
     saveRDS (repo_metrics, fs::path (dir, "results-repo-metrics.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))

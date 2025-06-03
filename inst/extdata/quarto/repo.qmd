@@ -158,6 +158,10 @@ fn_calls <- readRDS ("fn-calls.Rds")$fn_calls |>
     dplyr::arrange (dplyr::desc (n), .by_group = TRUE) |>
     dplyr::ungroup () |>
     dplyr::rename (fn_name = name)
+
+cran_data <- readRDS ("results-cran-checks.Rds")
+not_cran <- gsub ("^.*\\/", "", attr (cran_data, "not_cran"))
+attr (cran_data, "not_cran") <- NULL
 ```
 
 ```{r ojs-in-metrics}
@@ -173,6 +177,8 @@ ojs_define (repo_metrics_in = repo_metrics_data)
 ojs_define (deps_in = deps)
 ojs_define (fn_calls_in = fn_calls)
 ojs_define (ctbs_in = data_ctbs)
+ojs_define (cran_data_in = cran_data)
+ojs_define (not_cran_in = not_cran)
 ```
 
 ```{ojs plot-latest}
@@ -212,6 +218,11 @@ depsTranspose = {
 }
 fnCallsTranspose = {
     return transpose(fn_calls_in).map(row => ({
+        ...row,
+    }));
+}
+cranDataTranspose = {
+    return transpose(cran_data_in).map(row => ({
         ...row,
     }));
 }
@@ -264,6 +275,11 @@ fn_calls = fnCallsTranspose.filter(function(r) {
     return r.package === repo
 })
 has_fn_calls = fn_calls.length > 0;
+cran_data = cranDataTranspose.filter(function(r) {
+    return r.package === repo
+})
+has_cran_data = cran_data.length > 0;
+not_on_cran = not_cran_in.includes(repo);
 ```
 
 ```{ojs}
@@ -469,6 +485,28 @@ htl.html`
   </ul>`)}</div>`
 ```
 
+## CRAN Summary
+
+```{ojs}
+not_on_cran ? htl.html`<div>This package is not on CRAN</div>` :
+    (has_cran_data ?
+    htl.html`<div><a href="https://cran.r-project.org//web/checks/check_results_${repo}.html">CRAN checks</a> on this package currently list these issues:</div>` :
+    htl.html`<div><a href="https://cran.r-project.org//web/checks/check_results_${repo}.html">CRAN checks</a> on this package are all good</div>`);
+
+htl.html`<div style="margin-top: 20px; margin-bottom: 20px;"></div>`
+
+has_cran_data ?
+    Inputs.table(cran_data, {
+        columns: ["package", "version", "result", "check", "message"],
+        format: {
+            check: d => htl.html`<span style="white-space:normal">${d}`,
+            message: d => htl.html`<span style="white-space:normal">${d}`,
+        }
+    }) :
+    Inputs.table(cran_data, {
+        colunmns: [],
+    });
+```
 
 ### Statistical properties
 

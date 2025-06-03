@@ -263,6 +263,7 @@ deps = depsTranspose.filter(function(r) {
 fn_calls = fnCallsTranspose.filter(function(r) {
     return r.package === repo
 })
+has_fn_calls = fn_calls.length > 0;
 ```
 
 ```{ojs}
@@ -480,7 +481,6 @@ uses the following abbreviations:
 - "fn" for _function_
 - "Doc" for _Documentation_
 
-
 ```{ojs}
 viewof statsLimit = Inputs.range(
     [0,50],
@@ -516,25 +516,30 @@ Inputs.table(pkgStatsData, {
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
+### Function usage in other packages
+
 ```{ojs}
-h1 = fn_calls.length > 0 ? htl.html`<div><h3>Function usage in other packages</h3>
+has_fn_calls ? htl.html`<div>
 The following table shows the number of times different functions are used in
 other packages. Numbers may be less than total numbers of packages listed above
 in <q><i>Dependencies: Used by org pkgs</i></q> because some of those usages may be only
 in tests, whereas the following usage counts are within actual R code only.
-</div>` : null;
+</div>` :
+htl.html`<div>This package uses no other packages from the organizations</div>`;
 ```
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
 ```{ojs}
-h2 = fn_calls.length > 0 ? Inputs.table(fn_calls, {
+has_fn_calls ? Inputs.table(fn_calls, {
     columns: ["fn_name", "n"],
     header: {
         fn_name: "Function name",
         n: "Usage"
     }
-}) : undefined;
+}) : Inputs.table(fn_calls, {
+    columns: []
+});
 ```
 
 -----

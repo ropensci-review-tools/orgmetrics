@@ -508,7 +508,7 @@ has_cran_data ?
     });
 ```
 
-### Statistical properties
+## Statistical properties
 
 The "Limits" slider below can be used to reduce statistical properties to only
 those lying in the lower or upper percentiles of the specified value. The table
@@ -554,7 +554,7 @@ Inputs.table(pkgStatsData, {
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
-### Function usage in other packages
+## Function usage in other packages
 
 ```{ojs}
 has_fn_calls ? htl.html`<div>

@@ -110,7 +110,7 @@ pkgcheck_stats <- lapply (data_pkgcheck, function (d) {
             measure == "num_params_per_fn" ~ "Nr. params per fn",
             measure == "loc_per_fn_r" ~ "LOC per fn: R",
             measure == "loc_per_fn_r_exp" ~ "LOC per exported fn: R",
-            measure == "loc_per_fn_r_non_exp" ~ "LOC per non-exported fn: R",
+            measure == "loc_per_fn_r_not_exp" ~ "LOC per non-exported fn: R",
             measure == "doclines_per_fn_exp" ~ "Doc. lines per exported fn.",
             measure == "doclines_per_fn_not_exp" ~ "Doc. lines per non-exported fn.",
             measure == "fn_call_network_size" ~ "Nr. nodes in fn. call network",
@@ -472,8 +472,14 @@ htl.html`
 ### Statistical properties
 
 The "Limits" slider below can be used to reduce statistical properties to only
-those lying in the lower or upper percentiles of the specified value. Note in
-the measures that "LOC" = "Lines-of-Code".
+those lying in the lower or upper percentiles of the specified value. The table
+uses the following abbreviations:
+
+- "LOC" for _Lines-of-Code_
+- "Nr." for _Number_
+- "fn" for _function_
+- "Doc" for _Documentation_
+
 
 ```{ojs}
 viewof statsLimit = Inputs.range(

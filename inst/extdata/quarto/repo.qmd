@@ -178,7 +178,11 @@ ojs_define (ctbs_in = data_ctbs)
 ```
 
 ```{ojs plot-latest}
-Plot = import("https://esm.sh/@observablehq/plot")
+Plot = import("https://esm.sh/@observablehq/plot");
+path = import("https://esm.sh/path");
+// Need to alias FileAttachment; see
+// https://talk.observablehq.com/t/evaluate-from-fileattachment/3889/3
+FA = FileAttachment;
 ```
 
 ```{ojs}
@@ -217,17 +221,17 @@ fnCallsTranspose = {
         ...row,
     }));
 }
-gitlog_data_in = FileAttachment("data/results-gitlog.json").json();
+gitlog_data_in = FA(path.join("data","results-gitlog.json")).json();
 gitlogDataTranspose = gitlog_data_in.map(row => ({
     ...row,
     first_commit: new Date(row.first_commit)
 }));
 
-cranDataAll = FileAttachment("data/results-data-cran.json").json();
-not_cran_in = FileAttachment("data/results-not-cran.json").json();
-repos_on_r_univ = FileAttachment("data/data_is_on_r_univ.json").json();
-data_r_univ_jobs = FileAttachment("data/data_r_univ_jobs.json").json();
-data_r_univ_builds = FileAttachment("data/data_r_univ_builds.json").json();
+cranDataAll = FA(path.join("data","results-data-cran.json")).json();
+not_cran_in = FA(path.join("data","results-not-cran.json")).json();
+repos_on_r_univ = FA(path.join("data","data_is_on_r_univ.json")).json();
+data_r_univ_jobs = FA(path.join("data","data_r_univ_jobs.json")).json();
+data_r_univ_builds = FA(path.join("data","data_r_univ_builds.json")).json();
 ```
 
 ```{ojs get-all-repos}

@@ -159,9 +159,9 @@ fn_calls <- readRDS ("fn-calls.Rds")$fn_calls |>
     dplyr::ungroup () |>
     dplyr::rename (fn_name = name)
 
-cran_data <- readRDS ("results-cran-checks.Rds")
-not_cran <- gsub ("^.*\\/", "", attr (cran_data, "not_cran"))
-attr (cran_data, "not_cran") <- NULL
+# cran_data <- readRDS ("results-cran-checks.Rds")
+# not_cran <- gsub ("^.*\\/", "", attr (cran_data, "not_cran"))
+# attr (cran_data, "not_cran") <- NULL
 ```
 
 ```{r ojs-in-metrics}
@@ -177,8 +177,8 @@ ojs_define (repo_metrics_in = repo_metrics_data)
 ojs_define (deps_in = deps)
 ojs_define (fn_calls_in = fn_calls)
 ojs_define (ctbs_in = data_ctbs)
-ojs_define (cran_data_in = cran_data)
-ojs_define (not_cran_in = not_cran)
+# ojs_define (cran_data_in = cran_data)
+# ojs_define (not_cran_in = not_cran)
 ```
 
 ```{ojs plot-latest}
@@ -221,17 +221,14 @@ fnCallsTranspose = {
         ...row,
     }));
 }
-cranDataTranspose = {
-    return transpose(cran_data_in).map(row => ({
-        ...row,
-    }));
-}
 gitlog_data_in = FileAttachment("results-gitlog.json").json();
 gitlogDataTranspose = gitlog_data_in.map(row => ({
     ...row,
     first_commit: new Date(row.first_commit)
 }));
 
+cranDataAll = FileAttachment("results-data-cran.json").json();
+not_cran_in = FileAttachment("results-not-cran.json").json();
 repos_on_r_univ = FileAttachment("data_is_on_r_univ.json").json();
 data_r_univ_jobs = FileAttachment("data_r_univ_jobs.json").json();
 data_r_univ_builds = FileAttachment("data_r_univ_builds.json").json();
@@ -284,7 +281,7 @@ fn_calls = fnCallsTranspose.filter(function(r) {
     return r.package === repo
 })
 has_fn_calls = fn_calls.length > 0;
-cran_data = cranDataTranspose.filter(function(r) {
+cran_data = cranDataAll.filter(function(r) {
     return r.package === repo
 })
 has_cran_data = cran_data.length > 0;
@@ -559,10 +556,11 @@ is_on_r_univ && !build_checks_okay?
 ## CRAN Summary
 
 ```{ojs}
-not_on_cran ? htl.html`<div>This package is not on CRAN</div>` :
-    (has_cran_data ?
-    htl.html`<div><a href="https://cran.r-project.org//web/checks/check_results_${repo}.html">CRAN checks</a> on this package currently list these issues:</div>` :
-    htl.html`<div><a href="https://cran.r-project.org//web/checks/check_results_${repo}.html">CRAN checks</a> on this package are all good</div>`);
+cran_txt = has_cran_data ? "currently list these issues:" : "are all good";
+cran_url = "https://cran.r-project.org/web/checks/check_results_" + repo + ".html";
+not_on_cran ?
+    htl.html`<div>This package is not on CRAN</div>` :
+    htl.html`<div><a href="${cran_url}" target="_blank" rel="noopener noreferrer">CRAN checks</a> on this package ${cran_txt}</div>`;
 
 htl.html`<div style="margin-top: 20px; margin-bottom: 20px;"></div>`
 

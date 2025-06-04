@@ -54,6 +54,8 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
 
     data_pkgcheck <- lapply (data_org$repos, function (i) i$pkgcheck)
     data_cran <- dashboard_data_cran (data_org)
+    not_cran <- gsub ("^.*\\/", "", attr (data_cran, "not_cran"))
+    attr (data_cran, "not_cran") <- NULL
     data_gitlog <- dashboard_data_gitlog (data_org)
     data_r_universe <- dashboard_data_r_universe (data_org)
     # -------- ADDITIONAL DATA: END -------
@@ -73,11 +75,12 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (data_resp, fs::path (dir, "results-data-issue-resp.Rds"))
     saveRDS (data_bugs, fs::path (dir, "results-data-issue-bugs.Rds"))
     saveRDS (data_pkgcheck, fs::path (dir, "results-pkgcheck.Rds"))
-    saveRDS (data_cran, fs::path (dir, "results-cran-checks.Rds"))
     saveRDS (repo_metrics, fs::path (dir, "results-repo-metrics.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))
 
+    jsonlite::write_json (not_cran, fs::path (dir, "results-not-cran.json"))
+    jsonlite::write_json (data_cran, fs::path (dir, "results-data-cran.json"))
     jsonlite::write_json (data_gitlog, fs::path (dir, "results-gitlog.json"))
     jsonlite::write_json (data_r_universe$data_is_on_r_univ, fs::path (dir, "data_is_on_r_univ.json"))
     jsonlite::write_json (data_r_universe$r_univ_jobs, fs::path (dir, "data_r_univ_jobs.json"))

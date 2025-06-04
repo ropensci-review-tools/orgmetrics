@@ -99,7 +99,7 @@ four groups, plus the "Overall" metric averaged across all four groups.
 --->
 
 ```{r}
-data_metrics <- readRDS ("results-metrics.Rds")
+data_metrics <- readRDS (fs::path ("data", "results-metrics.Rds"))
 # These currently have too many datees, and will be fixed with next update
 # (already fixed via #27). These lines can then be deleted.
 # ----- START DATE FIX -----
@@ -206,7 +206,7 @@ lead to the repository maintenance page with further details of the selected
 package or repository.
 
 ```{r}
-data_metrics <- readRDS ("results-metrics.Rds")
+data_metrics <- readRDS (fs::path ("data", "results-metrics.Rds"))
 
 # Main table of most recent metrics:
 # which.max does not work for dates, but max does
@@ -273,7 +273,7 @@ within the same range as the metrics of community engagement and developer
 responsiveness.
 
 ```{r}
-maintenance_ts <- readRDS ("results-maintenance-org.Rds") |>
+maintenance_ts <- readRDS (fs::path ("data", "results-maintenance-org.Rds")) |>
     dplyr::group_by (date) |>
     dplyr::summarise (
         comm_engage = mean (comm_engage),
@@ -345,7 +345,7 @@ And these are maintenance deficit values for individual repositories
 (packages), for the latest time period only.
 
 ```{r}
-maintenance_repo <- readRDS ("results-maintenance-org.Rds") |>
+maintenance_repo <- readRDS (fs::path ("data", "results-maintenance-org.Rds")) |>
     dplyr::filter (date == max (date)) |>
     dplyr::select (-date) |>
     dplyr::mutate (
@@ -406,12 +406,12 @@ which are assessed over the most recent period of repository activity:
 - _Prop. Bugs_: The proportion of new issues opened that were bug reports
 
 ```{r load-table-data}
-data_extra_metrics <- readRDS ("results-data-ctb-absence.Rds") |>
+data_extra_metrics <- readRDS (fs::path ("data", "results-data-ctb-absence.Rds")) |>
     dplyr::filter (what == "absence") |>
     dplyr::group_by (repo) |>
     dplyr::summarise (ctb_absence = max (measure)) |>
-    dplyr::full_join (readRDS ("results-data-issue-resp.Rds"), by = "repo") |>
-    dplyr::full_join (readRDS ("results-data-issue-bugs.Rds"), by = "repo")
+    dplyr::full_join (readRDS (fs::path ("data", "results-data-issue-resp.Rds")), by = "repo") |>
+    dplyr::full_join (readRDS (fs::path ("data", "results-data-issue-bugs.Rds")), by = "repo")
 # data_ctb_abs_ctb <- dplyr::group_by (data_ctb_abs, name) |>
 #     dplyr::summarise (measure = mean (measure), n = dplyr::n ())
 ```
@@ -469,7 +469,7 @@ describe recently absent contributors who have previously been major
 contributors to numerous repositories.
 
 ```{r load-data}
-data_ctb_abs_ctb <- readRDS ("results-data-ctb-absence.Rds") |>
+data_ctb_abs_ctb <- readRDS (fs::path ("data", "results-data-ctb-absence.Rds")) |>
     dplyr::filter (what == "absence") |>
     dplyr::group_by (name) |>
     dplyr::summarise (measure = sum (measure))

@@ -41,18 +41,18 @@ library (orgmetrics)
 ```
 
 ```{r load-data}
-data_metrics <- readRDS ("results-metrics.Rds")
+data_metrics <- readRDS (fs::path ("data", "results-metrics.Rds"))
 # which.max does not work for dates, but max does
 index1 <- which (names (data_metrics) == max (names (data_metrics)))
 data_metrics <- data_metrics [[index1]]
 data_metrics$value [which (is.na (data_metrics$value))] <- 0
-data_models <- readRDS ("results-models.Rds")
-data_repo_src <- readRDS ("results-data-repo-src.Rds")
+data_models <- readRDS (fs::path ("data", "results-models.Rds"))
+data_repo_src <- readRDS (fs::path ("data", "results-data-repo-src.Rds"))
 
-data_ctb_abs <- readRDS ("results-data-ctb-absence.Rds")
-data_issue_resp <- readRDS ("results-data-issue-resp.Rds")
-data_issue_bugs <- readRDS ("results-data-issue-bugs.Rds")
-data_ctbs <- readRDS ("results-maintenance-contribs.Rds")
+data_ctb_abs <- readRDS (fs::path ("data", "results-data-ctb-absence.Rds"))
+data_issue_resp <- readRDS (fs::path ("data", "results-data-issue-resp.Rds"))
+data_issue_bugs <- readRDS (fs::path ("data", "results-data-issue-bugs.Rds"))
+data_ctbs <- readRDS (fs::path ("data", "results-maintenance-contribs.Rds"))
 ```
 
 ```{r data outliers}
@@ -75,7 +75,7 @@ data_models <- data_models |>
     ) |>
     dplyr::arrange (package, dplyr::desc (value))
 
-data_pkgcheck <- readRDS ("results-pkgcheck.Rds")
+data_pkgcheck <- readRDS (fs::path ("data", "results-pkgcheck.Rds"))
 names (data_pkgcheck) <- gsub ("^.*\\/", "", names (data_pkgcheck))
 pkgcheck_summaries <- lapply (data_pkgcheck, function (d) {
     out <- pkgcheck:::summarise_all_checks (d)
@@ -147,9 +147,9 @@ revdeps <- lapply (deps$package, function (p) {
 deps$revdeps <- I (revdeps)
 rownames (deps) <- NULL
 
-repo_metrics_data <- readRDS ("results-repo-metrics.Rds")
+repo_metrics_data <- readRDS (fs::path ("data", "results-repo-metrics.Rds"))
 
-fn_calls <- readRDS ("fn-calls.Rds")$fn_calls |>
+fn_calls <- readRDS (fs::path ("data", "fn-calls.Rds"))$fn_calls |>
     dplyr::group_by (name, package) |>
     dplyr::summarise (n = sum (n), .groups = "keep") |>
     dplyr::ungroup () |>
@@ -158,10 +158,6 @@ fn_calls <- readRDS ("fn-calls.Rds")$fn_calls |>
     dplyr::arrange (dplyr::desc (n), .by_group = TRUE) |>
     dplyr::ungroup () |>
     dplyr::rename (fn_name = name)
-
-# cran_data <- readRDS ("results-cran-checks.Rds")
-# not_cran <- gsub ("^.*\\/", "", attr (cran_data, "not_cran"))
-# attr (cran_data, "not_cran") <- NULL
 ```
 
 ```{r ojs-in-metrics}
@@ -182,7 +178,11 @@ ojs_define (ctbs_in = data_ctbs)
 ```
 
 ```{ojs plot-latest}
-Plot = import("https://esm.sh/@observablehq/plot")
+Plot = import("https://esm.sh/@observablehq/plot");
+path = import("https://esm.sh/path");
+// Need to alias FileAttachment; see
+// https://talk.observablehq.com/t/evaluate-from-fileattachment/3889/3
+FA = FileAttachment;
 ```
 
 ```{ojs}
@@ -221,17 +221,17 @@ fnCallsTranspose = {
         ...row,
     }));
 }
-gitlog_data_in = FileAttachment("results-gitlog.json").json();
+gitlog_data_in = FA(path.join("data","results-gitlog.json")).json();
 gitlogDataTranspose = gitlog_data_in.map(row => ({
     ...row,
     first_commit: new Date(row.first_commit)
 }));
 
-cranDataAll = FileAttachment("results-data-cran.json").json();
-not_cran_in = FileAttachment("results-not-cran.json").json();
-repos_on_r_univ = FileAttachment("data_is_on_r_univ.json").json();
-data_r_univ_jobs = FileAttachment("data_r_univ_jobs.json").json();
-data_r_univ_builds = FileAttachment("data_r_univ_builds.json").json();
+cranDataAll = FA(path.join("data","results-data-cran.json")).json();
+not_cran_in = FA(path.join("data","results-not-cran.json")).json();
+repos_on_r_univ = FA(path.join("data","data_is_on_r_univ.json")).json();
+data_r_univ_jobs = FA(path.join("data","data_r_univ_jobs.json")).json();
+data_r_univ_builds = FA(path.join("data","data_r_univ_builds.json")).json();
 ```
 
 ```{ojs get-all-repos}

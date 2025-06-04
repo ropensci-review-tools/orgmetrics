@@ -15,9 +15,9 @@ library (plotly)
 ```
 
 ```{r valuebox-values}
-repo_data <- readRDS ("results-data-repo-src.Rds")
-annual_commits <- readRDS ("results-annual-commits.Rds")
-annual_gh_activity <- readRDS ("results-annual-gh-activity.Rds")
+repo_data <- readRDS (fs::path ("data", "results-data-repo-src.Rds"))
+annual_commits <- readRDS (fs::path ("data", "results-annual-commits.Rds"))
+annual_gh_activity <- readRDS (fs::path ("data", "results-annual-gh-activity.Rds"))
 annual_gh_activity$total <- rowSums (annual_gh_activity [, -1])
 num_repos <- nrow (repo_data)
 repo_orgs <- gsub ("\\/.*$", "", repo_data$orgrepo) |>
@@ -33,7 +33,7 @@ repo_orgs <- gsub ("\\/.*$", "", repo_data$orgrepo) |>
 # corner of the quadrant frormed by the regerssion and its perpendicular
 # through the mid-point of the entire plane, and lying below the 90% CI.
 ci_level <- 0.9
-m <- readRDS ("results-maintenance-org.Rds") |>
+m <- readRDS (fs::path ("data", "results-maintenance-org.Rds")) |>
     dplyr::rename (x = comm_engage, y = dev_resp) |>
     dplyr::filter (date == max (date)) |>
     dplyr::select (-date)
@@ -251,7 +251,7 @@ bslib::page_fillable (
 threshold <- 0.8
 threshold <- 0.5 + threshold / 2
 num_sds <- qnorm (threshold, 0, 1)
-data_metrics <- readRDS ("results-metrics.Rds")
+data_metrics <- readRDS (fs::path ("data", "results-metrics.Rds"))
 # which.max does not work for dates, but max does
 index1 <- which (names (data_metrics) == max (names (data_metrics)))
 limits <- data_metrics [[index1]] |>

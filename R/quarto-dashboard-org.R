@@ -74,11 +74,11 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (data_bugs, fs::path (dir, "results-data-issue-bugs.Rds"))
     saveRDS (data_pkgcheck, fs::path (dir, "results-pkgcheck.Rds"))
     saveRDS (data_cran, fs::path (dir, "results-cran-checks.Rds"))
-    saveRDS (data_gitlog, fs::path (dir, "results-gitlog.Rds"))
     saveRDS (repo_metrics, fs::path (dir, "results-repo-metrics.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))
 
+    jsonlite::write_json (data_gitlog, fs::path (dir, "results-gitlog.json"))
     jsonlite::write_json (data_r_universe$data_is_on_r_univ, fs::path (dir, "data_is_on_r_univ.json"))
     jsonlite::write_json (data_r_universe$r_univ_jobs, fs::path (dir, "data_r_univ_jobs.json"))
     jsonlite::write_json (data_r_universe$r_univ_builds, fs::path (dir, "data_r_univ_builds.json"))

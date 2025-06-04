@@ -558,8 +558,10 @@ and to
 </div>` :
 htl.html`<div>This package is not on R-univers</div>`;
 
-is_on_r_univ && build_checks_okay ?
-    htl.html`<div>All recent R-universe builds were successful</div>` :
+is_on_r_univ ?
+    (build_checks_okay ?
+        htl.html`<div>&#9989; All recent R-universe builds were successful</div>` :
+        htl.html`<div>&#10060; Some recent R-universe builds were unsuccessful</div>`) :
     htl.html`<div></div>`;
 
 is_on_r_univ ? htl.html`<h4>Recent R-Universe Jobs</h4>` : undefined

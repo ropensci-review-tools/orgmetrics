@@ -237,6 +237,8 @@ gitlogDataTranspose = {
 }
 
 repos_on_r_univ = FileAttachment("data_is_on_r_univ.json").json();
+data_r_univ_jobs = FileAttachment("data_r_univ_jobs.json").json();
+data_r_univ_builds = FileAttachment("data_r_univ_builds.json").json();
 ```
 
 ```{ojs get-all-repos}
@@ -299,6 +301,9 @@ gitlog_first_commit = gitlog[0]['first_commit'].toLocaleDateString("en-GB", {
     month: 'short',
     year: 'numeric'
 });
+
+r_univ_jobs = data_r_univ_jobs[repo];
+r_univ_builds = data_r_univ_builds[repo];
 
 r_univ_page = repos_on_r_univ.filter(function(r) {
     return r.package === repo
@@ -540,9 +545,49 @@ has_cran_data ?
 is_on_r_univ = r_univ_page.length > 0;
 r_univ_universe = is_on_r_univ ? r_univ_page[0]['universe'] : undefined;
 r_univ_package = is_on_r_univ ? r_univ_page[0]['package'] : undefined;
+build_url = is_on_r_univ ? r_univ_builds[0]['buildurl'] : undefined;
+
+build_checks = r_univ_builds.filter(d => (d['status'] !== "success"));
+build_checks_okay = build_checks.length == 0;
+
 is_on_r_univ ?
-htl.html`<div><a href="https://${r_univ_universe}.r-universe.dev/${r_univ_package}">Link to ${r_univ_package} on R-universe</a> </div>` :
+htl.html`<div>Links to
+<a href="https://${r_univ_universe}.r-universe.dev/${r_univ_package}" target="_blank" rel="noopener noreferrer"><i>${r_univ_package}</i> on R-universe</a>
+and to
+<a href="${build_url}" target="_blank" rel="noopener noreferrer">recent R-universe builds</a>.
+</div>` :
 htl.html`<div>This package is not on R-univers</div>`;
+
+is_on_r_univ && build_checks_okay ?
+    htl.html`<div>All recent R-universe builds were successful</div>` :
+    htl.html`<div></div>`;
+
+is_on_r_univ ? htl.html`<h4>Recent R-Universe Jobs</h4>` : undefined
+
+is_on_r_univ ?
+    Inputs.table(r_univ_jobs, {
+        columns: ["job", "config", "r", "check"],
+        format: {
+            job: d => htl.html`<a href="${build_url}/job/${d}" target="_blank" rel="noopener noreferrer">${d.toFixed(0)}</a>`,
+        },
+    }) :
+    Inputs.table(r_univ_jobs, {
+        columns: [],
+    })
+
+is_on_r_univ && !build_checks_okay ? htl.html`<h3>Recent Builds</h3>` : htl.html`<div></div>`;
+
+is_on_r_univ && !build_checks_okay ?
+    htl.html`<div><a href=${build_url}>The following recent builds were unsuccessful</a></div>` :
+    htl.html`<div></div>`;
+
+is_on_r_univ && !build_checks_okay?
+    Inputs.table(build_checks, {
+        columns: ["r", "os", "status", "check"],
+    }) :
+    Inputs.table(build_checks, {
+        columns: [],
+    })
 ```
 
 ## Statistical properties

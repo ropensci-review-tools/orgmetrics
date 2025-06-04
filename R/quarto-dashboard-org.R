@@ -117,11 +117,35 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
         row.names = NULL
     )
 
+    # -------- R-UNIVERSE START -------
     dat <- lapply (data_org$repos, function (i) {
         c (i$rm$r_universe$universe, i$rm$r_universe$package)
     })
     dat <- do.call (rbind, unname (dat))
     data_is_on_r_univ <- data.frame (universe = dat [, 1], package = dat [, 2])
+
+    r_univ_jobs <- lapply (data_org$repos, function (i) {
+        data.frame (
+            universe = i$rm$r_universe$universe,
+            package = i$rm$r_universe$package,
+            i$rm$r_universe$jobs
+        )
+    })
+    r_univ_jobs <- do.call (rbind, r_univ_jobs)
+    rownames (r_univ_jobs) <- NULL
+    r_univ_jobs <- split (r_univ_jobs, f = as.factor (r_univ_jobs$package))
+
+    r_univ_builds <- lapply (data_org$repos, function (i) {
+        data.frame (
+            universe = i$rm$r_universe$universe,
+            package = i$rm$r_universe$package,
+            i$rm$r_universe$binaries
+        )
+    })
+    r_univ_builds <- do.call (rbind, r_univ_builds)
+    rownames (r_univ_builds) <- NULL
+    r_univ_builds <- split (r_univ_builds, f = as.factor (r_univ_builds$package))
+    # -------- R-UNIVERSE END -------
 
     requireNamespace ("jsonlite")
     requireNamespace ("quarto")
@@ -151,6 +175,8 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))
 
     jsonlite::write_json (data_is_on_r_univ, fs::path (dir, "data_is_on_r_univ.json"))
+    jsonlite::write_json (r_univ_jobs, fs::path (dir, "data_r_univ_jobs.json"))
+    jsonlite::write_json (r_univ_builds, fs::path (dir, "data_r_univ_builds.json"))
 
     withr::with_dir (dir, {
         do.call (eval (parse (text = quarto_action)), list ())

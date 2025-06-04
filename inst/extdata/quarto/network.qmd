@@ -36,7 +36,7 @@ slider.
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
 ```{r fn-calls-pre-process}
-fn_calls <- readRDS ("fn-calls.Rds")
+fn_calls <- readRDS (fs::path ("data", "fn-calls.Rds"))
 
 fn_call_nodes_pkg <- fn_calls$summary |>
     dplyr::group_by (package) |>
@@ -56,7 +56,7 @@ fn_call_nodes <- dplyr::bind_rows (
     fn_call_nodes_src
 )
 
-dat <- readRDS ("results-models.Rds")
+dat <- readRDS (fs::path ("data", "results-models.Rds"))
 all_pkgs <- unique (dat$package)
 extra_pkgs <- all_pkgs [which (!all_pkgs %in% fn_call_nodes$id)]
 fn_call_nodes <- rbind (
@@ -71,7 +71,7 @@ fn_call_links$type <- "depends"
 ```
 
 ```{r emb-matrix-pre-process}
-emb <- readRDS ("emb-matrix.Rds")
+emb <- readRDS (fs::path ("data", "emb-matrix.Rds"))
 colnames (emb) <- rownames (emb)
 emb_nodes <- rowSums (emb, na.rm = TRUE)
 emb_nodes <- data.frame (

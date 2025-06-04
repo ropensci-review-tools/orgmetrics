@@ -37,7 +37,7 @@ library (orgmetrics)
 ```
 
 ```{r load-data}
-dat_models <- readRDS ("results-models.Rds")
+dat_models <- readRDS (fs::path ("data", "results-models.Rds"))
 ```
 ```{r ojs-in-models}
 ojs_define (models_in = dat_models)

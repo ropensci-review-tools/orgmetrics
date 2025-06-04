@@ -83,12 +83,14 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (fn_calls, fs::path (dir_data, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir_data, "emb-matrix.Rds"))
 
-    jsonlite::write_json (not_cran, fs::path (dir_data, "results-not-cran.json"))
-    jsonlite::write_json (data_cran, fs::path (dir_data, "results-data-cran.json"))
-    jsonlite::write_json (data_gitlog, fs::path (dir_data, "results-gitlog.json"))
-    jsonlite::write_json (data_r_universe$data_is_on_r_univ, fs::path (dir_data, "data_is_on_r_univ.json"))
-    jsonlite::write_json (data_r_universe$r_univ_jobs, fs::path (dir_data, "data_r_univ_jobs.json"))
-    jsonlite::write_json (data_r_universe$r_univ_builds, fs::path (dir_data, "data_r_univ_builds.json"))
+    # Observable FileAttachment requires string literals which can't be build
+    # in platform-independent ways, so these are dumped in root.
+    jsonlite::write_json (not_cran, fs::path (dir, "results-not-cran.json"))
+    jsonlite::write_json (data_cran, fs::path (dir, "results-data-cran.json"))
+    jsonlite::write_json (data_gitlog, fs::path (dir, "results-gitlog.json"))
+    jsonlite::write_json (data_r_universe$data_is_on_r_univ, fs::path (dir, "data_is_on_r_univ.json"))
+    jsonlite::write_json (data_r_universe$r_univ_jobs, fs::path (dir, "data_r_univ_jobs.json"))
+    jsonlite::write_json (data_r_universe$r_univ_builds, fs::path (dir, "data_r_univ_builds.json"))
 
     withr::with_dir (dir, {
         do.call (eval (parse (text = quarto_action)), list ())

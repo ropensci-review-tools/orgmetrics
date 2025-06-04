@@ -17,7 +17,7 @@
 orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "preview") {
 
     # Suppress no visible binding notes:
-    org <- package <- NULL
+    org <- package <- name <- login <- contributions <- result <- NULL
 
     data_models <- data_models_preprocess (data_org$models) |>
         dplyr::select (-org, -date) |>

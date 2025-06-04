@@ -547,7 +547,7 @@ r_univ_universe = is_on_r_univ ? r_univ_page[0]['universe'] : undefined;
 r_univ_package = is_on_r_univ ? r_univ_page[0]['package'] : undefined;
 build_url = is_on_r_univ ? r_univ_builds[0]['buildurl'] : undefined;
 
-build_checks = r_univ_builds.filter(d => (d['status'] !== "success"));
+build_checks = is_on_r_univ ? r_univ_builds.filter(d => (d['status'] !== "success")) : [];
 build_checks_okay = build_checks.length == 0;
 
 is_on_r_univ ?
@@ -556,7 +556,7 @@ htl.html`<div>Links to
 and to
 <a href="${build_url}" target="_blank" rel="noopener noreferrer">recent R-universe builds</a>.
 </div>` :
-htl.html`<div>This package is not on R-univers</div>`;
+htl.html`<div>This package is not on R-universe</div>`;
 
 is_on_r_univ ?
     (build_checks_okay ?
@@ -564,7 +564,7 @@ is_on_r_univ ?
         htl.html`<div>&#10060; Some recent R-universe builds were unsuccessful</div>`) :
     htl.html`<div></div>`;
 
-is_on_r_univ ? htl.html`<h4>Recent R-Universe Jobs</h4>` : undefined
+is_on_r_univ ? htl.html`<h4>Recent R-Universe Jobs</h4>` : htl.html`<div></div>`;
 
 is_on_r_univ ?
     Inputs.table(r_univ_jobs, {
@@ -573,9 +573,7 @@ is_on_r_univ ?
             job: d => htl.html`<a href="${build_url}/job/${d}" target="_blank" rel="noopener noreferrer">${d.toFixed(0)}</a>`,
         },
     }) :
-    Inputs.table(r_univ_jobs, {
-        columns: [],
-    })
+    htl.html`<div></div>`;
 
 is_on_r_univ && !build_checks_okay ? htl.html`<h3>Recent Builds</h3>` : htl.html`<div></div>`;
 
@@ -586,10 +584,7 @@ is_on_r_univ && !build_checks_okay ?
 is_on_r_univ && !build_checks_okay?
     Inputs.table(build_checks, {
         columns: ["r", "os", "status", "check"],
-    }) :
-    Inputs.table(build_checks, {
-        columns: [],
-    })
+    }) : htl.html`<div></div>`;
 ```
 
 ## Statistical properties

@@ -235,6 +235,8 @@ gitlogDataTranspose = {
         first_commit: new Date(row.first_commit)
     }));
 }
+
+repos_on_r_univ = FileAttachment("data_is_on_r_univ.json").json();
 ```
 
 ```{ojs get-all-repos}
@@ -297,6 +299,10 @@ gitlog_first_commit = gitlog[0]['first_commit'].toLocaleDateString("en-GB", {
     month: 'short',
     year: 'numeric'
 });
+
+r_univ_page = repos_on_r_univ.filter(function(r) {
+    return r.package === repo
+})
 ```
 
 ```{ojs}
@@ -526,6 +532,17 @@ has_cran_data ?
     Inputs.table(cran_data, {
         colunmns: [],
     });
+```
+
+## R-universe summary
+
+```{ojs}
+is_on_r_univ = r_univ_page.length > 0;
+r_univ_universe = is_on_r_univ ? r_univ_page[0]['universe'] : undefined;
+r_univ_package = is_on_r_univ ? r_univ_page[0]['package'] : undefined;
+is_on_r_univ ?
+htl.html`<div><a href="https://${r_univ_universe}.r-universe.dev/${r_univ_package}">Link to ${r_univ_package} on R-universe</a> </div>` :
+htl.html`<div>This package is not on R-univers</div>`;
 ```
 
 ## Statistical properties

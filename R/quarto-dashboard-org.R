@@ -117,6 +117,12 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
         row.names = NULL
     )
 
+    dat <- lapply (data_org$repos, function (i) {
+        c (i$rm$r_universe$universe, i$rm$r_universe$package)
+    })
+    dat <- do.call (rbind, unname (dat))
+    data_is_on_r_univ <- data.frame (universe = dat [, 1], package = dat [, 2])
+
     requireNamespace ("jsonlite")
     requireNamespace ("quarto")
     requireNamespace ("withr")
@@ -143,6 +149,8 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (repo_metrics, fs::path (dir, "results-repo-metrics.Rds"))
     saveRDS (fn_calls, fs::path (dir, "fn-calls.Rds"))
     saveRDS (emb_matrix, fs::path (dir, "emb-matrix.Rds"))
+
+    jsonlite::write_json (data_is_on_r_univ, fs::path (dir, "data_is_on_r_univ.json"))
 
     withr::with_dir (dir, {
         do.call (eval (parse (text = quarto_action)), list ())

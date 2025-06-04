@@ -411,8 +411,8 @@ revdeps_list_txt = revdeps.length > 0 ? htl.html`<ul>${revdeps_list}</ul>` : und
 
 :::{.grid}
 
-:::{.g-col-12 .g-col-md-6}
-
+<!--- CARD ONE: TOP LEFT --->
+::::{.g-col-12 .g-col-md-6}
 <div class="card" style="background: linear-gradient(to bottom, #33ccff 0%, #ffcc99 100%); text-align:center;">
 <img src="bs-icons/tools.svg" alt="Bootstrap" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
 <h2 style="margin-top:-20px;">Maintainance:</h2>
@@ -427,29 +427,10 @@ htl.html`<ul>
 ```
 </div>
 </div>
+::::
 
-
-:::
-
-:::{.g-col-12 .g-col-md-6}
-
-<div class="card" style="background: linear-gradient(to bottom, #00cc66 0%, #33ccff 100%); text-align:center;">
-<img src="bs-icons/chat-square-heart.svg" alt="Bootstrap" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
-<h2 style="margin-top:-20px;">Popularity</h2>
-<div style="text-align:left;">
-```{ojs}
-htl.html`<ul>
-    <li>${stars_forks} GitHub stars and forks</li>
-    <li>${num_dl} CRAN downloads</li>
-</ul>`
-```
-</div>
-</div>
-
-:::
-
-:::{.g-col-12 .g-col-md-6}
-
+<!--- CARD TWO: TOP RIGHT --->
+::::{.g-col-12 .g-col-md-6}
 <div class="card" style="background: linear-gradient(to bottom, #33ccff 0%, #ffcc99 100%); text-align:center;">
 <img src="bs-icons/pencil-square.svg" alt="Bootstrap" class="text-pencil-square" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
 <h2 style="margin-top:-20px;">Dependencies</h2>
@@ -468,12 +449,26 @@ htl.html`<ul>
 ```
 </div>
 </div>
+::::
 
+<!--- CARD THREE: BOTTOM LEFT --->
+::::{.g-col-12 .g-col-md-6}
+<div class="card" style="background: linear-gradient(to bottom, #00cc66 0%, #33ccff 100%); text-align:center;">
+<img src="bs-icons/chat-square-heart.svg" alt="Bootstrap" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
+<h2 style="margin-top:-20px;">Popularity</h2>
+<div style="text-align:left;">
+```{ojs}
+htl.html`<ul>
+    <li>${stars_forks} GitHub stars and forks</li>
+    <li>${num_dl} CRAN downloads</li>
+</ul>`
+```
+</div>
+</div>
+::::
 
-:::
-
-:::{.g-col-12 .g-col-md-6}
-
+<!--- CARD FOUR: BOTTOM RIGHT --->
+::::{.g-col-12 .g-col-md-6}
 <div class="card" style="background: linear-gradient(to bottom, #00cc66 0%, #33ccff 100%); text-align:center;">
 <img src="bs-icons/github.svg" alt="Bootstrap" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
 <h2 style="margin-top:-20px;">GitHub Activity</h2>
@@ -486,8 +481,7 @@ htl.html`<ul>
 ```
 </div>
 </div>
-
-:::
+::::
 
 :::
 
@@ -514,26 +508,6 @@ htl.html`
   <div>${this_pkg_summary.map((item) => htl.html.fragment`<ul>
     <li>${unescapeHtml(item)}</li>
   </ul>`)}</div>`
-```
-
-## CRAN Summary
-
-```{ojs}
-not_on_cran ? htl.html`<div>This package is not on CRAN</div>` :
-    (has_cran_data ?
-    htl.html`<div><a href="https://cran.r-project.org//web/checks/check_results_${repo}.html">CRAN checks</a> on this package currently list these issues:</div>` :
-    htl.html`<div><a href="https://cran.r-project.org//web/checks/check_results_${repo}.html">CRAN checks</a> on this package are all good</div>`);
-
-htl.html`<div style="margin-top: 20px; margin-bottom: 20px;"></div>`
-
-has_cran_data ?
-    Inputs.table(cran_data, {
-        columns: ["package", "version", "result", "check", "message"],
-        format: {
-            check: d => htl.html`<span style="white-space:normal">${d}`,
-            message: d => htl.html`<span style="white-space:normal">${d}`,
-        }
-    }) : htl.html`<div></div>`;
 ```
 
 ## R-universe summary
@@ -583,6 +557,26 @@ is_on_r_univ && !build_checks_okay ?
 is_on_r_univ && !build_checks_okay?
     Inputs.table(build_checks, {
         columns: ["r", "os", "status", "check"],
+    }) : htl.html`<div></div>`;
+```
+
+## CRAN Summary
+
+```{ojs}
+not_on_cran ? htl.html`<div>This package is not on CRAN</div>` :
+    (has_cran_data ?
+    htl.html`<div><a href="https://cran.r-project.org//web/checks/check_results_${repo}.html">CRAN checks</a> on this package currently list these issues:</div>` :
+    htl.html`<div><a href="https://cran.r-project.org//web/checks/check_results_${repo}.html">CRAN checks</a> on this package are all good</div>`);
+
+htl.html`<div style="margin-top: 20px; margin-bottom: 20px;"></div>`
+
+has_cran_data ?
+    Inputs.table(cran_data, {
+        columns: ["package", "version", "result", "check", "message"],
+        format: {
+            check: d => htl.html`<span style="white-space:normal">${d}`,
+            message: d => htl.html`<span style="white-space:normal">${d}`,
+        }
     }) : htl.html`<div></div>`;
 ```
 
@@ -641,7 +635,8 @@ other packages. Numbers may be less than total numbers of packages listed above
 in <q><i>Dependencies: Used by org pkgs</i></q> because some of those usages may be only
 in tests, whereas the following usage counts are within actual R code only.
 </div>` :
-htl.html`<div>This package uses no other packages from the organizations</div>`;
+htl.html`<div>This package uses no other packages from the organizations,
+and so its functions are not used anywhere else.</div>`;
 ```
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
@@ -653,9 +648,7 @@ has_fn_calls ? Inputs.table(fn_calls, {
         fn_name: "Function name",
         n: "Usage"
     }
-}) : Inputs.table(fn_calls, {
-    columns: []
-});
+}) : htl.html`<div></div>`;
 ```
 
 -----

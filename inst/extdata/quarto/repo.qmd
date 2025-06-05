@@ -389,9 +389,9 @@ order_vector_sub = order_vector.slice(0, num_similar);
 matched_names = order_vector_sub.map(i => rank_names_in[i]);
 
 similar_pkgs = matched_names.map(i => {
-    const url = repo_src.filter(function(r) {
+    const url = (repo_src.filter(function(r) {
         return r.package === i
-    })[0].url;
+    }, i)[0] || {}).url || null;
     return htl.html`<li><a href="${url}" target="_blank">${i}</a></li>`
 });
 ```

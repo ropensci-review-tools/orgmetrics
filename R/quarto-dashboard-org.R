@@ -17,7 +17,7 @@
 orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "preview") {
 
     # Suppress no visible binding notes:
-    org <- package <- name <- login <- contributions <- result <- NULL
+    org <- package <- NULL
 
     action <- match.arg (action, c ("preview", "render"))
     quarto_action <- paste0 ("quarto::quarto_", action)
@@ -60,11 +60,19 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     attr (data_cran, "not_cran") <- NULL
     data_gitlog <- dashboard_data_gitlog (data_org)
     data_r_universe <- dashboard_data_r_universe (data_org)
+    rm_metrics_json <- system.file (
+        "extdata",
+        "metrics-models",
+        "metrics-models.json",
+        package = "repometrics"
+    )
+    rm_metrics_models <- jsonlite::read_json (rm_metrics_json, simplify = TRUE)
     data_json <- list (
         cran = data_cran,
         not_cran = not_cran,
         gitlog = data_gitlog,
-        r_universe = data_r_universe
+        r_universe = data_r_universe,
+        rm_metrics_models = rm_metrics_models
     )
 
     path_src <- system.file ("extdata", "quarto", package = "orgmetrics")
@@ -106,6 +114,9 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
 
 dashboard_data_repo_metrics <- function (data_metrics, dates) {
 
+    # Suppress no visible binding notes:
+    org <- package <- date <- name <- NULL
+
     # Repo summaries for repo page:
     repo_summary_vars <- c (
         "change_req_n_opened",
@@ -142,6 +153,9 @@ dashboard_data_repo_metrics <- function (data_metrics, dates) {
 
 dashboard_data_contributors <- function (data_org) {
 
+    # Suppress no visible binding notes:
+    name <- login <- contributions <- NULL
+
     data_contributors <- lapply (data_org$repos, function (repo) {
         ctbs_gh <- repo$rm$contribs_from_gh_api |>
             dplyr::select (login, name, contributions)
@@ -167,6 +181,9 @@ dashboard_data_repo_source <- function (data_org) {
 }
 
 dashboard_data_cran <- function (data_org) {
+
+    # Suppress no visible binding notes:
+    result <- NULL
 
     data_cran <- lapply (data_org$repos, function (i) {
         if (!inherits (i$cran_checks, "data.frame")) {

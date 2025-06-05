@@ -10,9 +10,27 @@ format:
 ---
 
 <!---
-******** START UTILITY FUNCTIONS ********
+******** STRUCTURE OF THIS FILE: ********
+1. Utility functions
+2. R pre-processing functions
+3. R -> js conversion
+4. Read js data
+5. Repo selector
+6. Filter repo data
+7. Text strings for cards
+    (---start of displayed content---)
+8. CARDS GRID (2-by-2 layout)
+9. Pkgcheck summary
+10. R-universe summary
+11. Cran summary
+12. Statistical properties
+13. Function usage
+    (---end of displayed content---)
 --->
 
+<!---
+******** 1. START UTILITY FUNCTIONS ********
+--->
 
 ```{ojs}
 function sparkbar(max) {
@@ -33,7 +51,11 @@ function sparkbar(max) {
 ```
 
 <!---
-******** END UTILITY FUNCTIONS ********
+******** 1. END UTILITY FUNCTIONS ********
+--->
+
+<!---
+******** 2. START R PRE-PROCESSING FUNCTIONS ********
 --->
 
 ```{r load-pkg, echo = FALSE, message = FALSE}
@@ -173,15 +195,15 @@ ojs_define (repo_metrics_in = repo_metrics_data)
 ojs_define (deps_in = deps)
 ojs_define (fn_calls_in = fn_calls)
 ojs_define (ctbs_in = data_ctbs)
-# ojs_define (cran_data_in = cran_data)
-# ojs_define (not_cran_in = not_cran)
 ```
 
-```{ojs plot-latest}
-Plot = import("https://esm.sh/@observablehq/plot");
-```
+<!---
+******** 2. END R PRE-PROCESSING FUNCTIONS ********
+--->
 
 ```{ojs load-r-data}
+// -------- 3. R -> JS CONVERSION
+
 metricsTranspose = {
     return transpose(metrics_in).map(row => ({
         ...row,
@@ -219,7 +241,10 @@ fnCallsTranspose = {
 }
 ```
 
+<!---- break --->
+
 ```{ojs load-json-data}
+// -------- 4. READ JS DATA
 json_data = FileAttachment("results-json-data.json").json();
 gitlogDataTranspose = json_data['gitlog'].map(row => ({
     ...row,
@@ -233,7 +258,12 @@ data_r_univ_jobs = json_data['r_universe']['r_univ_jobs'];
 data_r_univ_builds = json_data['r_universe']['r_univ_builds'];
 ```
 
+
+<!---- break --->
+
 ```{ojs get-all-repos}
+// -------- 5. REPO SELECTOR
+// This can also be set via localStorage in org page
 // Get array of unique repo names for input selector:
 reposAll = metricsTranspose.map(function(item) {
     return item.package;
@@ -251,6 +281,8 @@ viewof repo = Inputs.select(
 s = localStorage.setItem("orgmetricsRepo", repo.toString());
 ```
 
+<!---- break --->
+
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
 ```{ojs}
@@ -258,12 +290,19 @@ s = localStorage.setItem("orgmetricsRepo", repo.toString());
 repoURL = repo_src.filter(function(r) {
     return r.package === repo
 })[0].url;
-htl.html`<div>Click here to see the <a href=${repoURL} target="_blank">${repo} repository</a>.</div>`
+htl.html`<div>
+Click here for the source code of the
+<a href=${repoURL} target="_blank"><i>${repo}</i> repository</a>.
+</div>`
 ```
+
+<!---- break --->
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
 ```{ojs}
+// -------- 6. FILTER REPO DATA
+
 ctb_abs = ctb_absTranspose.filter(function(r) {
     return r.repo === repo
 })
@@ -302,6 +341,8 @@ r_univ_page = repos_on_r_univ.filter(function(r) {
 })
 ```
 
+<!---- break --->
+
 ```{ojs}
 repoMetrics = {
     return transpose(repo_metrics_in[repo]).map(row => ({
@@ -314,6 +355,12 @@ ctbs = {
     }))
 }
 ctbs_gh = ctbs.map((ctb) => ctb['gh_handle']);
+```
+
+<!---- break --->
+
+```{ojs}
+// -------- 7. TEXT STRINGS FOR CARDS
 
 function pluraliseObjects(x, what) {
     if (x === 0) {
@@ -400,6 +447,9 @@ revdeps_in_org = revdeps.length > 0 ?
 revdeps_list_txt = revdeps.length > 0 ? htl.html`<ul>${revdeps_list}</ul>` : undefined;
 ```
 
+<!---
+******** 8. START CARDS GRID (2-by-2 layout)********
+--->
 
 :::{.grid}
 
@@ -477,8 +527,14 @@ htl.html`<ul>
 
 :::
 
+<!---
+******** 8. END CARDS GRID (2-by-2 layout)********
+--->
+
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
+
+<!-------- 9. PKGCHECK SUMMARY -------->
 
 ## pkgcheck Summary
 
@@ -501,6 +557,8 @@ htl.html`
     <li>${unescapeHtml(item)}</li>
   </ul>`)}</div>`
 ```
+
+<!-------- 10. R-UNIVERSE SUMMARY -------->
 
 ## R-universe summary
 
@@ -552,6 +610,8 @@ is_on_r_univ && !build_checks_okay?
     }) : htl.html`<div></div>`;
 ```
 
+<!-------- 11. CRAN SUMMARY -------->
+
 ## CRAN Summary
 
 ```{ojs}
@@ -572,6 +632,8 @@ has_cran_data ?
         }
     }) : htl.html`<div></div>`;
 ```
+
+<!-------- 12. STATISTICAL PROPERTIES -------->
 
 ## Statistical properties
 
@@ -619,6 +681,8 @@ Inputs.table(pkgStatsData, {
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
+<!-------- 13. FUNCTION USAGE -------->
+
 ## Function usage in other packages
 
 ```{ojs}
@@ -644,31 +708,43 @@ has_fn_calls ? Inputs.table(fn_calls, {
 }) : htl.html`<div></div>`;
 ```
 
------
 
 
-This page identifies maintenance priorities for a selected repository, in
-terms of both [CHAOSS
-models](https://chaoss.community/kbtopic/all-metrics-models/), and the
-individual [CHAOSS metrics](https://chaoss.community/kbtopic/all-metrics/)
-which comprise those models. In its present state, this is mostly a
-proof-of-concept, and is not as well developed as the accompanying
-[*Organizational Maintenance* page](./org.html).
+## CHAOSS metrics and models
 
-The "Outliers only" selector immediate below determines whether values shown
-for both models and metrics are outliers only (default of "true"), or whether
-all values are shown ("false").
+```{ojs}
+url_chaoss = "https://chaoss.community/kb-metrics-and-metrics-models/";
+url_chaoss_models = "https://chaoss.community/kbtopic/all-metrics-models/";
+url_chaoss_metrics = "https://chaoss.community/kbtopic/all-metrics/";
 
+htl.html`<div>
+This section highlights important <a href="${url_chaoss}" target="_blank">
+CHAOSS (<i> Community Health Analytics in Open Source Software</i>)</a> metrics
+and models for the
+<a href=${repoURL} target="_blank"><i>${repo}</i> repository</a>.
+The first graph shows
+<q><a href=${url_chaoss_models} target="_blank">models</a></q>,
+which are aggregations of
+<a href=${url_chaoss_metrics} target="_blank">metrics</a>
+into conceptual or thematic groups, and the second provides more detail into
+individual metrics. All values are standardised between 0 and 1 such that
+higher values are always better than lower values.
+</div>`
+```
 
+By default, the following charts of both models and metrics only show
+categories for which the repository is an outlier, defined as lying in the
+lower or upper 10% of all repositories. Note that these outlier proportions
+depend on distributions of values measured across all repositories, and will
+generally not correspond values beyond the limits of \[10, 90\]% on the scale
+shown. For example, values for metrics of models may be very concentrated
+around 0.5 with only a very few extreme values. The lower 10% of values may,
+for example, be all those below a value of 0.4. Clicking on the following
+button will toggle to display all values.
 
-## CHAOSS models
-
-This first graph shows scores for the various [CHAOSS (*Community Health
-Analytics in Open Source Software*)
-models](https://chaoss.community/kbtopic/all-metrics-models/) for a selected
-repository. Each of these models is an aggregation of several underlying
-[metrics](https://chaoss.community/kbtopic/all-metrics/), which can be examined
-in the following sub-section.
+```{ojs plot-latest}
+Plot = import("https://esm.sh/@observablehq/plot");
+```
 
 ```{ojs}
 viewof outliersOnly = Inputs.radio(
@@ -680,30 +756,78 @@ viewof outliersOnly = Inputs.radio(
 )
 ```
 
+#### CHAOSS Models
+
 ```{ojs}
-models_all = {
+// -------- METRICS-MODELS.JSON FROM REPOMETRICS
+//
+// This file has the text definitions for all metrics & models variables, and
+// used to construct a textMap to replace variable names by text from that
+// file. Note that this needs to use `reduce` to be explicitly assigned to a
+// return value so that Observable executes everything in the expected order.
+// Alternatives like initially constructing an empty map and then implicitly
+// filling with a `forEach` are not correctly executed in the expected
+// sequence.
+
+rm_metrics_models = json_data['rm_metrics_models'];
+rm_models = rm_metrics_models['models_text'];
+rm_metrics = rm_metrics_models['metrics'];
+modelsTextMap = rm_models.reduce((map, item) => {
+    return map.set(String(item.name), item.text);
+}, new Map());
+metricsTextMap = rm_metrics.reduce((map, item) => {
+    return map.set(String(item.name), item.airtable_name);
+}, new Map());
+```
+
+```{ojs}
+// ------ load metrics and models data from R input and replace variables with
+// ------ text from repometrics JSON file.
+
+modelsAll = {
     return transpose(models_in).map(row => ({
         ...row,
     }));
 }
-models_final = models_all.filter(function(mod) {
-    return mod.name === "final"
-})
-model_repoAll = models_all.filter(function(mod) {
+modelRepoVarnames = modelsAll.filter(function(mod) {
     return mod.package === repo && mod.name !== "final"
 })
-model_repo = outliersOnly === "true" ?
-    model_repoAll.filter(function(m) {
-        return m.outlier === true;
-    }) : model_repoAll;
-model_repo_len = model_repo.length
-model_repo_ht_mult = model_repo_len < 10 ? 80 : 40
+
+modelRepoAll = modelRepoVarnames.map(item => {
+    const key = String(item.name);
+    return {
+        ...item,
+        name: modelsTextMap.has(key) ? modelsTextMap.get(key) : item.name
+    }
+})
+
+metricsAll = metricsTranspose.map(item => {
+    const key = String(item.name);
+    return {
+        ...item,
+        name: metricsTextMap.has(key) ? metricsTextMap.get(key) : item.name
+    }
+})
 ```
+
+<!--- break --->
+
+```{ojs}
+// ------ filter model data by optional outliersOnly
+modelRepoFilt = outliersOnly === "true" ?
+    modelRepoAll.filter(function(m) {
+        return m.outlier === true;
+    }) : modelRepoAll;
+model_repo_len = modelRepoFilt.length
+model_repo_ht_mult = model_repo_len < 15 ? 40 : 20
+```
+
+<!--- break --->
 
 ```{ojs colour-scales}
 // Bar colours should be scaled to full data range, not just restricted range
 // of filtered data.
-fullScaleValues = model_repoAll.map(d => d.value);
+fullScaleValues = modelRepoAll.map(d => d.value);
 minVal = Math.min(...fullScaleValues);
 maxVal = Math.max(...fullScaleValues);
 ```
@@ -724,13 +848,13 @@ Plot.plot({
     },
     y: { grid: true },
     marks: [
-        Plot.barX(model_repo, {
+        Plot.barX(modelRepoFilt, {
             y: "name",
             x: "value",
             sort: {y: "-x" },
             fill: "value",
         }),
-        Plot.barX(model_repo,
+        Plot.barX(modelRepoFilt,
             Plot.pointer(
             {
                 y: "name",
@@ -741,7 +865,7 @@ Plot.plot({
                 strokeWidth: 2,
             })
         ),
-        Plot.text(model_repo, {
+        Plot.text(modelRepoFilt, {
             x: (d) => d.value < 0 ? 0 : d.value,
             y: "name",
             text: "name",
@@ -758,7 +882,7 @@ Plot.plot({
 })
 ```
 
-## CHAOSS metrics
+#### CHAOSS metrics
 
 This graph provides more detailed insight into the state of the selected
 repository, through showing values for individual [CHAOSS
@@ -767,20 +891,21 @@ aggregate models.
 
 ```{ojs}
 metrics = outliersOnly === "true" ?
-    metricsTranspose.filter(function(m) {
+    metricsAll.filter(function(m) {
         return m.outlier === true;
-    }) : metricsTranspose;
+    }) : metricsAll;
 
 metrics_repo = metrics.filter(function(mod) {
     return mod.package === repo
 })
 metrics_repo_len = metrics_repo.length
+metrics_repo_ht_mult = metrics_repo_len < 15 ? 30 : 20
 ```
 
 
 ```{ojs plot-filtered-repo-metrics}
 Plot.plot({
-    height: 40 * metrics_repo_len,
+    height: metrics_repo_ht_mult * metrics_repo_len,
     marginLeft: 60,
     marginRight: 160,
     marginTop: 50,

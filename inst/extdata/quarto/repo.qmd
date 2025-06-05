@@ -387,7 +387,13 @@ order_vector = Array
 num_similar = 5
 order_vector_sub = order_vector.slice(0, num_similar);
 matched_names = order_vector_sub.map(i => rank_names_in[i]);
-similar_pkgs = matched_names.map(i => htl.html`<li>${i}</li>`);
+
+similar_pkgs = matched_names.map(i => {
+    const url = repo_src.filter(function(r) {
+        return r.package === i
+    })[0].url;
+    return htl.html`<li><a href="${url}" target="_blank">${i}</a></li>`
+});
 ```
 
 <!---- break --->
@@ -550,10 +556,13 @@ htl.html`<ul>
 <img src="bs-icons/github.svg" alt="Bootstrap" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
 <h2 style="margin-top:-20px;">Similar Packages</h2>
 <div style="text-align:left;">
-<div style="margin-left: 20px;">The five most similar packages are:</div>
+<div style="margin-left: 10px;">The five most similar packages are:</div>
 ```{ojs}
 htl.html`<ul>${similar_pkgs}</ul>`
 ```
+<div style="margin-left:10px; margin-top:-15px; margin-right:20px; font-size:14px; white-space:normal;">
+(Assessed from similarities between language model embedding vectors.)
+</div>
 </div>
 </div>
 ::::

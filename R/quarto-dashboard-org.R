@@ -22,9 +22,9 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     action <- match.arg (action, c ("preview", "render"))
     quarto_action <- paste0 ("quarto::quarto_", action)
 
-    requireNamespace ("jsonlite")
-    requireNamespace ("quarto")
-    requireNamespace ("withr")
+    requireNamespace ("jsonlite", quietly = TRUE)
+    requireNamespace ("quarto", quietly = TRUE)
+    requireNamespace ("withr", quietly = TRUE)
 
     # -------- CHAOSS MODELS and METRICS: START -------
     data_models <- data_models_preprocess (data_org$models) |>
@@ -44,21 +44,28 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     names (data_metrics) <- dates
     # -------- CHAOSS MODELS and METRICS: END -------
 
-    # -------- ADDITIONAL DATA: START -------
+    # -------- ADDITIONAL DATA IN R -------
     data_maintenance <- org_maintenance_metric (data_org)
     data_abs <- ctb_absence (data_org)
     data_resp <- issue_responses (data_org)
     data_bugs <- issue_bugs (data_org)
     data_contributors <- dashboard_data_contributors (data_org)
     data_repo_src <- dashboard_data_repo_source (data_org)
-
     data_pkgcheck <- lapply (data_org$repos, function (i) i$pkgcheck)
+
+    # -------- ADDITIONAL DATA IN JSON -------
+    # All saved as single JSON structure; only used in 'repo.qmd'
     data_cran <- dashboard_data_cran (data_org)
     not_cran <- gsub ("^.*\\/", "", attr (data_cran, "not_cran"))
     attr (data_cran, "not_cran") <- NULL
     data_gitlog <- dashboard_data_gitlog (data_org)
     data_r_universe <- dashboard_data_r_universe (data_org)
-    # -------- ADDITIONAL DATA: END -------
+    data_json <- list (
+        cran = data_cran,
+        not_cran = not_cran,
+        gitlog = data_gitlog,
+        r_universe = data_r_universe
+    )
 
     path_src <- system.file ("extdata", "quarto", package = "orgmetrics")
     path_dest <- fs::path (fs::path_temp (), "quarto")
@@ -68,10 +75,14 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
         fs::dir_create (dir_data, recurse = TRUE)
     }
 
+    # -------- SAVE CHAOSS DATA
     saveRDS (data_models, fs::path (dir_data, "results-models.Rds"))
     saveRDS (data_metrics, fs::path (dir_data, "results-metrics.Rds"))
+    saveRDS (repo_metrics, fs::path (dir_data, "results-repo-metrics.Rds"))
     saveRDS (data_org$annual_commits, fs::path (dir_data, "results-annual-commits.Rds"))
     saveRDS (data_org$annual_gh_activity, fs::path (dir_data, "results-annual-gh-activity.Rds"))
+
+    # -------- SAVE ADDITIONAL R DATA
     saveRDS (data_maintenance, fs::path (dir_data, "results-maintenance-org.Rds"))
     saveRDS (data_contributors, fs::path (dir_data, "results-maintenance-contribs.Rds"))
     saveRDS (data_repo_src, fs::path (dir_data, "results-data-repo-src.Rds"))
@@ -79,18 +90,14 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     saveRDS (data_resp, fs::path (dir_data, "results-data-issue-resp.Rds"))
     saveRDS (data_bugs, fs::path (dir_data, "results-data-issue-bugs.Rds"))
     saveRDS (data_pkgcheck, fs::path (dir_data, "results-pkgcheck.Rds"))
-    saveRDS (repo_metrics, fs::path (dir_data, "results-repo-metrics.Rds"))
-    saveRDS (fn_calls, fs::path (dir_data, "fn-calls.Rds"))
-    saveRDS (emb_matrix, fs::path (dir_data, "emb-matrix.Rds"))
 
+    # -------- SAVE JSON DATA
     # Observable FileAttachment requires string literals which can't be build
     # in platform-independent ways, so these are dumped in root.
-    jsonlite::write_json (not_cran, fs::path (dir, "results-not-cran.json"))
-    jsonlite::write_json (data_cran, fs::path (dir, "results-data-cran.json"))
-    jsonlite::write_json (data_gitlog, fs::path (dir, "results-gitlog.json"))
-    jsonlite::write_json (data_r_universe$data_is_on_r_univ, fs::path (dir, "data_is_on_r_univ.json"))
-    jsonlite::write_json (data_r_universe$r_univ_jobs, fs::path (dir, "data_r_univ_jobs.json"))
-    jsonlite::write_json (data_r_universe$r_univ_builds, fs::path (dir, "data_r_univ_builds.json"))
+    jsonlite::write_json (data_json, fs::path (dir, "results-json-data.json"))
+
+    saveRDS (fn_calls, fs::path (dir_data, "fn-calls.Rds"))
+    saveRDS (emb_matrix, fs::path (dir_data, "emb-matrix.Rds"))
 
     withr::with_dir (dir, {
         do.call (eval (parse (text = quarto_action)), list ())

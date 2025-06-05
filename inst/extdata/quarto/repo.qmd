@@ -181,7 +181,7 @@ ojs_define (ctbs_in = data_ctbs)
 Plot = import("https://esm.sh/@observablehq/plot");
 ```
 
-```{ojs}
+```{ojs load-r-data}
 metricsTranspose = {
     return transpose(metrics_in).map(row => ({
         ...row,
@@ -217,17 +217,20 @@ fnCallsTranspose = {
         ...row,
     }));
 }
-gitlog_data_in = FileAttachment("results-gitlog.json").json();
-gitlogDataTranspose = gitlog_data_in.map(row => ({
+```
+
+```{ojs load-json-data}
+json_data = FileAttachment("results-json-data.json").json();
+gitlogDataTranspose = json_data['gitlog'].map(row => ({
     ...row,
     first_commit: new Date(row.first_commit)
 }));
 
-cranDataAll = FileAttachment("results-data-cran.json").json();
-not_cran_in = FileAttachment("results-not-cran.json").json();
-repos_on_r_univ = FileAttachment("data_is_on_r_univ.json").json();
-data_r_univ_jobs = FileAttachment("data_r_univ_jobs.json").json();
-data_r_univ_builds = FileAttachment("data_r_univ_builds.json").json();
+cranDataAll = json_data['cran'];
+not_cran_in = json_data['not_cran'];
+repos_on_r_univ = json_data['r_universe']['data_is_on_r_univ'];
+data_r_univ_jobs = json_data['r_universe']['r_univ_jobs'];
+data_r_univ_builds = json_data['r_universe']['r_univ_builds'];
 ```
 
 ```{ojs get-all-repos}

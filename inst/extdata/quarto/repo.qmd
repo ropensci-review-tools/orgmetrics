@@ -740,13 +740,15 @@ The first graph shows
 <q><a href=${url_chaoss_models} target="_blank">models</a></q>,
 which are aggregations of
 <a href=${url_chaoss_metrics} target="_blank">metrics</a>
-into conceptual or thematic groups.
+into conceptual or thematic groups, and the second provides more detail into
+individual metrics. All values are standardised between 0 and 1 such that
+higher values are always better than lower values.
 </div>`
 ```
 
 By default, the following charts of both models and metrics only show
 categories for which the repository is an outlier, defined as lying in the
-lower or upper 10% of all repositories. Clicking on the following button will
+lower or upper 20% of all repositories. Clicking on the following button will
 toggle to display all values.
 
 ```{ojs plot-latest}
@@ -788,8 +790,8 @@ metricsTextMap = rm_metrics.reduce((map, item) => {
 ```
 
 ```{ojs}
-// ------ load model data from R input and replace variables with text
-// ------ from repometrics JSON file.
+// ------ load metrics and models data from R input and replace variables with
+// ------ text from repometrics JSON file.
 
 modelsAll = {
     return transpose(models_in).map(row => ({
@@ -807,6 +809,14 @@ modelRepoAll = modelRepoVarnames.map(item => {
         name: modelsTextMap.has(key) ? modelsTextMap.get(key) : item.name
     }
 })
+
+metricsAll = metricsTranspose.map(item => {
+    const key = String(item.name);
+    return {
+        ...item,
+        name: metricsTextMap.has(key) ? metricsTextMap.get(key) : item.name
+    }
+})
 ```
 
 <!--- break --->
@@ -818,7 +828,7 @@ modelRepoFilt = outliersOnly === "true" ?
         return m.outlier === true;
     }) : modelRepoAll;
 model_repo_len = modelRepoFilt.length
-model_repo_ht_mult = model_repo_len < 10 ? 40 : 20
+model_repo_ht_mult = model_repo_len < 15 ? 40 : 20
 ```
 
 <!--- break --->
@@ -890,20 +900,21 @@ aggregate models.
 
 ```{ojs}
 metrics = outliersOnly === "true" ?
-    metricsTranspose.filter(function(m) {
+    metricsAll.filter(function(m) {
         return m.outlier === true;
-    }) : metricsTranspose;
+    }) : metricsAll;
 
 metrics_repo = metrics.filter(function(mod) {
     return mod.package === repo
 })
 metrics_repo_len = metrics_repo.length
+metrics_repo_ht_mult = metrics_repo_len < 15 ? 30 : 20
 ```
 
 
 ```{ojs plot-filtered-repo-metrics}
 Plot.plot({
-    height: model_repo_ht_mult * metrics_repo_len,
+    height: metrics_repo_ht_mult * metrics_repo_len,
     marginLeft: 60,
     marginRight: 160,
     marginTop: 50,

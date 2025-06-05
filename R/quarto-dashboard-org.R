@@ -8,13 +8,13 @@
 #' @param action One of "preview", to start and open a live preview of the
 #' dashboard website, or "render" to render a static version without previewing
 #' or opening.
-#' @param emb_matrix Matrix of embeddings between packages, returned from
-#' `rm_org_emb_distances()` function.
+#' @param similarities Matrix of cosine similarities from embeddings between
+#' packages, returned from `rm_org_emb_distances()` function.
 #' @return (Invisibly) Path to main "index.html" document of quarto site. Note
 #' that the site must be served with `action = "preview"`, and will not work by
 #' simply opening this "index.html" file.
 #' @export
-orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "preview") {
+orgmetrics_dashboard <- function (data_org, fn_calls, similarities, action = "preview") {
 
     # Suppress no visible binding notes:
     org <- package <- NULL
@@ -105,7 +105,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     jsonlite::write_json (data_json, fs::path (dir, "results-json-data.json"))
 
     saveRDS (fn_calls, fs::path (dir_data, "fn-calls.Rds"))
-    saveRDS (emb_matrix, fs::path (dir_data, "emb-matrix.Rds"))
+    saveRDS (similarities, fs::path (dir_data, "similarities.Rds"))
 
     withr::with_dir (dir, {
         do.call (eval (parse (text = quarto_action)), list ())

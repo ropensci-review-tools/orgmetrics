@@ -22,9 +22,9 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     action <- match.arg (action, c ("preview", "render"))
     quarto_action <- paste0 ("quarto::quarto_", action)
 
-    requireNamespace ("jsonlite")
-    requireNamespace ("quarto")
-    requireNamespace ("withr")
+    requireNamespace ("jsonlite", quietly = TRUE)
+    requireNamespace ("quarto", quietly = TRUE)
+    requireNamespace ("withr", quietly = TRUE)
 
     # -------- CHAOSS MODELS and METRICS: START -------
     data_models <- data_models_preprocess (data_org$models) |>

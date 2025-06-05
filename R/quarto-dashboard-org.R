@@ -60,11 +60,19 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
     attr (data_cran, "not_cran") <- NULL
     data_gitlog <- dashboard_data_gitlog (data_org)
     data_r_universe <- dashboard_data_r_universe (data_org)
+    rm_metrics_json <- system.file (
+        "extdata",
+        "metrics-models",
+        "metrics-models.json",
+        package = "repometrics"
+    )
+    rm_metrics_models <- jsonlite::read_json (rm_metrics_json, simplify = TRUE)
     data_json <- list (
         cran = data_cran,
         not_cran = not_cran,
         gitlog = data_gitlog,
-        r_universe = data_r_universe
+        r_universe = data_r_universe,
+        rm_metrics_models = rm_metrics_models
     )
 
     path_src <- system.file ("extdata", "quarto", package = "orgmetrics")

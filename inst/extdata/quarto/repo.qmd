@@ -763,9 +763,20 @@ viewof outliersOnly = Inputs.radio(
 )
 ```
 
+```{ojs}
+// -------- METRICS-MODELS.JSON FROM REPOMETRICS
+//
+// This file has the text definitions for all metrics & models variables
+rm_metrics_models = json_data['rm_metrics_models'];
+rm_models = rm_metrics_models['models_text'];
+```
+
+
+
 #### CHAOSS Models
 
 ```{ojs}
+// ------ load model data from R input
 models_all = {
     return transpose(models_in).map(row => ({
         ...row,
@@ -777,6 +788,13 @@ models_final = models_all.filter(function(mod) {
 model_repoAll = models_all.filter(function(mod) {
     return mod.package === repo && mod.name !== "final"
 })
+```
+
+
+<!--- break --->
+
+```{ojs}
+// ------ filter model data by optional outliersOnly
 model_repo = outliersOnly === "true" ?
     model_repoAll.filter(function(m) {
         return m.outlier === true;
@@ -784,6 +802,22 @@ model_repo = outliersOnly === "true" ?
 model_repo_len = model_repo.length
 model_repo_ht_mult = model_repo_len < 10 ? 40 : 20
 ```
+
+<!--- break --->
+
+```{ojs}
+// ------ replace model variables with text from repometrics JSON file
+textMap = new Map();
+rm_models.forEach(item => {
+    textMap.set(String(item.name), item.text);
+});
+model_repo.forEach(item => {
+    if (textMap.has(item.name)) {
+        item.name = textMap.get(item.name);
+    }
+})
+```
+<!--- break --->
 
 ```{ojs colour-scales}
 // Bar colours should be scaled to full data range, not just restricted range

@@ -814,12 +814,16 @@ metricsAll = metricsTranspose.map(item => {
 
 ```{ojs}
 // ------ filter model data by optional outliersOnly
+// The height of each bar is kept at 25, but `Plot.plot` sets top and bottom
+// margins of 50.
+
 modelRepoFilt = outliersOnly === "true" ?
     modelRepoAll.filter(function(m) {
         return m.outlier === true;
     }) : modelRepoAll;
-model_repo_len = modelRepoFilt.length
-model_repo_ht_mult = model_repo_len < 15 ? 40 : 20
+modelRepoLen = modelRepoFilt.length;
+oneBarHeight = 20;
+modelPlotHeight = modelRepoLen * oneBarHeight + 100;
 ```
 
 <!--- break --->
@@ -835,7 +839,7 @@ maxVal = Math.max(...fullScaleValues);
 
 ```{ojs plot-filtered-repo-models}
 Plot.plot({
-    height: model_repo_ht_mult * model_repo_len,
+    height: modelPlotHeight,
     marginLeft: 60,
     marginRight: 160,
     marginTop: 50,
@@ -895,17 +899,16 @@ metrics = outliersOnly === "true" ?
         return m.outlier === true;
     }) : metricsAll;
 
-metrics_repo = metrics.filter(function(mod) {
+metricsRepo = metrics.filter(function(mod) {
     return mod.package === repo
 })
-metrics_repo_len = metrics_repo.length
-metrics_repo_ht_mult = metrics_repo_len < 15 ? 30 : 20
+metricsPlotHeight = metricsRepo.length * oneBarHeight + 100;
 ```
 
 
 ```{ojs plot-filtered-repo-metrics}
 Plot.plot({
-    height: metrics_repo_ht_mult * metrics_repo_len,
+    height: metricsPlotHeight,
     marginLeft: 60,
     marginRight: 160,
     marginTop: 50,
@@ -918,13 +921,13 @@ Plot.plot({
     },
     y: { grid: true },
     marks: [
-        Plot.barX(metrics_repo, {
+        Plot.barX(metricsRepo, {
             y: "name",
             x: "value",
             sort: {y: "-x" },
             fill: "value",
         }),
-        Plot.barX(metrics_repo,
+        Plot.barX(metricsRepo,
             Plot.pointer(
             {
                 y: "name",
@@ -935,7 +938,7 @@ Plot.plot({
                 strokeWidth: 2,
             })
         ),
-        Plot.text(metrics_repo, {
+        Plot.text(metricsRepo, {
             x: (d) => d.value < 0 ? 0 : d.value,
             y: "name",
             text: "name",

@@ -180,6 +180,20 @@ fn_calls <- readRDS (fs::path ("data", "fn-calls.Rds"))$fn_calls |>
     dplyr::arrange (dplyr::desc (n), .by_group = TRUE) |>
     dplyr::ungroup () |>
     dplyr::rename (fn_name = name)
+
+# Re-ranking of embedding similarities:
+similarities <- readRDS (fs::path ("data", "similarities.Rds"))
+npkgs <- nrow (similarities [[1]])
+k <- 60
+ranks_each <- lapply (similarities, function (s) {
+    1 / (k + apply (s, 2, function (i) order (i, decreasing = TRUE)))
+})
+ranks <- lapply (seq_len (npkgs), function (i) {
+    ranks_i <- lapply (similarities, function (s) s [, i])
+    rowSums (do.call (cbind, ranks_i))
+})
+ranks <- do.call (rbind, ranks)
+rank_names <- colnames (similarities [[1]])
 ```
 
 ```{r ojs-in-metrics}
@@ -195,6 +209,8 @@ ojs_define (repo_metrics_in = repo_metrics_data)
 ojs_define (deps_in = deps)
 ojs_define (fn_calls_in = fn_calls)
 ojs_define (ctbs_in = data_ctbs)
+ojs_define (ranks_in = ranks)
+ojs_define (rank_names_in = rank_names)
 ```
 
 <!---
@@ -357,6 +373,29 @@ ctbs = {
 ctbs_gh = ctbs.map((ctb) => ctb['gh_handle']);
 ```
 
+
+<!---- break --->
+
+```{ojs}
+// Most similar packages from LLM embedding similarities
+rank_index = rank_names_in.indexOf(repo);
+rank_vector = ranks_in[rank_index];
+order_vector = Array
+    .from(rank_vector.keys())
+    .sort((a, b) => rank_vector[b] - rank_vector[a])
+    .filter(item => item !== rank_index);
+num_similar = 5
+order_vector_sub = order_vector.slice(0, num_similar);
+matched_names = order_vector_sub.map(i => rank_names_in[i]);
+
+similar_pkgs = matched_names.map(i => {
+    const url = (repo_src.filter(function(r) {
+        return r.package === i
+    }, i)[0] || {}).url || null;
+    return htl.html`<li><a href="${url}" target="_blank">${i}</a></li>`
+});
+```
+
 <!---- break --->
 
 ```{ojs}
@@ -497,12 +536,14 @@ htl.html`<ul>
 ::::{.g-col-12 .g-col-md-6}
 <div class="card" style="background: linear-gradient(to bottom, #00cc66 0%, #33ccff 100%); text-align:center;">
 <img src="bs-icons/chat-square-heart.svg" alt="Bootstrap" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
-<h2 style="margin-top:-20px;">Popularity</h2>
+<h2 style="margin-top:-20px;">Popularity &#38;<br>GitHub Activity</h2>
 <div style="text-align:left;">
 ```{ojs}
 htl.html`<ul>
     <li>${stars_forks} GitHub stars and forks</li>
     <li>${num_dl} CRAN downloads</li>
+    <li>${issue_count}</li>
+    <li>${issue_cmt_txt}</li>
 </ul>`
 ```
 </div>
@@ -513,14 +554,15 @@ htl.html`<ul>
 ::::{.g-col-12 .g-col-md-6}
 <div class="card" style="background: linear-gradient(to bottom, #00cc66 0%, #33ccff 100%); text-align:center;">
 <img src="bs-icons/github.svg" alt="Bootstrap" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
-<h2 style="margin-top:-20px;">GitHub Activity</h2>
+<h2 style="margin-top:-20px;">Similar Packages</h2>
 <div style="text-align:left;">
+<div style="margin-left: 10px;">The five most similar packages are:</div>
 ```{ojs}
-htl.html`<ul>
-    <li>${issue_count}</li>
-    <li>${issue_cmt_txt}</li>
-</ul>`
+htl.html`<ul>${similar_pkgs}</ul>`
 ```
+<div style="margin-left:10px; margin-top:-15px; margin-right:20px; font-size:14px; white-space:normal;">
+(Assessed from similarities between language model embedding vectors.)
+</div>
 </div>
 </div>
 ::::

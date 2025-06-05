@@ -763,7 +763,6 @@ viewof outliersOnly = Inputs.radio(
 )
 ```
 
-
 #### CHAOSS Models
 
 ```{ojs}
@@ -779,8 +778,12 @@ viewof outliersOnly = Inputs.radio(
 
 rm_metrics_models = json_data['rm_metrics_models'];
 rm_models = rm_metrics_models['models_text'];
+rm_metrics = rm_metrics_models['metrics'];
 modelsTextMap = rm_models.reduce((map, item) => {
     return map.set(String(item.name), item.text);
+}, new Map());
+metricsTextMap = rm_metrics.reduce((map, item) => {
+    return map.set(String(item.name), item.airtable_name);
 }, new Map());
 ```
 
@@ -788,19 +791,16 @@ modelsTextMap = rm_models.reduce((map, item) => {
 // ------ load model data from R input and replace variables with text
 // ------ from repometrics JSON file.
 
-models_all = {
+modelsAll = {
     return transpose(models_in).map(row => ({
         ...row,
     }));
 }
-models_final = models_all.filter(function(mod) {
-    return mod.name === "final"
-})
-model_repoAll_varnames = models_all.filter(function(mod) {
+modelRepoVarnames = modelsAll.filter(function(mod) {
     return mod.package === repo && mod.name !== "final"
 })
 
-model_repoAll = model_repoAll_varnames.map(item => {
+modelRepoAll = modelRepoVarnames.map(item => {
     const key = String(item.name);
     return {
         ...item,
@@ -813,11 +813,11 @@ model_repoAll = model_repoAll_varnames.map(item => {
 
 ```{ojs}
 // ------ filter model data by optional outliersOnly
-model_repo = outliersOnly === "true" ?
-    model_repoAll.filter(function(m) {
+modelRepoFilt = outliersOnly === "true" ?
+    modelRepoAll.filter(function(m) {
         return m.outlier === true;
-    }) : model_repoAll;
-model_repo_len = model_repo.length
+    }) : modelRepoAll;
+model_repo_len = modelRepoFilt.length
 model_repo_ht_mult = model_repo_len < 10 ? 40 : 20
 ```
 
@@ -826,7 +826,7 @@ model_repo_ht_mult = model_repo_len < 10 ? 40 : 20
 ```{ojs colour-scales}
 // Bar colours should be scaled to full data range, not just restricted range
 // of filtered data.
-fullScaleValues = model_repoAll.map(d => d.value);
+fullScaleValues = modelRepoAll.map(d => d.value);
 minVal = Math.min(...fullScaleValues);
 maxVal = Math.max(...fullScaleValues);
 ```
@@ -847,13 +847,13 @@ Plot.plot({
     },
     y: { grid: true },
     marks: [
-        Plot.barX(model_repo, {
+        Plot.barX(modelRepoFilt, {
             y: "name",
             x: "value",
             sort: {y: "-x" },
             fill: "value",
         }),
-        Plot.barX(model_repo,
+        Plot.barX(modelRepoFilt,
             Plot.pointer(
             {
                 y: "name",
@@ -864,7 +864,7 @@ Plot.plot({
                 strokeWidth: 2,
             })
         ),
-        Plot.text(model_repo, {
+        Plot.text(modelRepoFilt, {
             x: (d) => d.value < 0 ? 0 : d.value,
             y: "name",
             text: "name",

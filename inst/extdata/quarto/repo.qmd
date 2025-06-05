@@ -290,7 +290,10 @@ s = localStorage.setItem("orgmetricsRepo", repo.toString());
 repoURL = repo_src.filter(function(r) {
     return r.package === repo
 })[0].url;
-htl.html`<div>Click here for the source code of the <a href=${repoURL} target="_blank">${repo} repository</a>.</div>`
+htl.html`<div>
+Click here for the source code of the
+<a href=${repoURL} target="_blank"><i>${repo}</i> repository</a>.
+</div>`
 ```
 
 <!---- break --->
@@ -721,14 +724,30 @@ all values are shown ("false").
 
 
 
-## CHAOSS models
+## CHAOSS metrics and models
 
-This first graph shows scores for the various [CHAOSS (*Community Health
-Analytics in Open Source Software*)
-models](https://chaoss.community/kbtopic/all-metrics-models/) for a selected
-repository. Each of these models is an aggregation of several underlying
-[metrics](https://chaoss.community/kbtopic/all-metrics/), which can be examined
-in the following sub-section.
+```{ojs}
+url_chaoss = "https://chaoss.community/kb-metrics-and-metrics-models/";
+url_chaoss_models = "https://chaoss.community/kbtopic/all-metrics-models/";
+url_chaoss_metrics = "https://chaoss.community/kbtopic/all-metrics/";
+
+htl.html`<div>
+This section highlights important <a href="${url_chaoss}" target="_blank">
+CHAOSS (<i> Community Health Analytics in Open Source Software</i>)</a> metrics
+and models for the
+<a href=${repoURL} target="_blank"><i>${repo}</i> repository</a>.
+The first graph shows
+<q><a href=${url_chaoss_models} target="_blank">models</a></q>,
+which are aggregations of
+<a href=${url_chaoss_metrics} target="_blank">metrics</a>
+into conceptual or thematic groups.
+</div>`
+```
+
+By default, the following charts of both models and metrics only show
+categories for which the repository is an outlier, defined as lying in the
+lower or upper 10% of all repositories. Clicking on the following button will
+toggle to display all values.
 
 ```{ojs plot-latest}
 Plot = import("https://esm.sh/@observablehq/plot");
@@ -743,6 +762,8 @@ viewof outliersOnly = Inputs.radio(
     }
 )
 ```
+
+#### CHAOSS Models
 
 ```{ojs}
 models_all = {
@@ -761,7 +782,7 @@ model_repo = outliersOnly === "true" ?
         return m.outlier === true;
     }) : model_repoAll;
 model_repo_len = model_repo.length
-model_repo_ht_mult = model_repo_len < 10 ? 80 : 40
+model_repo_ht_mult = model_repo_len < 10 ? 40 : 20
 ```
 
 ```{ojs colour-scales}
@@ -822,7 +843,7 @@ Plot.plot({
 })
 ```
 
-## CHAOSS metrics
+#### CHAOSS metrics
 
 This graph provides more detailed insight into the state of the selected
 repository, through showing values for individual [CHAOSS
@@ -844,7 +865,7 @@ metrics_repo_len = metrics_repo.length
 
 ```{ojs plot-filtered-repo-metrics}
 Plot.plot({
-    height: 40 * metrics_repo_len,
+    height: model_repo_ht_mult * metrics_repo_len,
     marginLeft: 60,
     marginRight: 160,
     marginTop: 50,

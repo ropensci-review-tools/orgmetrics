@@ -708,20 +708,6 @@ has_fn_calls ? Inputs.table(fn_calls, {
 }) : htl.html`<div></div>`;
 ```
 
------
-
-This page identifies maintenance priorities for a selected repository, in
-terms of both [CHAOSS
-models](https://chaoss.community/kbtopic/all-metrics-models/), and the
-individual [CHAOSS metrics](https://chaoss.community/kbtopic/all-metrics/)
-which comprise those models. In its present state, this is mostly a
-proof-of-concept, and is not as well developed as the accompanying
-[*Organizational Maintenance* page](./org.html).
-
-The "Outliers only" selector immediate below determines whether values shown
-for both models and metrics are outliers only (default of "true"), or whether
-all values are shown ("false").
-
 
 
 ## CHAOSS metrics and models
@@ -748,8 +734,13 @@ higher values are always better than lower values.
 
 By default, the following charts of both models and metrics only show
 categories for which the repository is an outlier, defined as lying in the
-lower or upper 20% of all repositories. Clicking on the following button will
-toggle to display all values.
+lower or upper 10% of all repositories. Note that these outlier proportions
+depend on distributions of values measured across all repositories, and will
+generally not correspond values beyond the limits of \[10, 90\]% on the scale
+shown. For example, values for metrics of models may be very concentrated
+around 0.5 with only a very few extreme values. The lower 10% of values may,
+for example, be all those below a value of 0.4. Clicking on the following
+button will toggle to display all values.
 
 ```{ojs plot-latest}
 Plot = import("https://esm.sh/@observablehq/plot");

@@ -763,20 +763,31 @@ viewof outliersOnly = Inputs.radio(
 )
 ```
 
-```{ojs}
-// -------- METRICS-MODELS.JSON FROM REPOMETRICS
-//
-// This file has the text definitions for all metrics & models variables
-rm_metrics_models = json_data['rm_metrics_models'];
-rm_models = rm_metrics_models['models_text'];
-```
-
-
 
 #### CHAOSS Models
 
 ```{ojs}
-// ------ load model data from R input
+// -------- METRICS-MODELS.JSON FROM REPOMETRICS
+//
+// This file has the text definitions for all metrics & models variables, and
+// used to construct a textMap to replace variable names by text from that
+// file. Note that this needs to use `reduce` to be explicitly assigned to a
+// return value so that Observable executes everything in the expected order.
+// Alternatives like initially constructing an empty map and then implicitly
+// filling with a `forEach` are not correctly executed in the expected
+// sequence.
+
+rm_metrics_models = json_data['rm_metrics_models'];
+rm_models = rm_metrics_models['models_text'];
+modelsTextMap = rm_models.reduce((map, item) => {
+    return map.set(String(item.name), item.text);
+}, new Map());
+```
+
+```{ojs}
+// ------ load model data from R input and replace variables with text
+// ------ from repometrics JSON file.
+
 models_all = {
     return transpose(models_in).map(row => ({
         ...row,
@@ -785,11 +796,18 @@ models_all = {
 models_final = models_all.filter(function(mod) {
     return mod.name === "final"
 })
-model_repoAll = models_all.filter(function(mod) {
+model_repoAll_varnames = models_all.filter(function(mod) {
     return mod.package === repo && mod.name !== "final"
 })
-```
 
+model_repoAll = model_repoAll_varnames.map(item => {
+    const key = String(item.name);
+    return {
+        ...item,
+        name: modelsTextMap.has(key) ? modelsTextMap.get(key) : item.name
+    }
+})
+```
 
 <!--- break --->
 
@@ -803,20 +821,6 @@ model_repo_len = model_repo.length
 model_repo_ht_mult = model_repo_len < 10 ? 40 : 20
 ```
 
-<!--- break --->
-
-```{ojs}
-// ------ replace model variables with text from repometrics JSON file
-textMap = new Map();
-rm_models.forEach(item => {
-    textMap.set(String(item.name), item.text);
-});
-model_repo.forEach(item => {
-    if (textMap.has(item.name)) {
-        item.name = textMap.get(item.name);
-    }
-})
-```
 <!--- break --->
 
 ```{ojs colour-scales}

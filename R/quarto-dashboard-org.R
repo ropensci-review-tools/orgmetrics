@@ -17,7 +17,7 @@
 orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "preview") {
 
     # Suppress no visible binding notes:
-    org <- package <- name <- login <- contributions <- result <- NULL
+    org <- package <- NULL
 
     action <- match.arg (action, c ("preview", "render"))
     quarto_action <- paste0 ("quarto::quarto_", action)
@@ -114,6 +114,9 @@ orgmetrics_dashboard <- function (data_org, fn_calls, emb_matrix, action = "prev
 
 dashboard_data_repo_metrics <- function (data_metrics, dates) {
 
+    # Suppress no visible binding notes:
+    org <- package <- date <- name <- NULL
+
     # Repo summaries for repo page:
     repo_summary_vars <- c (
         "change_req_n_opened",
@@ -150,6 +153,9 @@ dashboard_data_repo_metrics <- function (data_metrics, dates) {
 
 dashboard_data_contributors <- function (data_org) {
 
+    # Suppress no visible binding notes:
+    name <- login <- contributions <- NULL
+
     data_contributors <- lapply (data_org$repos, function (repo) {
         ctbs_gh <- repo$rm$contribs_from_gh_api |>
             dplyr::select (login, name, contributions)
@@ -175,6 +181,9 @@ dashboard_data_repo_source <- function (data_org) {
 }
 
 dashboard_data_cran <- function (data_org) {
+
+    # Suppress no visible binding notes:
+    result <- NULL
 
     data_cran <- lapply (data_org$repos, function (i) {
         if (!inherits (i$cran_checks, "data.frame")) {

@@ -10,9 +10,27 @@ format:
 ---
 
 <!---
-******** START UTILITY FUNCTIONS ********
+******** STRUCTURE OF THIS FILE: ********
+1. Utility functions
+2. R pre-processing functions
+3. R -> js conversion
+4. Read js data
+5. Repo selector
+6. Filter repo data
+7. Text strings for cards
+    (---start of displayed content---)
+8. CARDS GRID (2-by-2 layout)
+9. Pkgcheck summary
+10. R-universe summary
+11. Cran summary
+12. Statistical properties
+13. Function usage
+    (---end of displayed content---)
 --->
 
+<!---
+******** 1. START UTILITY FUNCTIONS ********
+--->
 
 ```{ojs}
 function sparkbar(max) {
@@ -33,7 +51,11 @@ function sparkbar(max) {
 ```
 
 <!---
-******** END UTILITY FUNCTIONS ********
+******** 1. END UTILITY FUNCTIONS ********
+--->
+
+<!---
+******** 2. START R PRE-PROCESSING FUNCTIONS ********
 --->
 
 ```{r load-pkg, echo = FALSE, message = FALSE}
@@ -173,15 +195,15 @@ ojs_define (repo_metrics_in = repo_metrics_data)
 ojs_define (deps_in = deps)
 ojs_define (fn_calls_in = fn_calls)
 ojs_define (ctbs_in = data_ctbs)
-# ojs_define (cran_data_in = cran_data)
-# ojs_define (not_cran_in = not_cran)
 ```
 
-```{ojs plot-latest}
-Plot = import("https://esm.sh/@observablehq/plot");
-```
+<!---
+******** 2. END R PRE-PROCESSING FUNCTIONS ********
+--->
 
 ```{ojs load-r-data}
+// -------- 3. R -> JS CONVERSION
+
 metricsTranspose = {
     return transpose(metrics_in).map(row => ({
         ...row,
@@ -219,7 +241,10 @@ fnCallsTranspose = {
 }
 ```
 
+<!---- break --->
+
 ```{ojs load-json-data}
+// -------- 4. READ JS DATA
 json_data = FileAttachment("results-json-data.json").json();
 gitlogDataTranspose = json_data['gitlog'].map(row => ({
     ...row,
@@ -233,7 +258,12 @@ data_r_univ_jobs = json_data['r_universe']['r_univ_jobs'];
 data_r_univ_builds = json_data['r_universe']['r_univ_builds'];
 ```
 
+
+<!---- break --->
+
 ```{ojs get-all-repos}
+// -------- 5. REPO SELECTOR
+// This can also be set via localStorage in org page
 // Get array of unique repo names for input selector:
 reposAll = metricsTranspose.map(function(item) {
     return item.package;
@@ -251,6 +281,8 @@ viewof repo = Inputs.select(
 s = localStorage.setItem("orgmetricsRepo", repo.toString());
 ```
 
+<!---- break --->
+
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
 ```{ojs}
@@ -258,12 +290,16 @@ s = localStorage.setItem("orgmetricsRepo", repo.toString());
 repoURL = repo_src.filter(function(r) {
     return r.package === repo
 })[0].url;
-htl.html`<div>Click here to see the <a href=${repoURL} target="_blank">${repo} repository</a>.</div>`
+htl.html`<div>Click here for the source code of the <a href=${repoURL} target="_blank">${repo} repository</a>.</div>`
 ```
+
+<!---- break --->
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
 ```{ojs}
+// -------- 6. FILTER REPO DATA
+
 ctb_abs = ctb_absTranspose.filter(function(r) {
     return r.repo === repo
 })
@@ -302,6 +338,8 @@ r_univ_page = repos_on_r_univ.filter(function(r) {
 })
 ```
 
+<!---- break --->
+
 ```{ojs}
 repoMetrics = {
     return transpose(repo_metrics_in[repo]).map(row => ({
@@ -314,6 +352,12 @@ ctbs = {
     }))
 }
 ctbs_gh = ctbs.map((ctb) => ctb['gh_handle']);
+```
+
+<!---- break --->
+
+```{ojs}
+// -------- 7. TEXT STRINGS FOR CARDS
 
 function pluraliseObjects(x, what) {
     if (x === 0) {
@@ -400,6 +444,9 @@ revdeps_in_org = revdeps.length > 0 ?
 revdeps_list_txt = revdeps.length > 0 ? htl.html`<ul>${revdeps_list}</ul>` : undefined;
 ```
 
+<!---
+******** 8. START CARDS GRID (2-by-2 layout)********
+--->
 
 :::{.grid}
 
@@ -477,8 +524,14 @@ htl.html`<ul>
 
 :::
 
+<!---
+******** 8. END CARDS GRID (2-by-2 layout)********
+--->
+
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
+
+<!-------- 9. PKGCHECK SUMMARY -------->
 
 ## pkgcheck Summary
 
@@ -501,6 +554,8 @@ htl.html`
     <li>${unescapeHtml(item)}</li>
   </ul>`)}</div>`
 ```
+
+<!-------- 10. R-UNIVERSE SUMMARY -------->
 
 ## R-universe summary
 
@@ -552,6 +607,8 @@ is_on_r_univ && !build_checks_okay?
     }) : htl.html`<div></div>`;
 ```
 
+<!-------- 11. CRAN SUMMARY -------->
+
 ## CRAN Summary
 
 ```{ojs}
@@ -572,6 +629,8 @@ has_cran_data ?
         }
     }) : htl.html`<div></div>`;
 ```
+
+<!-------- 12. STATISTICAL PROPERTIES -------->
 
 ## Statistical properties
 
@@ -619,6 +678,8 @@ Inputs.table(pkgStatsData, {
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
+<!-------- 13. FUNCTION USAGE -------->
+
 ## Function usage in other packages
 
 ```{ojs}
@@ -646,7 +707,6 @@ has_fn_calls ? Inputs.table(fn_calls, {
 
 -----
 
-
 This page identifies maintenance priorities for a selected repository, in
 terms of both [CHAOSS
 models](https://chaoss.community/kbtopic/all-metrics-models/), and the
@@ -669,6 +729,10 @@ models](https://chaoss.community/kbtopic/all-metrics-models/) for a selected
 repository. Each of these models is an aggregation of several underlying
 [metrics](https://chaoss.community/kbtopic/all-metrics/), which can be examined
 in the following sub-section.
+
+```{ojs plot-latest}
+Plot = import("https://esm.sh/@observablehq/plot");
+```
 
 ```{ojs}
 viewof outliersOnly = Inputs.radio(

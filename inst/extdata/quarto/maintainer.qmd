@@ -43,7 +43,12 @@ these_pkgs_list = these_pkgs.map(i => {
     const url = (repo_src.filter(function(r) {
         return r.package === i
     }, i)[0] || {}).url || null;
-    return htl.html`<li><a href="${url}" target="_blank">${i}</a></li>`
+    return htl.html`
+<li>
+<div onclick=${() => localStorage.setItem('orgmetricsRepo', i)}>
+<a href="/repo.html">${i}</a>
+</div>
+</li>`
 });
 
 these_cos = comaintainers[maintainer] || null

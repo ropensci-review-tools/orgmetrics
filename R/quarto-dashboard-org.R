@@ -67,26 +67,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, similarities, action = "pr
         package = "repometrics"
     )
     rm_metrics_models <- jsonlite::read_json (rm_metrics_json, simplify = TRUE)
-    # data_contributors is package-based; this inverts to be maintainer-based:
-    data_maintainers <- do.call (rbind, data_contributors)
-    pkgs <- gsub ("\\.[0-9]+$", "", rownames (data_maintainers))
-    rownames (data_maintainers) <- NULL
-    data_maintainers$package <- pkgs
-    maintainer_pkgs <- data_maintainers |>
-        dplyr::arrange (gh_handle, package) |>
-        dplyr::filter (!is.na (gh_handle)) |>
-        dplyr::select (gh_handle, package)
-    maintainer_pkgs <- lapply (split (
-        maintainer_pkgs,
-        f = as.factor (maintainer_pkgs$gh_handle)
-    ), function (m) unique (m$package))
-    comaintainers <- data_maintainers |>
-        dplyr::filter (!is.na (gh_handle)) |>
-        dplyr::arrange (package)
-    comaintainers <- lapply (split (
-        comaintainers,
-        f = as.factor (comaintainers$package)
-    ), function (m) unique (m$gh_handle))
+    maintainers <- databoard_data_maintainers (data_contributors)
 
     data_json <- list (
         cran = data_cran,
@@ -94,8 +75,8 @@ orgmetrics_dashboard <- function (data_org, fn_calls, similarities, action = "pr
         gitlog = data_gitlog,
         r_universe = data_r_universe,
         rm_metrics_models = rm_metrics_models,
-        maintainer_pkgs = maintainer_pkgs,
-        comaintainers = comaintainers
+        maintainer_pkgs = maintainers$maintainers,
+        comaintainers = maintainers$comaintainers
     )
 
     path_src <- system.file ("extdata", "quarto", package = "orgmetrics")
@@ -278,5 +259,51 @@ dashboard_data_r_universe <- function (data_org) {
         data_is_on_r_univ = data_is_on_r_univ,
         r_univ_jobs = r_univ_jobs,
         r_univ_builds = r_univ_builds
+    )
+}
+
+# data_contributors is package-based; this inverts to be maintainer-based:
+databoard_data_maintainers <- function (data_contributors) {
+
+    data_maintainers <- do.call (rbind, data_contributors)
+    pkgs <- gsub ("\\.[0-9]+$", "", rownames (data_maintainers))
+    rownames (data_maintainers) <- NULL
+    data_maintainers$package <- pkgs
+
+    maintainer_pkgs <- data_maintainers |>
+        dplyr::arrange (gh_handle, package) |>
+        dplyr::filter (!is.na (gh_handle)) |>
+        dplyr::select (gh_handle, package)
+    maintainer_pkgs_json <- lapply (split (
+        maintainer_pkgs,
+        f = as.factor (maintainer_pkgs$gh_handle)
+    ), function (m) unique (m$package))
+
+    comaintainers <- maintainer_pkgs |>
+        dplyr::filter (!is.na (gh_handle)) |>
+        dplyr::arrange (package) |>
+        dplyr::select (gh_handle, package) |>
+        dplyr::distinct ()
+    comaintainers <- lapply (split (
+        comaintainers,
+        f = as.factor (comaintainers$package)
+    ), function (m) {
+        if (nrow (m) < 2L) {
+            return (NULL)
+        }
+        t (combn (unique (m$gh_handle), 2L))
+    })
+    comaintainers <- do.call (rbind, comaintainers) |>
+        data.frame () |>
+        dplyr::distinct () |>
+        dplyr::arrange (X1)
+    comaintainers_json <- lapply (split (
+        comaintainers,
+        f = as.factor (comaintainers$X1)
+    ), function (i) i$X2)
+
+    list (
+        maintainers = maintainer_pkgs_json,
+        comaintainers = comaintainers_json
     )
 }

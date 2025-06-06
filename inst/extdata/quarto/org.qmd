@@ -77,8 +77,8 @@ function pkgfmt(pkg) {
 
     th.addEventListener("click", () => {
         localStorage.setItem("orgmetricsRepo", pkg);
-        th.style.background = "#a0f8ff";
-        window.location.href = "/repo.html";
+        th.style.background="#a0f8ff";
+        window.location.href="/repo.html";
     });
 
     return th;

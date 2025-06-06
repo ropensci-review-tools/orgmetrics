@@ -9,6 +9,7 @@ website:
     left:
       - org.qmd
       - repo.qmd
+      - maintainer.qmd
       - models.qmd
       - network.qmd
     right:

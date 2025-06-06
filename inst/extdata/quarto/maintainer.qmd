@@ -1,0 +1,71 @@
+---
+title: "Maintainers"
+execute:
+  echo: false
+format: 
+  html:
+    fig-width: 8
+    fig-height: 4
+    code-fold: false
+---
+
+
+```{ojs}
+maintainer = localStorage.getItem("orgmetricsMaintainer") || null;
+htl.html`<div>Maintainers page for <a href="https://github.com/${maintainer}" target="_blank">${maintainer}</a>.</div>`
+```
+
+<!---- break --->
+
+```{r load-data}
+data_repo_src <- readRDS (fs::path ("data", "results-data-repo-src.Rds"))
+ojs_define (repo_src_in = data_repo_src)
+```
+
+```{ojs load-json-data}
+// -------- READ JS DATA
+repo_src = {
+    return transpose(repo_src_in).map(row => ({
+        ...row,
+    }));
+}
+json_data = FileAttachment("results-json-data.json").json();
+maintainer_pkgs = json_data['maintainer_pkgs'];
+comaintainers = json_data['comaintainers'];
+```
+
+<!---- break --->
+
+```{ojs extract-maintainer-data}
+these_pkgs = maintainer_pkgs[maintainer] || null;
+
+these_pkgs_list = these_pkgs.map(i => {
+    const url = (repo_src.filter(function(r) {
+        return r.package === i
+    }, i)[0] || {}).url || null;
+    return htl.html`
+<li>
+<div onclick=${() => localStorage.setItem('orgmetricsRepo', i)}>
+<a href="/repo.html">${i}</a>
+</div>
+</li>`
+});
+
+these_cos = comaintainers[maintainer] || null
+these_cos_list = these_cos.map(i => htl.html`
+<li><a href="https://github.com/${i}" target="_blank">${i}</a></li>
+`)
+```
+
+## Packages
+
+```{ojs packages-list}
+htl.html`<ul>${these_pkgs_list}</ul>`
+```
+
+
+## Co-Maintainers
+
+```{ojs comaintainers-list}
+htl.html`<ul>${these_cos_list}</ul>`
+```

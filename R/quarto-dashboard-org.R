@@ -54,7 +54,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, similarities, action = "pr
     data_pkgcheck <- lapply (data_org$repos, function (i) i$pkgcheck)
 
     # -------- ADDITIONAL DATA IN JSON -------
-    # All saved as single JSON structure; only used in 'repo.qmd'
+    # All saved as single JSON structure; only used in 'repo.qmd' and 'maintainer.qmd'
     data_cran <- dashboard_data_cran (data_org)
     not_cran <- gsub ("^.*\\/", "", attr (data_cran, "not_cran"))
     attr (data_cran, "not_cran") <- NULL
@@ -67,12 +67,35 @@ orgmetrics_dashboard <- function (data_org, fn_calls, similarities, action = "pr
         package = "repometrics"
     )
     rm_metrics_models <- jsonlite::read_json (rm_metrics_json, simplify = TRUE)
+    # data_contributors is package-based; this inverts to be maintainer-based:
+    data_maintainers <- do.call (rbind, data_contributors)
+    pkgs <- gsub ("\\.[0-9]+$", "", rownames (data_maintainers))
+    rownames (data_maintainers) <- NULL
+    data_maintainers$package <- pkgs
+    maintainer_pkgs <- data_maintainers |>
+        dplyr::arrange (gh_handle, package) |>
+        dplyr::filter (!is.na (gh_handle)) |>
+        dplyr::select (gh_handle, package)
+    maintainer_pkgs <- lapply (split (
+        maintainer_pkgs,
+        f = as.factor (maintainer_pkgs$gh_handle)
+    ), function (m) unique (m$package))
+    comaintainers <- data_maintainers |>
+        dplyr::filter (!is.na (gh_handle)) |>
+        dplyr::arrange (package)
+    comaintainers <- lapply (split (
+        comaintainers,
+        f = as.factor (comaintainers$package)
+    ), function (m) unique (m$gh_handle))
+
     data_json <- list (
         cran = data_cran,
         not_cran = not_cran,
         gitlog = data_gitlog,
         r_universe = data_r_universe,
-        rm_metrics_models = rm_metrics_models
+        rm_metrics_models = rm_metrics_models,
+        maintainer_pkgs = maintainer_pkgs,
+        comaintainers = comaintainers
     )
 
     path_src <- system.file ("extdata", "quarto", package = "orgmetrics")

@@ -9,4 +9,8 @@ format:
     code-fold: false
 ---
 
-Maintainers page
+
+```{ojs}
+maintainer = localStorage.getItem("orgmetricsMaintainer") || null;
+htl.html`<div>Maintainers page for <a href="https://github.com/${maintainer}" target="_blank">${maintainer}</a>.</div>`
+```

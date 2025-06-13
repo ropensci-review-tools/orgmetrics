@@ -48,7 +48,8 @@ s = localStorage.setItem("orgmetricsMaintainer", maintainer.toString());
 ```{ojs extract-maintainer-data}
 these_pkgs = maintainer_pkgs[maintainer] || null;
 
-these_pkgs_list = these_pkgs.map(i => {
+these_pkgs_list = these_pkgs ?
+these_pkgs.map(i => {
     const url = (repo_src.filter(function(r) {
         return r.package === i
     }, i)[0] || {}).url || null;
@@ -58,12 +59,13 @@ these_pkgs_list = these_pkgs.map(i => {
 <a href="/repo.html">${i}</a>
 </div>
 </li>`
-});
+}) : htl.html`<li>No packages listed</li>`;
 
 these_cos = comaintainers[maintainer] || null
-these_cos_list = these_cos.map(i => htl.html`
+these_cos_list = these_cos ?
+these_cos.map(i => htl.html`
 <li><a href="https://github.com/${i}" target="_blank">${i}</a></li>
-`)
+`) : htl.html`<li>No co-maintainers</li>`;
 ```
 
 ## Packages

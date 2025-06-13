@@ -10,13 +10,6 @@ format:
 ---
 
 
-```{ojs}
-maintainer = localStorage.getItem("orgmetricsMaintainer") || null;
-htl.html`<div>Maintainers page for <a href="https://github.com/${maintainer}" target="_blank">${maintainer}</a>.</div>`
-```
-
-<!---- break --->
-
 ```{r load-data}
 data_repo_src <- readRDS (fs::path ("data", "results-data-repo-src.Rds"))
 ojs_define (repo_src_in = data_repo_src)
@@ -32,6 +25,22 @@ repo_src = {
 json_data = FileAttachment("results-json-data.json").json();
 maintainer_pkgs = json_data['maintainer_pkgs'];
 comaintainers = json_data['comaintainers'];
+maintainers = Object.keys(maintainer_pkgs);
+```
+
+<!---- break --->
+
+```{ojs maintainer-select}
+maintainerSet = localStorage.getItem("orgmetricsMaintainer") || maintainers[0];
+viewof maintainer = Inputs.select(
+    maintainers,
+    {
+        multiple: false,
+        value: maintainerSet,
+        label: htl.html`<b>Maintainer:</b>`
+    }
+)
+s = localStorage.setItem("orgmetricsMaintainer", maintainer.toString());
 ```
 
 <!---- break --->

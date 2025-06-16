@@ -92,10 +92,16 @@ htl.html`<ul>${these_cos_list}</ul>`
 
 ```{ojs network-in}
 // Connect co-maintainers to all of their packages:
-pkgs_expanded_full = these_cos.map(i => maintainer_pkgs[i]).flat();
+co_pkgs = these_cos ? these_cos.map(i => maintainer_pkgs[i]).flat() : [];
+pkgs_expanded_full = [
+    ...these_pkgs,
+    ...co_pkgs
+];
 // Reduce to unique pkgs:
 pkgs_expanded = [...new Set(pkgs_expanded_full)];
 
+co_nodes = these_cos ?
+    these_cos.map(item => ({ id: item, group: "Co-maintainer", size: 6 })) : [];
 nodes = [
     { id: maintainer, group: "Maintainer", size: 10 },
     ...pkgs_expanded.map(item => ({
@@ -103,19 +109,19 @@ nodes = [
         group: these_pkgs.includes(item) ? "packages" : "otherPackages",
         size: these_pkgs.includes(item) ? 8 : 4,
     })),
-    ...these_cos.map(item => ({ id: item, group: "Co-maintainer", size: 6 }))
+    ...co_nodes
 ];
 
 // edges are mappings from co-maintainers to all packages. First collect list
 // of all packages from co-maintainers:
-these_co_pkgs = these_cos.reduce((acc, key) => {
+these_co_pkgs = these_cos ? these_cos.reduce((acc, key) => {
     if (maintainer_pkgs.hasOwnProperty(key)) {
         if (!these_pkgs.includes(key)) {
             acc[key] = maintainer_pkgs[key];
         }
     }
     return acc;
-}, {});
+}, {}) : [];
 // Then flatten that to (source, target) pairs of (maintainer, package):
 these_co_pkgs_flat = Object.entries(these_co_pkgs).flatMap(([source, targets]) =>
     targets.map(target => ({ source, target }))

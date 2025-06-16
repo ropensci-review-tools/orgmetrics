@@ -298,6 +298,13 @@ chart = {
         .attr("x", 8)
         .attr("y", "0.31em")
         .text(d => d.id)
+        .html(d => d.group === "Co-maintainer" ?
+            `<a href="/maintainer.html"
+                onclick="localStorage.setItem('orgmetricsMaintainer', '${d.id}')">${d.id}</a>` :
+            ((d.group === "packages" || d.group === "otherPackages") ?
+                `<a href="/repo.html"
+                    onclick="localStorage.setItem('orgmetricsRepo', '${d.id}')">${d.id}</a>` :
+            d.id))
         .clone(true).lower()
             .attr("fill", "none")
             .attr("stroke", "white")

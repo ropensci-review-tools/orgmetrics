@@ -97,13 +97,13 @@ pkgs_expanded_full = these_cos.map(i => maintainer_pkgs[i]).flat();
 pkgs_expanded = [...new Set(pkgs_expanded_full)];
 
 nodes = [
-    { id: maintainer, group: "maintainer", num_calls: 1 },
+    { id: maintainer, group: "Maintainer", size: 10 },
     ...pkgs_expanded.map(item => ({
         id: item,
-        group: these_pkgs.includes(item) ? "core" : "package",
-        num_calls: 2
+        group: these_pkgs.includes(item) ? "packages" : "otherPackages",
+        size: these_pkgs.includes(item) ? 8 : 4,
     })),
-    ...these_cos.map(item => ({ id: item, group: "maintainer", num_calls: 1 }))
+    ...these_cos.map(item => ({ id: item, group: "Co-maintainer", size: 6 }))
 ];
 
 // edges are mappings from co-maintainers to all packages. First collect list
@@ -122,10 +122,10 @@ these_co_pkgs_flat = Object.entries(these_co_pkgs).flatMap(([source, targets]) =
 );
 links = [
     ...these_pkgs.map(item => ({
-        source: maintainer, target: item, value: 2, type: "direct"
+        source: maintainer, target: item, value: 4
     })),
     ...these_co_pkgs_flat.map(item => ({
-        source: item.source, target: item.target, value: 1, type: "indirect"
+        source: item.source, target: item.target, value: 2
     }))
 ];
 ```
@@ -139,8 +139,9 @@ Swatches(chart.scales.color)
 ```
 
 ```{ojs ForceGraph-plot}
-linewidth = 2;
 strength = -400;
+// console.log ("-----nodes: " + JSON.stringify(nodes));
+// console.log ("-----links: " + JSON.stringify(links));
 
 chart = {
 
@@ -163,57 +164,41 @@ chart = {
         .attr("height", height)
         .attr("style", "max-width: 100%; height: auto; font: 14px sans-serif;");
 
-    // Per-type markers, as they don't inherit styles.
-    svg.append("defs").selectAll("marker")
-    .data(types)
-    .join("marker")
-        .attr("id", d => `arrow-${d}`)
-        .attr("viewBox", "0 -5 10 10")
-        .attr("refX", 15)
-        .attr("refY", -0.5)
-        .attr("markerWidth", 6)
-        .attr("markerHeight", 6)
-        .attr("orient", "auto")
-    .append("path")
-        .attr("fill", color)
-        .attr("d", "M0,-5L10,0L0,5");
-
     const link = svg.append("g")
         .attr("fill", "none")
         .attr("stroke-width", 1.5)
-    .selectAll("path")
-    .data(links)
-    .join("path")
-        .attr("stroke", d => color(d.type))
-        .attr("stroke-width", d => d.value * linewidth);
+        .selectAll("path")
+        .data(links)
+        .join("path")
+            .attr("stroke", "gray")
+            .attr("stroke-width", d => d.value);
 
     const node = svg.append("g")
-    .selectAll("g")
-    .data(nodes)
-    .join("g")
-        .call(drag(simulation));
+        .selectAll("g")
+        .data(nodes)
+        .join("g")
+            .call(drag(simulation));
 
     node.append("circle")
         .attr("stroke", "white")
         .attr("stroke-width", 1.5)
         .data(nodes)
         .join("circle")
-        .attr("fill", d => color(d.group))
-        .attr("r", d => 10 * Math.log10(d.num_calls + 1));
+            .attr("fill", d => color(d.group))
+            .attr("r", d => d.size);
 
     node.append("text")
         .attr("x", 8)
         .attr("y", "0.31em")
         .text(d => d.id)
-        .html(d => `<a href="https://github.com/${d.id}" style="text-decoration:none" target="_blank">${d.id}</a>`)
-    .clone(true).lower()
-        .attr("fill", "none")
-        .attr("stroke", "white")
-        .attr("stroke-width", 3);
+        .clone(true).lower()
+            .attr("fill", "none")
+            .attr("stroke", "white")
+            .attr("stroke-width", 3);
 
     simulation.on("tick", () => {
-    link.attr("d", linkArc);
-    node.attr("transform", d => `translate(${d.x},${d.y})`);
+        link.attr("d", linkArc);
+        node.attr("transform", d => `translate(${d.x},${d.y})`);
     });
 
     invalidation.then(() => simulation.stop());

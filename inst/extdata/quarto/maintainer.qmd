@@ -87,3 +87,177 @@ htl.html`<ul>${these_pkgs_list}</ul>`
 ```{ojs comaintainers-list}
 htl.html`<ul>${these_cos_list}</ul>`
 ```
+
+## Network
+
+```{ojs network-in}
+// Connect co-maintainers to all of their packages:
+pkgs_expanded_full = these_cos.map(i => maintainer_pkgs[i]).flat();
+// Reduce to unique pkgs:
+pkgs_expanded = [...new Set(pkgs_expanded_full)];
+
+nodes = [
+    { id: maintainer, group: "maintainer", num_calls: 1 },
+    ...pkgs_expanded.map(item => ({
+        id: item,
+        group: these_pkgs.includes(item) ? "core" : "package",
+        num_calls: 2
+    })),
+    ...these_cos.map(item => ({ id: item, group: "maintainer", num_calls: 1 }))
+];
+
+// edges are mappings from co-maintainers to all packages. First collect list
+// of all packages from co-maintainers:
+these_co_pkgs = these_cos.reduce((acc, key) => {
+    if (maintainer_pkgs.hasOwnProperty(key)) {
+        if (!these_pkgs.includes(key)) {
+            acc[key] = maintainer_pkgs[key];
+        }
+    }
+    return acc;
+}, {});
+// Then flatten that to (source, target) pairs of (maintainer, package):
+these_co_pkgs_flat = Object.entries(these_co_pkgs).flatMap(([source, targets]) =>
+    targets.map(target => ({ source, target }))
+);
+links = [
+    ...these_pkgs.map(item => ({
+        source: maintainer, target: item, value: 2, type: "direct"
+    })),
+    ...these_co_pkgs_flat.map(item => ({
+        source: item.source, target: item.target, value: 1, type: "indirect"
+    }))
+];
+```
+
+<div style="margin-top: 20px; margin-bottom: 20px;"></div>
+
+
+```{ojs swatches}
+import {Swatches} from "@d3/color-legend"
+Swatches(chart.scales.color)
+```
+
+```{ojs ForceGraph-plot}
+linewidth = 1;
+strength = -400;
+
+chart = {
+
+  const width = 928;
+  const height = 600;
+
+// console.log ("-----nodes: " + JSON.stringify(nodes));
+// console.log ("-----links: " + JSON.stringify(links));
+
+  const types = Array.from(new Set(nodes.map(d => d.group)));
+
+  const color = d3.scaleOrdinal(types, d3.schemeCategory10);
+
+  const simulation = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(d => d.id))
+      .force("charge", d3.forceManyBody().strength(strength))
+      .force("x", d3.forceX())
+      .force("y", d3.forceY());
+
+  const svg = d3.create("svg")
+      .attr("viewBox", [-width / 2, -height / 2, width, height])
+      .attr("width", width)
+      .attr("height", height)
+      .attr("style", "max-width: 100%; height: auto; font: 14px sans-serif;");
+
+  // Per-type markers, as they don't inherit styles.
+  svg.append("defs").selectAll("marker")
+    .data(types)
+    .join("marker")
+      .attr("id", d => `arrow-${d}`)
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 15)
+      .attr("refY", -0.5)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+    .append("path")
+      .attr("fill", color)
+      .attr("d", "M0,-5L10,0L0,5");
+
+  const link = svg.append("g")
+      .attr("fill", "none")
+      .attr("stroke-width", 1.5)
+    .selectAll("path")
+    .data(links)
+    .join("path")
+      .attr("stroke", d => color(d.type))
+      .attr("stroke-width", d => d.value * linewidth);
+
+  const node = svg.append("g")
+    .selectAll("g")
+    .data(nodes)
+    .join("g")
+      .call(drag(simulation));
+
+  node.append("circle")
+      .attr("stroke", "white")
+      .attr("stroke-width", 1.5)
+      .data(nodes)
+      .join("circle")
+        .attr("fill", d => color(d.group))
+        .attr("r", d => 10 * Math.log10(d.num_calls + 1));
+
+  node.append("text")
+      .attr("x", 8)
+      .attr("y", "0.31em")
+      .text(d => d.id)
+      .html(d => `<a href="https://github.com/${d.id}" style="text-decoration:none" target="_blank">${d.id}</a>`)
+    .clone(true).lower()
+      .attr("fill", "none")
+      .attr("stroke", "white")
+      .attr("stroke-width", 3);
+
+  simulation.on("tick", () => {
+    link.attr("d", linkArc);
+    node.attr("transform", d => `translate(${d.x},${d.y})`);
+  });
+
+  invalidation.then(() => simulation.stop());
+
+  return Object.assign(svg.node(), {scales: {color}});
+}
+```
+
+```{ojs}
+function linkArc(d) {
+  const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
+  return `
+    M${d.source.x},${d.source.y}
+    A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
+  `;
+}
+```
+
+```{ojs}
+drag = simulation => {
+
+  function dragstarted(event, d) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+
+  function dragged(event, d) {
+    d.fx = event.x;
+    d.fy = event.y;
+  }
+
+  function dragended(event, d) {
+    if (!event.active) simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+  }
+
+  return d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended);
+}
+```

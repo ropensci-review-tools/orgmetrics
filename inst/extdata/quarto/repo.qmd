@@ -392,7 +392,7 @@ similar_pkgs = matched_names.map(i => {
     const url = (repo_src.filter(function(r) {
         return r.package === i
     }, i)[0] || {}).url || null;
-    return htl.html`<li><a href="${url}" target="_blank">${i}</a></li>`
+    return htl.html`<li><a href="/repo.html" onclick="localStorage.setItem('orgmetricsRepo', '${i}')">${i}</a></li>`
 });
 ```
 

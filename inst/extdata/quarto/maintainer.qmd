@@ -10,6 +10,65 @@ format:
 ---
 
 
+
+<!---
+******** START UTILITY FUNCTIONS ********
+--->
+
+
+```{ojs}
+function sparkbar(max) {
+  const colourScale = d3.scaleSequential(d3.interpolateCool)
+    .domain([0, max]);
+
+  return (x) => htl.html`<div style="
+    background: ${colourScale(x)};
+    color: black;
+    width: ${100 * x / max}%;
+    float: right;
+    padding-right: 3px;
+    box-sizing: border-box;
+    overflow: visible;
+    display: flex;
+    justify-content: end;">${x.toFixed(2).toLocaleString("en-US")}`
+}
+
+function tooltip(title, expl) {
+    const th = document.createElement("th");
+    th.title = expl
+    th.style.background = "#f0f8ff";
+    th.textContent = title;
+
+    th.addEventListener("mouseover", () => th.style.background = "#d0e8ff");
+    th.addEventListener("mouseout", () => th.style.background = "#f0f8ff");
+
+    return th;
+}
+
+function pkgfmt(pkg) {
+    const th = document.createElement("th");
+    th.title = "hover"
+    th.style.background = "#f0f8ff";
+    th.textContent = pkg;
+
+    th.addEventListener("mouseover", () => th.style.background = "#d0e8ff");
+    th.addEventListener("mouseout", () => th.style.background = "#f0f8ff");
+
+    th.addEventListener("click", () => {
+        localStorage.setItem("orgmetricsRepo", pkg);
+        th.style.background="#a0f8ff";
+        window.location.href="/repo.html";
+    });
+
+    return th;
+}
+```
+
+<!---
+******** END UTILITY FUNCTIONS ********
+--->
+
+
 ```{r load-data}
 data_repo_src <- readRDS (fs::path ("data", "results-data-repo-src.Rds"))
 ojs_define (repo_src_in = data_repo_src)
@@ -48,19 +107,6 @@ s = localStorage.setItem("orgmetricsMaintainer", maintainer.toString());
 ```{ojs extract-maintainer-data}
 these_pkgs = maintainer_pkgs[maintainer] || null;
 
-these_pkgs_list = these_pkgs ?
-these_pkgs.map(i => {
-    const url = (repo_src.filter(function(r) {
-        return r.package === i
-    }, i)[0] || {}).url || null;
-    return htl.html`
-<li>
-<div onclick=${() => localStorage.setItem('orgmetricsRepo', i)}>
-<a href="/repo.html">${i}</a>
-</div>
-</li>`
-}) : htl.html`<li>No packages listed</li>`;
-
 these_cos = comaintainers[maintainer] || null
 these_cos_list = these_cos ?
 these_cos.map(i => htl.html`
@@ -77,9 +123,64 @@ htl.html`<div><a href="https://github.com/${maintainer}" target="_blank">github.
 
 ## Packages
 
-```{ojs packages-list}
-htl.html`<ul>${these_pkgs_list}</ul>`
+<!---
+******** START REPO-LEVEL METRICS TABLE ********
+--->
+
+```{r}
+data_metrics <- readRDS (fs::path ("data", "results-metrics.Rds"))
+
+# Main table of most recent metrics:
+# which.max does not work for dates, but max does
+index1 <- which (names (data_metrics) == max (names (data_metrics)))
+m <- data_metrics [[index1]] |>
+    tidyr::pivot_wider (names_from = name, values_from = value) |>
+    orgmetrics:::data_metrics_group () |>
+    dplyr::relocate (total, .after = package) |>
+    dplyr::arrange (by = desc (total))
+ojs_define (metrics_table_in = m)
 ```
+
+```{ojs}
+metricsGroupedTable = {
+    return transpose(metrics_table_in).map(row => ({
+        ...row,
+    }));
+}
+metricsTable = metricsGroupedTable.filter(i => these_pkgs.includes(i.package));
+```
+
+```{ojs}
+Inputs.table(metricsTable, {
+    width: {
+        package: 100,
+        total: 200,
+        development: 200,
+        issues: 200,
+        popularity: 200,
+        meta: 200,
+    },
+    format: {
+        package: d => pkgfmt(d),
+        development: sparkbar(d3.max(metricsGroupedTable, d => d.development)),
+        issues: sparkbar(d3.max(metricsGroupedTable, d => d.issues)),
+        popularity: sparkbar(d3.max(metricsGroupedTable, d => d.popularity)),
+        meta: sparkbar(d3.max(metricsGroupedTable, d => d.meta)),
+        total: sparkbar(d3.max(metricsGroupedTable, d => d.total)),
+    },
+    header: {
+        development: tooltip("Development", "Code development and maintenance metrics"),
+        issues: tooltip("Issues", "GitHub issues and pull request activity"),
+        popularity: tooltip("Popularity", "Project popularity on CRAN (where applicable) and GitHub"),
+        meta: tooltip("Dependencies and releases", ""),
+        total: tooltip("Overall", "Average across all four categories of metrics."),
+    },
+})
+```
+
+<!---
+******** END REPO-LEVEL METRICS TABLE ********
+--->
 
 
 ## Co-Maintainers
@@ -136,7 +237,7 @@ links = [
 ];
 ```
 
-<div style="margin-top: 20px; margin-bottom: 20px;"></div>
+<div style="margin-top: 20px; margin-bottom: 0px;"></div>
 
 
 ```{ojs swatches}
@@ -146,8 +247,6 @@ Swatches(chart.scales.color)
 
 ```{ojs ForceGraph-plot}
 strength = -400;
-// console.log ("-----nodes: " + JSON.stringify(nodes));
-// console.log ("-----links: " + JSON.stringify(links));
 
 chart = {
 

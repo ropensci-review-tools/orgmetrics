@@ -293,7 +293,10 @@ databoard_data_maintainers <- function (data_contributors) {
         }
         t (combn (unique (m$gh_handle), 2L))
     })
-    comaintainers <- do.call (rbind, comaintainers) |>
+    comaintainers <- rbind (
+        do.call (rbind, comaintainers),
+        do.call (rbind, comaintainers) [, 2:1]
+    ) |>
         data.frame () |>
         dplyr::distinct () |>
         dplyr::arrange (X1)

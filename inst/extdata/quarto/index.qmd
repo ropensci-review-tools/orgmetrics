@@ -321,13 +321,21 @@ bslib::page_fillable (
                     if (length (i$text) == 1L) {
                         tags$p (
                             bsicons::bs_icon ("caret-right"),
-                            tags$a (href = i$url, i$text)
+                            tags$a (
+                                href = "/repo.html",
+                                onclick = sprintf ("localStorage.setItem('orgmetricsRepo', '%s')", i$text),
+                                i$text
+                            )
                         )
                     } else {
                         htmltools::tagList (lapply (seq_along (i$text), function (j) {
                             tags$p (
                                 bsicons::bs_icon ("caret-right"),
-                                tags$a (href = i$url [j], i$text [j])
+                                tags$a (
+                                    href = "/repo.html",
+                                    onclick = sprintf ("localStorage.setItem('orgmetricsRepo', '%s')", i$text [j]),
+                                    i$text [j]
+                                )
                             )
                         }))
                     },

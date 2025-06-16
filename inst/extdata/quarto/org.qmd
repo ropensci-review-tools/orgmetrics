@@ -83,6 +83,26 @@ function pkgfmt(pkg) {
 
     return th;
 }
+
+function ctbfmt(ctb) {
+    const th = document.createElement("th");
+    th.title = "hover"
+    th.style.background = "#f0f8ff";
+    th.textContent = ctb;
+
+    th.addEventListener("mouseover", () => th.style.background = "#d0e8ff");
+    th.addEventListener("mouseout", () => th.style.background = "#f0f8ff");
+
+
+    th.addEventListener("click", () => {
+        console.log("----setting localStorage maintainer to: " + ctb);
+        localStorage.setItem('orgmetricsMaintainer', ctb);
+        th.style.background="#a0f8ff";
+        window.location.href="/maintainer.html";
+    });
+
+    return th;
+}
 ```
 
 <!---
@@ -499,8 +519,12 @@ ctb_abs_ctb_len = ctb_abs_ctb.length;
 
 
 ```{ojs}
+// The 'ctbfmt' function set the localStorage 'orgmetricsMaintainer' value, but
+// the inputs here are full names, no GitHub handles, so unless the are
+// identical, this currently fails and needs to be fixed.
 Inputs.table(ctb_abs_ctb, {
     format: {
+        name: d => ctbfmt(d),
         measure: sparkbar(d3.max(ctb_abs_ctb, d => d.measure)),
     },
     header: {

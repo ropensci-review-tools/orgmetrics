@@ -125,6 +125,11 @@ htl.html`<div><a href="https://github.com/${maintainer}" target="_blank">github.
 
 ## Packages
 
+This is a sub-set of the main table on [the _Organization_ page](/org.html),
+showing only packages maintained by _`{ojs} maintainer`_. Values are scaled
+between 0 and 1 based on the distribution of values across the entire
+organization, with higher values always better than lower values.
+
 <!---
 ******** START REPO-LEVEL METRICS TABLE ********
 --->

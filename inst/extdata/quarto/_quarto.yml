@@ -11,7 +11,6 @@ website:
       - repo.qmd
       - maintainer.qmd
       - models.qmd
-      - network.qmd
     right:
       - icon: "github"
         menu:

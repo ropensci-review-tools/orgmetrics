@@ -370,7 +370,7 @@ ctbs = {
         ...row,
     }))
 }
-ctbs_gh = ctbs.map((ctb) => ctb['gh_handle']);
+ctbs_gh = ctbs.map((ctb) => ctb['gh_handle']).filter(item => item != null);
 ```
 
 
@@ -431,10 +431,14 @@ maintainer_gh_list = maintainer_gh.length == 0 ? undefined:
 `));
 maintainer_gh_list_txt = maintainer_gh.length > 0 ? htl.html`<ul>${maintainer_gh_list}</ul>` : undefined;
 
-ctb_count = repoMetrics.filter(function(m) {
-    return m.name == "ctb_count"
-})[0].value;
+ctb_gh = [].concat(ctbs_gh.slice(maintainer_count) || []);
+ctb_count = ctb_gh.length;
 ctb_count_txt = pluraliseObjects(ctb_count, "additional contributor");
+ctb_count_list = ctb_gh.map((item, i) => htl.html`
+<span onclick=${() => localStorage.setItem('orgmetricsMaintainer', item)}>
+<a href='/maintainer.html'>${item}</a>${i < ctb_gh.length - 1 ? ", " : ""}</span>`);
+ctb_count_html = ctb_count == 0 ? htl.html`<div>No additional contributors</div>` :
+    htl.html`<div>${ctb_count_txt}: ${ctb_count_list}</div>`;
 
 num_commits = repoMetrics.filter(function(m) {
     return m.name == "num_commits"
@@ -509,7 +513,7 @@ revdeps_list_txt = revdeps.length > 0 ? htl.html`<ul>${revdeps_list}</ul>` : und
 htl.html`<ul>
     <li>${gitlog_txt}</li>
     <li>${maintainer_count_txt}${maintainer_gh_list_txt}</li>
-    <li>${ctb_count_txt}</li>
+    <li>${ctb_count_html}</li>
     <li>${test_coverage_txt}</li>
 </ul>`
 ```

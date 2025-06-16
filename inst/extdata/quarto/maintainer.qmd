@@ -64,8 +64,15 @@ these_pkgs.map(i => {
 these_cos = comaintainers[maintainer] || null
 these_cos_list = these_cos ?
 these_cos.map(i => htl.html`
-<li><a href="https://github.com/${i}" target="_blank">${i}</a></li>
-`) : htl.html`<li>No co-maintainers</li>`;
+<div onclick=${() => localStorage.setItem('orgmetricsMaintainer', i)}>
+<li><a href="/maintainer.html">${i}</a></li>
+</div>`) : htl.html`<li>No co-maintainers</li>`;
+```
+
+<div style="margin-top: 10px; margin-bottom: 10px;"></div>
+
+```{ojs maintainer-link}
+htl.html`<div><a href="https://github.com/${maintainer}" target="_blank">github.com/${maintainer}</a></div>`
 ```
 
 ## Packages

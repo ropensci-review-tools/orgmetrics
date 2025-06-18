@@ -59,6 +59,29 @@ ctb_absence <- function (data_org,
         nms <- unique (log$aut_name)
         nms_norm <- match_string_vecs (nms, nms)
         log$aut_name <- nms_norm [match (log$aut_name, nms)]
+        # And add gh handles. First match either names or logins:
+        gh_map <- cbind (
+            match_string_vecs (nms_norm, ctbs_gh$name),
+            match_string_vecs (nms_norm, ctbs_gh$login)
+        )
+        # Then match names to logins:
+        gh_map <- cbind (
+            gh_map,
+            ctbs_gh$login [match (gh_map [, 1], ctbs_gh$name)]
+        )
+        # Reduce to logins only:
+        gh_logins <- apply (
+            gh_map [, 2:3, drop = FALSE],
+            1,
+            function (i) {
+                ifelse (
+                    all (is.na (i)),
+                    NA_character_,
+                    unique (i [which (!is.na (i))])
+                )
+            }
+        )
+        log$gh_login <- gh_logins [match (log$aut_name, nms)]
 
         log_ctbs_all <- sort (table (log$aut_name), decreasing = TRUE)
         log_ctbs_all <- log_ctbs_all / sum (log_ctbs_all)
@@ -73,9 +96,13 @@ ctb_absence <- function (data_org,
         index <- which (!names (log_ctbs_all) %in% names (log_ctbs_recent))
         ctb_abs <- log_ctbs_all [index]
 
+        names <- c (names (ctb_change), names (ctb_abs))
+        logins <- gh_logins [match (names, nms_norm)]
+
         data.frame (
             repo = repo$rm$repo_from_gh_api$name,
-            name = c (names (ctb_change), names (ctb_abs)),
+            name = names,
+            login = logins,
             measure = c (as.numeric (ctb_change), as.numeric (ctb_abs)),
             what = c (
                 rep ("change", length (ctb_change)),
@@ -85,13 +112,16 @@ ctb_absence <- function (data_org,
     })
 
     abs <- do.call (rbind, abs)
-    rownames (abs) <- NULL
 
     abs <- dplyr::filter (
         abs,
         (what == "change" & measure >= threshold_change) |
             (what == "absence" & measure >= threshold_abs)
     )
+    # And remove any without GitHub logins:
+    abs <- dplyr::filter (abs, !is.na (login))
+
+    rownames (abs) <- NULL
 
     return (abs)
 }

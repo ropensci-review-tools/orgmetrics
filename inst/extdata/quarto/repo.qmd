@@ -482,15 +482,19 @@ deps_in_org = [].concat(deps[0]['deps_in_org'] || []);
 deps_in_org_txt = deps_in_org.length == 0 ?
     'Depends on no other pkgs in org' :
     'Depends on org pkgs:';
-deps_in_org_list = deps_in_org.length == 0 ? undefined :
-    (deps_in_org.length == 1 ? htl.html`<li>${deps_in_org}</li>` :
-    deps_in_org.map(d => htl.html`<li>${d}</li>`));
+deps_in_org_list = deps_in_org.length === 0 ? undefined :
+    deps_in_org.map(d => htl.html`
+<li>
+<a href='/repo.html' onclick="localStorage.setItem('orgmetricsRepo', '${d}')">${d}</a>
+</li>`);
 n_deps_in_org_txt = deps_in_org.length > 0 ? htl.html`<ul>${deps_in_org_list}</ul>` : undefined;
 
 revdeps = [].concat(deps[0]['revdeps'] || []);
 revdeps_list = revdeps.length == 0 ? undefined :
-    (revdeps.length == 1 ? htl.html`<li>${revdeps}</li>` :
-    revdeps.map(d => htl.html`<li>${d}</li>`));
+    revdeps.map(d => htl.html`
+<li>
+<a href='/repo.html' onclick="localStorage.setItem('orgmetricsRepo', '${d}')">${d}</a>
+</li>`);
 revdeps_in_org = revdeps.length > 0 ?
     'Dependend on by org pkgs:' :
     'Not depended on by any other pkgs in org';

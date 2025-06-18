@@ -310,6 +310,8 @@ metrics_data <- lapply (metrics, function (i) {
 
 
 ```{r}
+# NOTE that the href values here are filled with the sub-domain when deployed,
+# so DO NOT need to be modified!
 bslib::page_fillable (
     bslib::card (
         full_screen = FALSE,

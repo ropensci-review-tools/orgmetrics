@@ -491,8 +491,35 @@ contributors to numerous repositories.
 ```{r load-data}
 data_ctb_abs_ctb <- readRDS (fs::path ("data", "results-data-ctb-absence.Rds")) |>
     dplyr::filter (what == "absence") |>
-    dplyr::group_by (name) |>
-    dplyr::summarise (measure = sum (measure))
+    dplyr::group_by (name, login) |>
+    dplyr::summarise (measure = sum (measure), .groups = "keep")
+# Names and/or logins may be repeated:
+dups <- which (duplicated (data_ctb_abs_ctb$login))
+if (length (dups) > 0L) {
+    dups <- data_ctb_abs_ctb$login [dups]
+    names <- vapply (dups, function (d) {
+        index <- which (data_ctb_abs_ctb$login == d)
+        nms <- data_ctb_abs_ctb$name [index]
+        # Pick first name that is the longest and has most white space:
+        rank1 <- order (nchar (nms), decreasing = TRUE)
+        n_spaces <- vapply (
+            gregexpr ("\\s", nms),
+            function (s) length (which (s > 0)),
+            integer (1L)
+        )
+        rank2 <- order (n_spaces, decreasing = TRUE)
+        rank <- order (rank1 + rank2)
+        nms [rank [1L]]
+    }, character (1L))
+    for (d in seq_along (dups)) {
+        index <- which (data_ctb_abs_ctb$login == dups [d])
+        data_ctb_abs_ctb$name [index] <- names [d]
+    }
+    data_ctb_abs_ctb <- data_ctb_abs_ctb |>
+        dplyr::group_by (name, login) |>
+        dplyr::summarise (measure = sum (measure), .groups = "keep")
+}
+
 # Then only include contributors with an absence factor of 1, equivalent to
 # complete absence from a single repo:
 data_ctb_abs_ctb <- data_ctb_abs_ctb |>
@@ -524,7 +551,7 @@ ctb_abs_ctb_len = ctb_abs_ctb.length;
 // identical, this currently fails and needs to be fixed.
 Inputs.table(ctb_abs_ctb, {
     format: {
-        name: d => ctbfmt(d),
+        login: d => ctbfmt(d),
         measure: sparkbar(d3.max(ctb_abs_ctb, d => d.measure)),
     },
     header: {

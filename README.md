@@ -12,7 +12,8 @@ Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repost
 Metrics for your GitHub organization, collated from applying accompanying
 [`repometrics` package](https://github.com/ropensci-review-tools/repometrics)
 across all organization repositories, enhanced with additional
-organization-level data.
+organization-level data. Live demonstration currently at
+[ropensci-review-tools.github.io/repometrics-demo/repo.html](https://ropensci-review-tools.github.io/repometrics-demo/repo.html).
 
 ## How?
 

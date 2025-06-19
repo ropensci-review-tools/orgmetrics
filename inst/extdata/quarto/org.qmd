@@ -95,7 +95,6 @@ function ctbfmt(ctb) {
 
 
     th.addEventListener("click", () => {
-        console.log("----setting localStorage maintainer to: " + ctb);
         localStorage.setItem('orgmetricsMaintainer', ctb);
         th.style.background="#a0f8ff";
         window.location.href="/maintainer.html";

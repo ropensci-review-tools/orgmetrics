@@ -365,11 +365,9 @@ The dashboard currently has three main pages:
    maintenance priorities across all repositories.
 2. A [repository maintenance](./repo.html) page providing additional
    detail on maintenance needs of a selected repository.
-3. A [*Community Health*](./models.html) summarising scores for the various
-   [CHAOSS (*Community Health Analytics in Open Source Software*)
-    models and
-    metrics](https://chaoss.community/kb-metrics-and-metrics-models/) for each
-    repository.
-
-There is also an additional [network diagram page](./network.html), showing
-strengths of relationship between each repository.
+3. A [maintainer](/maintainer.html) page with details of individual
+   maintainers, their packages and co-maintainers.
+4. A [*Community Health*](./models.html) summarising scores for the various
+   [CHAOSS (*Community Health Analytics in Open Source Software*) models and
+metrics](https://chaoss.community/kb-metrics-and-metrics-models/) for each
+repository.

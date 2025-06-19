@@ -511,8 +511,8 @@ revdeps_list_txt = revdeps.length > 0 ? htl.html`<ul>${revdeps_list}</ul>` : und
 ::::{.g-col-12 .g-col-md-6}
 <div class="card" style="background: linear-gradient(to bottom, #33ccff 0%, #ffcc99 100%); text-align:center;">
 <img src="bs-icons/tools.svg" alt="Bootstrap" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
-<h2 style="margin-top:-20px;">Maintainance:</h2>
 <div style="text-align:left;">
+<h2 style="margin-top:-20px; margin-left:20px;">Maintenance</h2>
 ```{ojs}
 htl.html`<ul>
     <li>${gitlog_txt}</li>
@@ -529,8 +529,8 @@ htl.html`<ul>
 ::::{.g-col-12 .g-col-md-6}
 <div class="card" style="background: linear-gradient(to bottom, #33ccff 0%, #ffcc99 100%); text-align:center;">
 <img src="bs-icons/pencil-square.svg" alt="Bootstrap" class="text-pencil-square" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
-<h2 style="margin-top:-20px;">Dependencies</h2>
 <div style="text-align:left;">
+<h2 style="margin-top:-20px; margin-left:20px;">Dependencies</h2>
 ```{ojs}
 htl.html`<ul>
     <li>${imp_txt}</li>
@@ -551,8 +551,8 @@ htl.html`<ul>
 ::::{.g-col-12 .g-col-md-6}
 <div class="card" style="background: linear-gradient(to bottom, #00cc66 0%, #33ccff 100%); text-align:center;">
 <img src="bs-icons/chat-square-heart.svg" alt="Bootstrap" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
-<h2 style="margin-top:-20px;">Popularity &#38;<br>GitHub Activity</h2>
 <div style="text-align:left;">
+<h2 style="margin-top:-20px; margin-left:20px;">Popularity &#38;<br>GitHub Activity</h2>
 ```{ojs}
 htl.html`<ul>
     <li>${stars_forks} GitHub stars and forks</li>
@@ -569,8 +569,8 @@ htl.html`<ul>
 ::::{.g-col-12 .g-col-md-6}
 <div class="card" style="background: linear-gradient(to bottom, #00cc66 0%, #33ccff 100%); text-align:center;">
 <img src="bs-icons/github.svg" alt="Bootstrap" width="48" height="48" style="margin-left:auto; margin-top:5px; margin-right:5px;">
-<h2 style="margin-top:-20px;">Similar Packages</h2>
 <div style="text-align:left;">
+<h2 style="margin-top:-20px; margin-left:20px;">Similar Packages</h2>
 <div style="margin-left: 10px;">The five most similar packages are:</div>
 ```{ojs}
 htl.html`<ul>${similar_pkgs}</ul>`

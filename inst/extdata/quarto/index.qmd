@@ -359,7 +359,7 @@ to demonstrate the kinds of analyses and insights that are possible. It is
 intended to change and develop a lot. Please provide feedback via GitHub by
 clicking on the symbol on the top right.
 
-The dashboard currently has three main pages:
+The dashboard currently has four main pages:
 
 1. An [organization maintenance](./org.html) page identifying
    maintenance priorities across all repositories.

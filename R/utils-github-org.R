@@ -140,10 +140,11 @@ clone_gh_org_repos <- function (dir = getwd (), orgs = NULL) {
     }
     outfile <- fs::path (dir, "packages.json")
     if (!fs::file_exists (outfile)) {
+        pkgs <- cbind (fs::path (dir, pkgs), pkgs)
         write_pkgs_json (pkgs, dir = dir)
     }
     pkgs_json <- jsonlite::read_json (outfile, simplify = TRUE) |>
-        dplyr::filter (is_r)
+        dplyr::filter (is_r_pkg)
 
     for (p in pkgs_json$package) {
         url <- paste0 ("https://github.com/", p)

@@ -92,6 +92,12 @@ write_pkgs_json <- function (pkgs, dir = getwd ()) {
 
     checkmate::assert_directory_exists (dir)
 
+    pkg_dir_exists <- vapply (
+        pkgs [, 1],
+        function (d) fs::dir_exists (d),
+        logical (1L)
+    )
+
     root <- rprojroot::is_r_package
     pkg_root <- unlist (apply (pkgs, 1, function (p) {
         tryCatch (
@@ -117,6 +123,11 @@ write_pkgs_json <- function (pkgs, dir = getwd ()) {
     pkgs$is_r_pkg <- nzchar (pkgs$root)
     index <- which (pkgs$is_r_pkg)
     pkgs [index, ] <- rm_init_path_sep (pkgs [index, ], "root")
+
+    # Then get remote data for any dirs not existing:
+    index <- which (!pkg_dir_exists)
+    pkgs$is_r_pkg [index] <-
+        vapply (pkgs$orgrepo [index], pkgs_are_r, logical (1L))
 
     outfile <- fs::path (dir, "packages.json")
 
@@ -146,7 +157,7 @@ clone_gh_org_repos <- function (dir = getwd (), orgs = NULL) {
     pkgs_json <- jsonlite::read_json (outfile, simplify = TRUE) |>
         dplyr::filter (is_r_pkg)
 
-    for (p in pkgs_json$package) {
+    for (p in pkgs_json$orgrepo) {
         url <- paste0 ("https://github.com/", p)
         dir_org <- fs::path (dir, gsub ("\\/.*$", "", p))
         if (!fs::dir_exists (dir_org)) {

@@ -67,12 +67,12 @@ test_that ("clone gh org repos", {
     expect_length (f, 1L)
     expect_equal (basename (f), "packages.json")
     f <- fs::dir_ls (d, type = "directory")
-    # expect_length (f, 1L)
-    # expect_equal (basename (f), "ropensci")
+    expect_length (f, 1L)
+    expect_equal (basename (f), "ropensci")
 
     d_org <- f
     f <- fs::dir_ls (d_org, type = "directory")
-    # expect_length (f, 2L)
+    expect_length (f, 2L)
 
     fs::dir_delete (d)
 })

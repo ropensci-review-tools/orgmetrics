@@ -37,6 +37,23 @@ list_gh_org_repos <- function (org = "ropensci", n_per_page = 100) {
     return (paste0 (org, "/", names))
 }
 
+#' For individual packages in separate sub-dir, where each may belong to a
+#' separate GitHub org.
+#'
+#' @noRd
+list_gh_extra_repos <- function (org_path) {
+
+    repos <- fs::dir_ls (org_path, type = "directory")
+    unname (vapply (repos, function (i) {
+        u <- gert::git_remote_info (repo = i)$url
+        if (length (u) == 0L) {
+            return (NULL)
+        }
+        u <- strsplit (u, "\\/") [[1]]
+        paste0 (tail (u, n = 2L), collapse = "/")
+    }, character (1L)))
+}
+
 pkgs_are_r <- function (pkgs) {
 
     # Supress no visible binding notes:
@@ -71,15 +88,39 @@ pkgs_are_r <- function (pkgs) {
 write_pkgs_json <- function (pkgs, dir = getwd ()) {
 
     requireNamespace ("jsonlite", quietly = TRUE)
+    requireNamespace ("rprojroot", quietly = TRUE)
 
     checkmate::assert_directory_exists (dir)
 
-    is_r_pkg <- pkgs_are_r (pkgs)
-    res <- data.frame (package = pkgs, is_r = is_r_pkg)
+    root <- rprojroot::is_r_package
+    pkg_root <- unlist (apply (pkgs, 1, function (p) {
+        tryCatch (
+            rprojroot::find_root (criterion = root, path = p [1]),
+            error = function (e) ""
+        )
+    }))
+
+    pkgs <- data.frame (pkgs)
+    names (pkgs) <- c ("path", "orgrepo")
+    path <- fs::path_common (pkgs$path)
+    pkgs$path <- gsub (path, "", pkgs$path)
+    # These have initial path separators which are removed here:
+    rm_init_path_sep <- function (pkgs, what) {
+        pkgs [[what]] <- vapply (fs::path_split (pkgs [[what]]), function (p) {
+            p_red <- p [which (p != .Platform$file.sep)]
+            do.call (fs::path, as.list (p_red))
+        }, character (1L))
+        return (pkgs)
+    }
+    pkgs <- rm_init_path_sep (pkgs, "path")
+    pkgs$root <- gsub (path, "", pkg_root)
+    pkgs$is_r_pkg <- nzchar (pkgs$root)
+    index <- which (pkgs$is_r_pkg)
+    pkgs [index, ] <- rm_init_path_sep (pkgs [index, ], "root")
 
     outfile <- fs::path (dir, "packages.json")
 
-    jsonlite::write_json (res, path = outfile, pretty = TRUE)
+    jsonlite::write_json (pkgs, path = outfile, pretty = TRUE)
 
     return (outfile)
 }

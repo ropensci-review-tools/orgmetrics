@@ -120,7 +120,18 @@ write_pkgs_json <- function (pkgs, dir = getwd ()) {
     }
     pkgs <- rm_init_path_sep (pkgs, "path")
     pkgs$root <- gsub (path, "", pkg_root)
-    pkgs$is_r_pkg <- nzchar (pkgs$root)
+
+    files_required <- c ("DESCRIPTION", "NAMESPACE")
+    dirs_required <- c ("R", "man")
+    pkgs$is_r_pkg <- vapply (pkgs$path, function (p) {
+        path_p <- fs::path (path, p)
+        if (!fs::dir_exists (path_p)) {
+            return (FALSE)
+        }
+        files_p <- basename (fs::dir_ls (path_p, type = "file"))
+        dirs_p <- basename (fs::dir_ls (path_p, type = "directory"))
+        all (files_required %in% files_p) && all (dirs_required %in% dirs_p)
+    }, logical (1L))
     index <- which (pkgs$is_r_pkg)
     pkgs [index, ] <- rm_init_path_sep (pkgs [index, ], "root")
 

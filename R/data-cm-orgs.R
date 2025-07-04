@@ -49,7 +49,7 @@ orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_
     })
 
     index <- which (vapply (data, length, integer (1L)) > 0L)
-    pkgs <- pkgs [index]
+    pkgs_dat <- pkgs_dat [index, ]
     data <- data [index]
 
     pkgs_repos <- lapply (data, function (i) i$repo)

@@ -19,7 +19,7 @@ orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_
         if (!pkgs_dat$is_r_pkg [i] && !is_test_env) {
             return (NULL)
         }
-        if (!fs::dir_exits (pkgs_dat$path [i])) {
+        if (!fs::dir_exists (pkgs_dat$path [i])) {
             return (NULL)
         }
 

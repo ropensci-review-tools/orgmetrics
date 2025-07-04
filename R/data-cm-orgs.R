@@ -56,7 +56,7 @@ orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_
     pkgs_metrics <- lapply (data, function (i) i$metrics)
     pkgs_models <- lapply (data, function (i) i$models)
 
-    or <- vapply (pkgs, function (i) {
+    or <- vapply (pkgs_dat$path, function (i) {
         paste0 (org_repo_from_path (i), collapse = "/")
     }, character (1L), USE.NAMES = FALSE)
     names (pkgs_repos) <- names (pkgs_metrics) <- names (pkgs_models) <- or
@@ -69,6 +69,7 @@ orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_
 
     rm_tmp_pkg_files (or)
 
+    org_paths <- unique (fs::path_dir (pkgs_dat$path))
     annual_commits <- org_annual_commits (org_paths)
     annual_gh_activity <- org_annual_gh_activity (pkgs_repos)
 

@@ -10,8 +10,20 @@ test_that ("collate_org_data output", {
     Sys.setenv ("REPOMETRICS_TESTS" = "true")
     org_dir <- mock_collate_org_data (end_date = end_date)
 
+    pkgs <- c ("testpkg1", "testpkg2")
+    pkgs_dat <- data.frame (
+        path = fs::path (org_dir, pkgs),
+        orgrepo = fs::path ("ropensci-review-tools", pkgs),
+        root = fs::path ("ropensci-review-tools", pkgs),
+        is_r_pkg = TRUE,
+        row.names = NULL
+    )
+    pkgs_dat$path <- fs::path_rel (pkgs_dat$path, fs::path_temp ())
+    pkgs_json <- fs::file_temp (ext = "json")
+    jsonlite::write_json (pkgs_dat, path = pkgs_json, pretty = TRUE)
+
     org_data <- orgmetrics_collate_org_data (
-        org_dir,
+        pkgs_json,
         end_date = end_date,
         num_years = 1
     )

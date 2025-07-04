@@ -52,15 +52,28 @@ test_that ("org data preprocessing", {
     Sys.setenv ("REPOMETRICS_TESTS" = "true")
     org_dir <- mock_collate_org_data (end_date = end_date)
 
-    data_org <- orgmetrics_collate_org_data (
-        org_dir,
+    pkgs <- c ("testpkg1", "testpkg2")
+    pkgs_dat <- data.frame (
+        path = fs::path (org_dir, pkgs),
+        orgrepo = fs::path ("ropensci-review-tools", pkgs),
+        root = fs::path ("ropensci-review-tools", pkgs),
+        is_r_pkg = TRUE,
+        row.names = NULL
+    )
+    pkgs_dat$path <- fs::path_rel (pkgs_dat$path, fs::path_temp ())
+    pkgs_json <- fs::file_temp (ext = "json")
+    jsonlite::write_json (pkgs_dat, path = pkgs_json, pretty = TRUE)
+
+    org_data <- orgmetrics_collate_org_data (
+        pkgs_json,
         end_date = end_date,
         num_years = 1
     )
 
+
     fs::dir_delete (org_dir)
 
-    metrics_df <- data_metrics_to_df (data_org$metrics)
+    metrics_df <- data_metrics_to_df (org_data$metrics)
     expect_s3_class (metrics_df, "data.frame")
     expect_equal (nrow (metrics_df), 4L) # one year with 3-month intervals
     expect_equal (ncol (metrics_df), 50L) # one year with 3-month intervals
@@ -90,12 +103,12 @@ test_that ("org data preprocessing", {
     expect_true (!all (is.na (data_pre$value))) # Some actual values!
 
     # Replicate metrics in 'data_org' data:
-    names (data_org$metrics) <- rep ("a", length (data_org$metrics))
-    mb <- data_org$metrics
+    names (org_data$metrics) <- rep ("a", length (org_data$metrics))
+    mb <- org_data$metrics
     names (mb) <- rep ("b", length (mb))
-    data_org$metrics <- c (data_org$metrics, mb)
+    org_data$metrics <- c (org_data$metrics, mb)
 
-    data_maintenance <- org_maintenance_metric (data_org)
+    data_maintenance <- org_maintenance_metric (org_data)
     expect_s3_class (data_maintenance, "data.frame")
     expect_equal (ncol (data_maintenance), 5L)
     col_nms <- c ("package", "comm_engage", "date", "dev_resp", "maintenance")
@@ -109,7 +122,7 @@ test_that ("org data preprocessing", {
 
 
     # data_models needs > 1 package to generate meaningful results:
-    data_models <- data_org$models
+    data_models <- org_data$models
     data_models$package <- paste0 (
         data_models$package,
         "/",

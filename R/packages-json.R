@@ -23,12 +23,13 @@ om_packages_json <- function (org_path = NULL) {
         cbind (repo_path, repos)
     })
     repos <- do.call (rbind, repos)
+
     extra_path <- fs::path (path, "extra")
     if (fs::dir_exists (extra_path)) {
         extra_repos <- list_gh_extra_repos (extra_path)
         extra_path <- vapply (strsplit (extra_repos, "\\/"), function (i) i [2], character (1L))
         extra_path <- paste0 ("extra/", extra_path)
-        extra_repos <- cbind (extra_path, extra_repos)
+        extra_repos <- data.frame (repo_path = extra_path, repos = extra_repos)
         repos <- rbind (repos, extra_repos)
     }
     repos [, 1] <- paste0 (path, repos [, 1])
@@ -49,10 +50,10 @@ write_pkgs_json <- function (pkgs, dir = getwd ()) {
         logical (1L)
     )
 
-    root <- rprojroot::is_r_package
+    root_crit <- rprojroot::is_r_package
     pkg_root <- unlist (apply (pkgs, 1, function (p) {
         tryCatch (
-            rprojroot::find_root (criterion = root, path = p [1]),
+            rprojroot::find_root (criterion = root_crit, path = p [1]),
             error = function (e) ""
         )
     }))
@@ -61,6 +62,7 @@ write_pkgs_json <- function (pkgs, dir = getwd ()) {
     names (pkgs) <- c ("path", "orgrepo")
     path <- fs::path_common (pkgs$path)
     pkgs$path <- gsub (path, "", pkgs$path)
+
     # These have initial path separators which are removed here:
     rm_init_path_sep <- function (pkgs, what) {
         pkgs [[what]] <- vapply (fs::path_split (pkgs [[what]]), function (p) {
@@ -90,6 +92,29 @@ write_pkgs_json <- function (pkgs, dir = getwd ()) {
     index <- which (!pkg_dir_exists)
     pkgs$is_r_pkg [index] <-
         vapply (pkgs$orgrepo [index], pkgs_are_r, logical (1L))
+
+    # Then check whether 'root' is missing for any R pkgs, and clone if so:
+    pkgs_r_no_root <- dplyr::filter (pkgs, is_r_pkg) |>
+        dplyr::filter (!nzchar (root))
+    if (nrow (pkgs_r_no_root) > 0L) {
+        for (i in seq_len (nrow (pkgs_r_no_root))) {
+            pkg_dir_i <- fs::path (dir, p)
+            if (!fs::dir_exists (pkg_dir_i)) {
+                url <- paste0 ("https://github.com/", pkgs_r_no_root$orgrepo [i])
+                withr::with_dir (
+                    fs::path_dir (pkg_dir_i),
+                    gert::git_clone (url)
+                )
+            }
+
+            pkgs_r_no_root$root <- tryCatch (
+                rprojroot::find_root (criterion = root_crit, path = pkg_dir_i),
+                error = function (e) ""
+            )
+        }
+        index <- match (pkgs_r_no_root$path, pkgs$path)
+        pkgs$root [index] <- pkgs_r_no_root$root [index]
+    }
 
     outfile <- fs::path (dir, "packages.json")
 
@@ -129,28 +154,31 @@ pkgs_are_r <- function (pkgs) {
     return (is_r_pkg)
 }
 
-clone_gh_org_repos <- function (dir = getwd (), orgs = NULL) {
+#' Clone or update all repositories defined in 'packages.json'
+#'
+#' @param pkgs_json Local path to 'packages.json' as created or updated by
+#' running \link{om_packages_json}. That function must be run first, prior to
+#' calling this function!
+#' @return Nothing; called for side-effect of clone or updating all
+#' repositories defined in 'packages.json'.
+#'
+#' @export
+clone_gh_org_repos <- function (pkgs_json = NULL) {
+
+    requireNamespace ("jsonlite", quietly = TRUE)
+
+    checkmate::assert_character (pks_json, len = 1L)
+    checkmate::assert_file_exists (pkgs_json)
 
     # Supress no visible binding notes:
-    is_r <- NULL
+    is_r_pkg <- NULL
 
-    checkmate::assert_directory_exists (dir)
-    checkmate::assert_character (orgs, min.len = 1L)
-
-    pkgs <- lapply (orgs, list_gh_org_repos)
-    pkgs <- unlist (pkgs)
-    if (length (pkgs) == 0L) {
-        return (NULL)
-    }
-    outfile <- fs::path (dir, "packages.json")
-    if (!fs::file_exists (outfile)) {
-        pkgs <- cbind (fs::path (dir, pkgs), pkgs)
-        write_pkgs_json (pkgs, dir = dir)
-    }
-    pkgs_json <- jsonlite::read_json (outfile, simplify = TRUE) |>
+    pj <- jsonlite::read_json (pkgs_json, simplify = TRUE) |>
         dplyr::filter (is_r_pkg)
 
-    for (p in pkgs_json$orgrepo) {
+    dir <- fs::path_dir (pkgs_json)
+
+    for (p in pj$orgrepo) {
         url <- paste0 ("https://github.com/", p)
         dir_org <- fs::path (dir, gsub ("\\/.*$", "", p))
         if (!fs::dir_exists (dir_org)) {

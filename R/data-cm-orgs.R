@@ -9,7 +9,11 @@ orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_
 
     requireNamespace ("jsonlite", quietly = TRUE)
 
-    pkgs_dat <- jsonlite::read_json (pkgs_json, simplify = TRUE)
+    # Suppress no visible binding notes:
+    is_r_pkg <- NULL
+
+    pkgs_dat <- jsonlite::read_json (pkgs_json, simplify = TRUE) |>
+        dplyr::filter (is_r_pkg)
     pkgs_dat$path <- fs::path (fs::path_dir (pkgs_json), pkgs_dat$path)
     is_test_env <- Sys.getenv ("ORGMETRICS_TESTS") == "true"
 

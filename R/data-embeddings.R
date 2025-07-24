@@ -1,10 +1,20 @@
-rm_org_data_embeddings <- function (org_paths) {
+rm_org_data_embeddings <- function (pkgs_json) {
 
-    requireNamespace ("pkgmatch")
+    requireNamespace ("pkgmatch", quietly = TRUE)
+    requireNamespace ("jsonlite", quietly = TRUE)
 
-    pkg_names <- get_all_pkg_names (org_paths)
+    # Suppress no visible binding notes:
+    is_r_pkg <- NULL
 
-    embeddings <- pkgmatch::pkgmatch_embeddings_from_pkgs (pkg_names$path)
+    pkgs_dat <- jsonlite::read_json (pkgs_json, simplify = TRUE) |>
+        dplyr::filter (is_r_pkg)
+    pkgs_dat$path <- fs::path (fs::path_dir (pkgs_json), pkgs_dat$path)
+
+    dir <- fs::path_common (pkgs_dat$path)
+    pkgs_root <- fs::path (dir, pkgs_dat$root)
+    pkg_names <- get_all_pkg_names (pkgs_dat)
+
+    embeddings <- pkgmatch::pkgmatch_embeddings_from_pkgs (pkgs_root)
 
     return (embeddings)
 }

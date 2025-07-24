@@ -66,6 +66,11 @@ write_pkgs_json <- function (pkgs, dir = getwd ()) {
     pkgs <- data.frame (pkgs)
     names (pkgs) <- c ("path", "orgrepo")
     path <- fs::path_common (pkgs$path)
+    # If there is only one sub-dir, step down:
+    root_minus1 <- fs::path_common (fs::path_dir (pkg_root))
+    if (identical (path, root_minus1)) {
+        path <- fs::path_dir (path)
+    }
     pkgs$path <- gsub (path, "", pkgs$path)
 
     # These have initial path separators which are removed here:
@@ -78,6 +83,7 @@ write_pkgs_json <- function (pkgs, dir = getwd ()) {
     }
     pkgs <- rm_init_path_sep (pkgs, "path")
     pkgs$root <- gsub (path, "", pkg_root)
+    pkgs <- rm_init_path_sep (pkgs, "root")
 
     files_required <- c ("DESCRIPTION", "NAMESPACE")
     dirs_required <- c ("R", "man")

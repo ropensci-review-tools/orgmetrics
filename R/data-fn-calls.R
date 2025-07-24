@@ -6,17 +6,23 @@
 #' connections between packages in terms of total numbers of functions called
 #' by each pair of packages, and numbers of actual calls made.
 #' @noRd
-rm_org_data_fn_call_network <- function (org_paths) {
+rm_org_data_fn_call_network <- function (pkgs_json) {
+
+    requireNamespace ("jsonlite", quietly = TRUE)
 
     # Suppress no visible binding notes:
-    package <- n <- NULL
+    is_r_pkg <- package <- n <- NULL
 
-    fn_calls <- rm_org_data_fn_calls (org_paths)
+    pkgs_dat <- jsonlite::read_json (pkgs_json, simplify = TRUE) |>
+        dplyr::filter (is_r_pkg)
+    pkgs_dat$path <- fs::path (fs::path_dir (pkgs_json), pkgs_dat$path)
+
+    fn_calls <- rm_org_data_fn_calls (pkgs_dat)
 
     fn_call_summary <- NULL
     if (!is.null (fn_calls)) {
         fn_call_summary <- fn_calls |>
-            dplyr::group_by (source, package) |>
+            dplyr::group_by (source, target_pkg) |>
             dplyr::summarise (
                 num_fns = dplyr::n (),
                 num_calls = sum (n),
@@ -29,39 +35,39 @@ rm_org_data_fn_call_network <- function (org_paths) {
 
 #' Collate calls to all functions defined within packages of an organization.
 #' @noRd
-rm_org_data_fn_calls <- function (org_paths) {
+rm_org_data_fn_calls <- function (pkgs_dat) {
 
     # Suppress no visible binding notes:
     fn <- NULL
 
-    requireNamespace ("pkgmatch")
+    requireNamespace ("pkgmatch", quietly = TRUE)
 
-    pkg_names <- get_all_pkg_names (org_paths)
+    pkg_names <- get_all_pkg_names (pkgs_dat)
 
     fn_calls <- pbapply::pblapply (pkg_names$path, function (p) {
-
-        res <- get_pkg_fn_calls (p, pkg_names)
-        if (!is.null (res)) {
-            res <- res |>
-                dplyr::mutate (source = get_pkg_name (p), .before = 1L) |>
-                dplyr::mutate (fn = gsub ("^.*\\:\\:", "", fn))
-        }
-        return (res)
+        get_pkg_fn_calls (p, pkg_names)
     })
+    fn_calls <- do.call (rbind, fn_calls)
 
-    return (do.call (rbind, fn_calls))
+    if (nrow (fn_calls) > 0L) {
+        fn_calls <- fn_calls |>
+            dplyr::mutate (source = gsub ("\\:\\:.*$", "", fn), .before = 1L) |>
+            dplyr::mutate (fn = gsub ("^.*\\:\\:", "", fn)) |>
+            dplyr::rename (target_fn = name, target_pkg = package)
+    }
+
+    return (fn_calls)
 }
 
-get_all_pkg_names <- function (org_paths = NULL) {
+get_all_pkg_names <- function (pkgs_dat = NULL) {
 
-    checkmate::assert_directory_exists (org_paths)
-
-    pkgs <- fs::dir_ls (org_paths, type = "directory", recurse = FALSE)
-    pkg_names <- vapply (pkgs, function (i) {
+    dir <- fs::path_common (pkgs_dat$path)
+    pkgs_root <- fs::path (dir, pkgs_dat$root)
+    pkg_names <- vapply (pkgs_root, function (i) {
         get_pkg_name (i)
     }, character (1L), USE.NAMES = FALSE)
-    res <- data.frame (path = as.character (pkgs), pkg_name = pkg_names)
-    res <- res [which (nzchar (pkg_names)), ]
+    res <- data.frame (path = as.character (pkgs_root), pkg_name = pkg_names)
+    res [which (nzchar (pkg_names)), ]
 }
 
 get_pkg_name <- function (path) {
@@ -85,13 +91,13 @@ get_pkg_fn_calls_internal <- function (path, pkg_names) {
         return (NULL)
     }
 
-    fns <- fns |>
+    this_pkg <- get_pkg_name (path)
+
+    fns |>
         dplyr::mutate (package = gsub ("\\:\\:.*$", "", name), .after = name) |>
         dplyr::filter (package %in% pkg_names$pkg_name) |>
         dplyr::group_by (fn, name, package) |>
         dplyr::summarise (n = dplyr::n (), .groups = "keep") |>
         dplyr::filter (!package == get_pkg_name (path))
-
-    return (fns)
 }
 get_pkg_fn_calls <- memoise::memoise (get_pkg_fn_calls_internal)

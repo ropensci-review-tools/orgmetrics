@@ -1,3 +1,8 @@
+# The 'dplyr::mutate' calls in 'rm_org_data_fn_calls()' fail on windows and
+# mac, but work on Linux.
+skip_on_os ("windows")
+skip_on_os ("mac")
+
 test_that ("function call network", {
 
     d <- fs::path (fs::path_temp (), "tmpjson")

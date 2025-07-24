@@ -19,16 +19,13 @@ rm_org_data_fn_call_network <- function (pkgs_json) {
 
     fn_calls <- rm_org_data_fn_calls (pkgs_dat)
 
-    fn_call_summary <- NULL
-    if (!is.null (fn_calls)) {
-        fn_call_summary <- fn_calls |>
-            dplyr::group_by (source, target_pkg) |>
-            dplyr::summarise (
-                num_fns = dplyr::n (),
-                num_calls = sum (n),
-                .groups = "keep"
-            )
-    }
+    fn_call_summary <- fn_calls |>
+        dplyr::group_by (source, target_pkg) |>
+        dplyr::summarise (
+            num_fns = dplyr::n (),
+            num_calls = sum (n),
+            .groups = "keep"
+        )
 
     return (list (fn_calls = fn_calls, summary = fn_call_summary))
 }
@@ -49,19 +46,18 @@ rm_org_data_fn_calls <- function (pkgs_dat) {
     })
     fn_calls <- do.call (rbind, fn_calls)
 
-    if (nrow (fn_calls) > 0L) {
-        fn_calls <- fn_calls |>
-            dplyr::mutate (source = gsub ("\\:\\:.*$", "", fn), .before = 1L) |>
-            dplyr::mutate (fn = gsub ("^.*\\:\\:", "", fn)) |>
-            dplyr::rename (target_fn = name, target_pkg = package)
-    }
-
-    return (fn_calls)
+    fn_calls |>
+        dplyr::mutate (source = gsub ("\\:\\:.*$", "", fn), .before = 1L) |>
+        dplyr::mutate (fn = gsub ("^.*\\:\\:", "", fn)) |>
+        dplyr::rename (target_fn = name, target_pkg = package)
 }
 
 get_all_pkg_names <- function (pkgs_dat = NULL) {
 
     dir <- fs::path_common (pkgs_dat$path)
+    if (length (unique (fs::path_dir (pkgs_dat$path))) == 1L) {
+        dir <- fs::path_dir (dir)
+    }
     pkgs_root <- fs::path (dir, pkgs_dat$root)
     pkg_names <- vapply (pkgs_root, function (i) {
         get_pkg_name (i)

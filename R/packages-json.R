@@ -159,15 +159,17 @@ pkgs_are_r <- function (pkgs) {
 #' @param pkgs_json Local path to 'packages.json' as created or updated by
 #' running \link{om_packages_json}. That function must be run first, prior to
 #' calling this function!
-#' @return Nothing; called for side-effect of clone or updating all
-#' repositories defined in 'packages.json'.
+#' @return Function primarily called for side-effect of clone or updating all
+#' repositories defined in 'packages.json', but does invisibly return a vector
+#' of paths to all local repositories of R packages as listed in `pkgs_json`.
+#'
 #'
 #' @export
 clone_gh_org_repos <- function (pkgs_json = NULL) {
 
     requireNamespace ("jsonlite", quietly = TRUE)
 
-    checkmate::assert_character (pks_json, len = 1L)
+    checkmate::assert_character (pkgs_json, len = 1L)
     checkmate::assert_file_exists (pkgs_json)
 
     # Supress no visible binding notes:
@@ -177,24 +179,28 @@ clone_gh_org_repos <- function (pkgs_json = NULL) {
         dplyr::filter (is_r_pkg)
 
     dir <- fs::path_dir (pkgs_json)
+    pj$path <- fs::path (dir, pj$path)
 
-    for (p in pj$orgrepo) {
-        url <- paste0 ("https://github.com/", p)
-        dir_org <- fs::path (dir, gsub ("\\/.*$", "", p))
+    cli::cli_alert_info ("Cloning or updating {nrow (pj)} repositories.")
+
+    out <- pbapply::pblapply (seq_len (nrow (pj)), function (i) {
+        url <- paste0 ("https://github.com/", pj$orgrepo [i])
+        dir_org <- fs::path_dir (pj$path [i])
         if (!fs::dir_exists (dir_org)) {
             fs::dir_create (dir_org)
         }
-        dest_dir <- fs::path (dir_org, p)
-        if (!fs::dir_exists (dest_dir)) {
+        if (!fs::dir_exists (pj$path [i])) {
             withr::with_dir (
                 dir_org,
                 gert::git_clone (url)
             )
         } else {
             withr::with_dir (
-                dest_dir,
-                gert::git_pull (verbose = FALSE)
+                pj$path [i],
+                gert::git_fetch (verbose = FALSE)
             )
         }
-    }
+    })
+
+    invisible (unlist (out))
 }

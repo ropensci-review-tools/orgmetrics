@@ -39,7 +39,11 @@ test_that ("write pkgs_json", {
         fs::dir_create (path, recurse = TRUE)
         fs::path_rel (path, start = d)
     }, character (1L))
-    pkgs <- cbind (fs::path (d, repos), repos)
+    pkgs <- data.frame (
+        repo_path = fs::path (d, repos),
+        repos = repos,
+        row.names = NULL
+    )
 
     f <- write_pkgs_json (pkgs, dir = d)
     expect_s3_class (f, "fs_path")
@@ -61,14 +65,29 @@ test_that ("clone gh org repos", {
     expect_false (fs::dir_exists (d))
     fs::dir_create (d)
 
-    clone_gh_org_repos (dir = d, orgs = org)
+    repos <- c ("orgmetrics", "repometrics")
+    repos <- vapply (repos, function (repo) {
+        path_repo <- c ("ropensci-review-tools", repo)
+        path <- do.call (fs::path, as.list (c (d, path_repo)))
+        fs::dir_create (path, recurse = TRUE)
+        fs::path_rel (path, start = d)
+    }, character (1L))
+    pkgs <- data.frame (
+        repo_path = fs::path (d, repos),
+        repos = repos,
+        row.names = NULL
+    )
+
+    f <- write_pkgs_json (pkgs, dir = d)
+
+    clone_gh_org_repos (pkgs_json = f)
 
     f <- fs::dir_ls (d, type = "file")
     expect_length (f, 1L)
     expect_equal (basename (f), "packages.json")
     f <- fs::dir_ls (d, type = "directory")
     expect_length (f, 1L)
-    expect_equal (basename (f), "ropensci")
+    expect_equal (basename (f), "ropensci-review-tools")
 
     d_org <- f
     f <- fs::dir_ls (d_org, type = "directory")

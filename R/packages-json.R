@@ -13,7 +13,7 @@ om_packages_json <- function (org_path = NULL) {
     checkmate::assert_character (org_path, len = 1L)
     checkmate::assert_directory_exists (org_path)
 
-    org_paths <- fs::dir_ls (path, type = "directory")
+    org_paths <- fs::dir_ls (org_path, type = "directory")
     org_paths <- org_paths [which (!grepl ("(temp|extra)$", org_paths))]
 
     repos <- lapply (basename (org_paths), function (p) {
@@ -32,11 +32,16 @@ om_packages_json <- function (org_path = NULL) {
         extra_repos <- data.frame (repo_path = extra_path, repos = extra_repos)
         repos <- rbind (repos, extra_repos)
     }
-    repos [, 1] <- paste0 (path, repos [, 1])
+    repos [, 1] <- paste0 (org_path, repos [, 1])
 
     write_pkgs_json (repos, dir = org_path)
 }
 
+#' Write the 'packages.json' file.
+#'
+#' @param pkgs A `data.frame` of two columns: "repo_path" with full local path
+#' to repositories, and "repos" with GitHub 'org/repo'.
+#' @noRd
 write_pkgs_json <- function (pkgs, dir = getwd ()) {
 
     requireNamespace ("jsonlite", quietly = TRUE)

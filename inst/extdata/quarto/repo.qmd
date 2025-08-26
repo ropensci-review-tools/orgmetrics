@@ -172,7 +172,8 @@ rownames (deps) <- NULL
 repo_metrics_data <- readRDS (fs::path ("data", "results-repo-metrics.Rds"))
 
 fn_calls <- readRDS (fs::path ("data", "fn-calls.Rds"))$fn_calls |>
-    dplyr::group_by (name, package) |>
+    dplyr::group_by (fn, source) |>
+    dplyr::rename (name = fn, package = source) |>
     dplyr::summarise (n = sum (n), .groups = "keep") |>
     dplyr::ungroup () |>
     dplyr::mutate (name = gsub ("^.*\\:\\:", "", name)) |>

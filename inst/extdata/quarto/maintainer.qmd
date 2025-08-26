@@ -189,13 +189,6 @@ Inputs.table(metricsTable, {
 ******** END REPO-LEVEL METRICS TABLE ********
 --->
 
-
-## Co-Maintainers
-
-```{ojs comaintainers-list}
-htl.html`<ul>${these_cos_list}</ul>`
-```
-
 ## Network
 
 ```{ojs network-in}
@@ -361,4 +354,11 @@ drag = simulation => {
         .on("drag", dragged)
         .on("end", dragended);
 }
+```
+
+
+## Co-Maintainers
+
+```{ojs comaintainers-list}
+htl.html`<ul>${these_cos_list}</ul>`
 ```

@@ -34,9 +34,8 @@ test_that ("write pkgs_json", {
 
     repos <- c ("orgmetrics", "repometrics")
     repos <- vapply (repos, function (repo) {
-        path_repo <- c ("ropensci-review-tools", repo)
-        path <- do.call (fs::path, as.list (c (d, path_repo)))
-        fs::dir_create (path, recurse = TRUE)
+        tmp <- generate_test_pkg ()
+        path <- fs::dir_copy (tmp, fs::path (d, "ropensci-review-tools", repo))
         fs::path_rel (path, start = d)
     }, character (1L))
     pkgs <- data.frame (
@@ -59,7 +58,6 @@ skip_if (!test_all)
 test_that ("clone gh org repos", {
     Sys.setenv ("ORGMETRICS_TESTS" = "true")
     Sys.setenv ("REPOMETRICS_TESTS" = "true") # n_per_page = 2
-    org <- "ropensci"
 
     d <- fs::path (fs::path_temp (), "orgrepos")
     expect_false (fs::dir_exists (d))
@@ -67,9 +65,8 @@ test_that ("clone gh org repos", {
 
     repos <- c ("orgmetrics", "repometrics")
     repos <- vapply (repos, function (repo) {
-        path_repo <- c ("ropensci-review-tools", repo)
-        path <- do.call (fs::path, as.list (c (d, path_repo)))
-        fs::dir_create (path, recurse = TRUE)
+        tmp <- generate_test_pkg ()
+        path <- fs::dir_copy (tmp, fs::path (d, "ropensci-review-tools", repo))
         fs::path_rel (path, start = d)
     }, character (1L))
     pkgs <- data.frame (
@@ -79,6 +76,7 @@ test_that ("clone gh org repos", {
     )
 
     f <- write_pkgs_json (pkgs, dir = d)
+    fs::dir_delete (pkgs$repo_path)
 
     clone_gh_org_repos (pkgs_json = f)
 

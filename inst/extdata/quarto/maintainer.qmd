@@ -143,6 +143,7 @@ index1 <- which (names (data_metrics) == max (names (data_metrics)))
 m <- data_metrics [[index1]] |>
     tidyr::pivot_wider (names_from = name, values_from = value) |>
     orgmetrics:::data_metrics_group () |>
+    dplyr::select (-none) |>
     dplyr::relocate (total, .after = package) |>
     dplyr::arrange (by = desc (total))
 ojs_define (metrics_table_in = m)

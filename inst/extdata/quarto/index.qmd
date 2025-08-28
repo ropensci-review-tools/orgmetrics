@@ -254,6 +254,12 @@ bslib::page_fillable (
 ```
 
 
+<!--- ----------------------------------------------------- --->
+
+## Maintenance Priorities
+
+This section links to repositories with distinct maintenance priorities.
+
 ```{r}
 # Code to get outlier metrics for packages identified as having maintenance
 # priorities:
@@ -285,26 +291,15 @@ m <- dplyr::filter (m, package %in% data$package) |>
     dplyr::group_by (package)
 
 # Update metrics names to descriptions:
-desc <- data.frame (
-    name = limits$name,
-    desc = limits$name
-)
-desc$desc [desc$name == "burstiness"] <- "Development too 'bursty':"
-desc$desc [desc$name == "dependency_count"] <- "Potentially excessive dependencies:"
-desc$desc [desc$name == "has_ci"] <- "Lacking continuous integration:"
-desc$desc [desc$name == "issue_age"] <- "Old or stale issues:"
-desc$desc [desc$name == "issue_response_time"] <- "Issue response time:"
-desc$desc [desc$name == "issues_to_prs"] <- "High ratio of issues-to-PRs:"
-desc$desc [desc$name == "libyears"] <- "Dependencies need updating/checking:"
-desc$desc [desc$name == "maintainer_count"] <- "Low number of maintainers:"
-desc$desc [desc$name == "num_stars"] <- "Low number of GitHub stars:"
-desc$desc [desc$name == "pr_response_durations"] <- "Slow response to pull requests:"
-desc$desc [desc$name == "pr_review_duration"] <- "Slow review times on pull requests:"
-desc$desc [desc$name == "release_freq"] <- "Infrequent releases:"
-desc$desc [desc$name == "response_time"] <- "Slow response to issues:"
-desc$desc [desc$name == "time_to_close"] <- "Time to close issues too long:"
-desc$desc [desc$name == "test_coverage"] <- "Low test coverage:"
-m$name <- desc$desc [match (m$name, desc$name)]
+rm_metrics_json <- system.file (
+    "extdata",
+    "metrics-models",
+    "metrics-models.json",
+    package = "repometrics"
+) |>
+    jsonlite::read_json (simplify = TRUE)
+rm_metrics_dat <- rm_metrics_json$metrics
+m$name <- rm_metrics_dat$airtable_name [match (m$name, rm_metrics_dat$name)]
 
 metrics <- unique (m$name)
 metrics_data <- lapply (metrics, function (i) {

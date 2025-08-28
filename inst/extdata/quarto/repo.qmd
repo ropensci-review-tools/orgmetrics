@@ -832,8 +832,11 @@ viewof outliersOnly = Inputs.radio(
 
 rm_metrics_models = json_data['rm_metrics_models'];
 rm_models = rm_metrics_models['models'];
+rm_model_text = rm_metrics_models['model_names'];
+modelsTextMap = rm_model_text.reduce((map, item) => {
+    return map.set(String(item.name), item.airtable_name);
+}, new Map());
 rm_metrics = rm_metrics_models['metrics'];
-modelsTextMap = new Map(Object.entries(rm_models));
 metricsTextMap = rm_metrics.reduce((map, item) => {
     return map.set(String(item.name), item.airtable_name);
 }, new Map());

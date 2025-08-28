@@ -123,10 +123,11 @@ htl.html`<div><a href="https://github.com/${maintainer}" target="_blank">github.
 
 <div style="margin-top: 10px; margin-bottom: 10px;"></div>
 
-## Packages
+## Repositories
 
 This is a sub-set of the main table on [the _Organization_ page](/org.html),
-showing only packages maintained by _`{ojs} maintainer`_. Values are scaled
+showing repository metrics aggregated across the four categories described there.
+Values are shown only for repositories maintained by _`{ojs} maintainer`_, and are scaled
 between 0 and 1 based on the distribution of values across the entire
 organization, with higher values always better than lower values.
 

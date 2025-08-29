@@ -23,7 +23,7 @@ num_repos <- nrow (repo_data)
 repo_orgs <- gsub ("\\/.*$", "", repo_data$orgrepo) |>
     table () |>
     sort (decreasing = TRUE) |>
-    head (n = 2L)
+    head (n = 3L)
 ```
 
 
@@ -90,7 +90,8 @@ bslib::page_fillable (
             theme = "bg-gradient-blue-orange",
             htmltools::p ("including"),
             htmltools::p (bsicons::bs_icon ("1-square"), lines [1]),
-            htmltools::p (bsicons::bs_icon ("2-square"), lines [2])
+            htmltools::p (bsicons::bs_icon ("2-square"), lines [2]),
+            htmltools::p (bsicons::bs_icon ("3-square"), lines [3])
         ),
         bslib::value_box (
             full_screen = FALSE,
@@ -253,6 +254,36 @@ bslib::page_fillable (
 ```
 
 
+<!--- ----------------------------------------------------- --->
+
+-----
+
+This dashboard presents metrics and models for each repository within both the
+[`epiverse-trace`](https://github.com/epiverse-trace),
+[`reconhub`](https://github.com/reconhub), and
+[`reconverse`](https://github.com/reconverse) GitHub organizations. It is
+intended to demonstrate the kinds of analyses and insights that are possible,
+and is expected to change and develop a lot. Please provide feedback via GitHub
+by clicking on the symbol on the top right.
+
+The dashboard currently has four main pages:
+
+1. An [organization maintenance](./org.html) page identifying maintenance
+   priorities across all repositories within all organizations.
+2. A [repository maintenance](./repo.html) page providing additional
+   detail on maintenance needs of any selected repository.
+3. A [maintainer](/maintainer.html) page with details of individual
+   maintainers, their packages and co-maintainers.
+4. A [*Community Health*](./models.html) providing additional detail on scores
+   for the various [CHAOSS (*Community Health Analytics in Open Source
+    Software*) models and
+    metrics](https://chaoss.community/kb-metrics-and-metrics-models/) for each
+    repository.
+
+## Maintenance Priorities
+
+This section links to repositories with distinct maintenance priorities.
+
 ```{r}
 # Code to get outlier metrics for packages identified as having maintenance
 # priorities:
@@ -284,26 +315,15 @@ m <- dplyr::filter (m, package %in% data$package) |>
     dplyr::group_by (package)
 
 # Update metrics names to descriptions:
-desc <- data.frame (
-    name = limits$name,
-    desc = limits$name
-)
-desc$desc [desc$name == "burstiness"] <- "Development too 'bursty':"
-desc$desc [desc$name == "dependency_count"] <- "Potentially excessive dependencies:"
-desc$desc [desc$name == "has_ci"] <- "Lacking continuous integration:"
-desc$desc [desc$name == "issue_age"] <- "Old or stale issues:"
-desc$desc [desc$name == "issue_response_time"] <- "Issue response time:"
-desc$desc [desc$name == "issues_to_prs"] <- "High ratio of issues-to-PRs:"
-desc$desc [desc$name == "libyears"] <- "Dependencies need updating/checking:"
-desc$desc [desc$name == "maintainer_count"] <- "Low number of maintainers:"
-desc$desc [desc$name == "num_stars"] <- "Low number of GitHub stars:"
-desc$desc [desc$name == "pr_response_durations"] <- "Slow response to pull requests:"
-desc$desc [desc$name == "pr_review_duration"] <- "Slow review times on pull requests:"
-desc$desc [desc$name == "release_freq"] <- "Infrequent releases:"
-desc$desc [desc$name == "response_time"] <- "Slow response to issues:"
-desc$desc [desc$name == "time_to_close"] <- "Time to close issues too long:"
-desc$desc [desc$name == "test_coverage"] <- "Low test coverage:"
-m$name <- desc$desc [match (m$name, desc$name)]
+rm_metrics_json <- system.file (
+    "extdata",
+    "metrics-models",
+    "metrics-models.json",
+    package = "repometrics"
+) |>
+    jsonlite::read_json (simplify = TRUE)
+rm_metrics_dat <- rm_metrics_json$metrics
+m$name <- rm_metrics_dat$airtable_name [match (m$name, rm_metrics_dat$name)]
 
 metrics <- unique (m$name)
 metrics_data <- lapply (metrics, function (i) {
@@ -321,61 +341,35 @@ metrics_data <- lapply (metrics, function (i) {
 # NOTE that the href values here are filled with the sub-domain when deployed,
 # so DO NOT need to be modified!
 bslib::page_fillable (
-    bslib::card (
-        full_screen = FALSE,
-        bslib::card_header ("Maintenance priorities:"),
-        bslib::card_body (
-            lapply (metrics_data, function (i) {
-                htmltools::div (
-                    htmltools::h3 (i$h),
-                    if (length (i$text) == 1L) {
-                        tags$p (
-                            bsicons::bs_icon ("caret-right"),
-                            tags$a (
-                                href = "/repo.html",
-                                onclick = sprintf ("localStorage.setItem('orgmetricsRepo', '%s')", i$text),
-                                i$text
-                            )
-                        )
-                    } else {
-                        htmltools::tagList (lapply (seq_along (i$text), function (j) {
-                            tags$p (
-                                bsicons::bs_icon ("caret-right"),
-                                tags$a (
-                                    href = "/repo.html",
-                                    onclick = sprintf ("localStorage.setItem('orgmetricsRepo', '%s')", i$text [j]),
-                                    i$text [j]
-                                )
-                            )
-                        }))
-                    },
-                    style = "padding-bottom: 1rem; padding-top: 0px; border-bottom: 1px solid #eee;"
+    lapply (metrics_data, function (i) {
+        htmltools::div (
+            htmltools::h3 (i$h),
+            if (length (i$text) == 1L) {
+                tags$p (
+                    bsicons::bs_icon ("caret-right"),
+                    tags$a (
+                        href = "/repo.html",
+                        onclick = sprintf ("localStorage.setItem('orgmetricsRepo', '%s')", i$text),
+                        i$text
+                    )
                 )
-            })
+            } else {
+                htmltools::tagList (lapply (seq_along (i$text), function (j) {
+                    tags$p (
+                        bsicons::bs_icon ("caret-right"),
+                        tags$a (
+                            href = "/repo.html",
+                            onclick = sprintf ("localStorage.setItem('orgmetricsRepo', '%s')", i$text [j]),
+                            i$text [j]
+                        )
+                    )
+                }))
+            },
+            style = "padding-bottom: 1rem; padding-top: 0px; border-bottom: 1px solid #eee;"
         )
-    )
+    })
 )
 ```
 
 
 -----
-
-This dashboard presents metrics and models for each repository within both the
-[`epiverse-trace`](https://github.com/epiverse-trace) and
-[`reconhub`](https://github.com/reconhub) GitHub organizations. It is intended
-to demonstrate the kinds of analyses and insights that are possible. It is
-intended to change and develop a lot. Please provide feedback via GitHub by
-clicking on the symbol on the top right.
-
-The dashboard currently has four main pages:
-
-1. An [organization maintenance](./org.html) page identifying
-   maintenance priorities across all repositories.
-2. A [repository maintenance](./repo.html) page providing additional
-   detail on maintenance needs of a selected repository.
-3. A [maintainer](/maintainer.html) page with details of individual
-   maintainers, their packages and co-maintainers.
-4. A [*Community Health*](./models.html) summarising scores for the various
-   [CHAOSS (*Community Health Analytics in Open Source Software*) models and
-metrics](https://chaoss.community/kb-metrics-and-metrics-models/) for each
-repository.

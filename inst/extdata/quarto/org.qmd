@@ -108,6 +108,168 @@ function ctbfmt(ctb) {
 ******** END UTILITY FUNCTIONS ********
 --->
 
+## Repository Network
+
+This graph shows dependencies between all packages which use any other
+organization package. Nodes show individual packages, with circles for each
+package scaled by total numbers of dependent packages; that is, numbers of
+other packages which depend on that package. Edges connect dependent packages,
+with thicknesses scaled by total numbers of function calls by all dependent
+packages.
+
+```{r}
+data_pkgcheck <- readRDS (fs::path ("data", "results-pkgcheck.Rds"))
+pkg_deps <- lapply (data_pkgcheck, function (i) {
+    cbind (name = i$pkg$name, i$pkg$dependencies)
+})
+pkg_deps <- do.call (rbind, unname (pkg_deps)) |>
+    dplyr::filter (package %in% unique (name))
+
+nodes <- data.frame (
+    id = unique (c (pkg_deps$package, pkg_deps$name)),
+    size = 0L
+)
+pkg_counts <- table (pkg_deps$package)
+index <- match (names (pkg_counts), nodes$id)
+nodes$size [index] <- as.integer (pkg_counts)
+nodes$size <- nodes$size + 1
+
+pkg_deps$ncalls [is.na (pkg_deps$ncalls)] <- 0L
+pkg_deps$ncalls <- pkg_deps$ncalls + 1L
+edges <- data.frame (
+    source = pkg_deps$name,
+    target = pkg_deps$package,
+    value = pkg_deps$ncall
+)
+
+ojs_define (nodes_in = nodes)
+ojs_define (edges_in = edges)
+```
+
+```{ojs}
+pkg_nodes = {
+    return transpose(nodes_in).map(row => ({
+        ...row,
+    }));
+}
+pkg_edges = {
+    return transpose(edges_in).map(row => ({
+        ...row,
+    }));
+}
+```
+
+<!--------- break -------->
+
+
+```{ojs ForceGraph-plot}
+strength = -400;
+
+chart = {
+
+    const width = 928;
+    const height = 600;
+
+    const types = Array.from(new Set(pkg_nodes.map(d => d.group)));
+
+    const color = d3.scaleOrdinal(types, d3.schemeCategory10);
+
+    const simulation = d3.forceSimulation(pkg_nodes)
+        .force("link", d3.forceLink(pkg_edges).id(d => d.id))
+        .force("charge", d3.forceManyBody().strength(strength))
+        .force("x", d3.forceX())
+        .force("y", d3.forceY());
+
+    const svg = d3.create("svg")
+        .attr("viewBox", [-width / 2, -height / 2, width, height])
+        .attr("width", width)
+        .attr("height", height)
+        .attr("style", "max-width: 100%; height: auto; font: 14px sans-serif;");
+
+    const link = svg.append("g")
+        .attr("fill", "none")
+        .attr("stroke-width", 1.5)
+        .selectAll("path")
+        .data(pkg_edges)
+        .join("path")
+            .attr("stroke", "gray")
+            .attr("stroke-width", d => d.value);
+
+    const node = svg.append("g")
+        .selectAll("g")
+        .data(pkg_nodes)
+        .join("g")
+            .call(drag(simulation));
+
+    node.append("circle")
+        .attr("stroke", "white")
+        .attr("stroke-width", 1.5)
+        .data(pkg_nodes)
+        .join("circle")
+            .attr("fill", d => color(d.group))
+            .attr("r", d => d.size);
+
+    node.append("text")
+        .attr("x", 8)
+        .attr("y", "0.31em")
+        .text(d => d.id)
+        .html(d =>
+            `<a href="/repo.html"
+                onclick="localStorage.setItem('orgmetricsRepo', '${d.id}')">${d.id}</a>`)
+        .clone(true).lower()
+            .attr("fill", "none")
+            .attr("stroke", "white")
+            .attr("stroke-width", 3);
+
+    simulation.on("tick", () => {
+        link.attr("d", linkArc);
+        node.attr("transform", d => `translate(${d.x},${d.y})`);
+    });
+
+    invalidation.then(() => simulation.stop());
+
+    return Object.assign(svg.node(), {scales: {color}});
+}
+```
+
+```{ojs}
+function linkArc(d) {
+    const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
+    return `
+    M${d.source.x},${d.source.y}
+    A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
+    `;
+}
+```
+
+```{ojs}
+drag = simulation => {
+
+    function dragstarted(event, d) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+    }
+
+    function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+    }
+
+    function dragended(event, d) {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+    }
+
+    return d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended);
+}
+```
+
+
 ## Aggregate metrics
 
 This chart shows the recent development of metrics aggregated into each of the

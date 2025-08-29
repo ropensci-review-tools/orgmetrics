@@ -110,42 +110,57 @@ function ctbfmt(ctb) {
 
 ## Repository Network
 
+This graph shows dependencies between all packages which use any other
+organization package. Nodes show individual packages, with circles for each
+package scaled by total numbers of dependent packages; that is, numbers of
+other packages which depend on that package. Edges connect dependent packages,
+with thicknesses scaled by total numbers of function calls by all dependent
+packages.
+
 ```{r}
 data_pkgcheck <- readRDS (fs::path ("data", "results-pkgcheck.Rds"))
 pkg_deps <- lapply (data_pkgcheck, function (i) {
     cbind (name = i$pkg$name, i$pkg$dependencies)
 })
 pkg_deps <- do.call (rbind, unname (pkg_deps)) |>
-    dplyr::filter (package %in% name)
-pkg_deps_net <- lapply (
-    split (pkg_deps, f = as.factor (pkg_deps$name)),
-    function (i) i$package
-)
-ojs_define (pkg_deps_net_in = pkg_deps_net)
-```
+    dplyr::filter (package %in% unique (name))
 
+nodes <- data.frame (
+    id = unique (c (pkg_deps$package, pkg_deps$name)),
+    size = 0L
+)
+pkg_counts <- table (pkg_deps$package)
+index <- match (names (pkg_counts), nodes$id)
+nodes$size [index] <- as.integer (pkg_counts)
+nodes$size <- nodes$size + 1
+
+pkg_deps$ncalls [is.na (pkg_deps$ncalls)] <- 0L
+pkg_deps$ncalls <- pkg_deps$ncalls + 1L
+edges <- data.frame (
+    source = pkg_deps$name,
+    target = pkg_deps$package,
+    value = pkg_deps$ncall
+)
+
+ojs_define (nodes_in = nodes)
+ojs_define (edges_in = edges)
+```
 
 ```{ojs}
-pkg_node_names = Object.keys(pkg_deps_net_in);
-pkg_nodes = Object.entries(pkg_deps_net_in).map(([name, array]) => ({
-    name: name,
-    size: array.length
-}))
-pkg_edges = Object.entries(pkg_deps_net_in).flatMap(([source, targets]) => {
-    if (!Array.isArray(targets)) {
-        return [];
-    }
-    return targets.map(target => ({ source, target }))
-});
-console.log("-------NODES: " + JSON.stringify(pkg_nodes));
-console.log("-------EDGES: " + JSON.stringify(pkg_edges));
+pkg_nodes = {
+    return transpose(nodes_in).map(row => ({
+        ...row,
+    }));
+}
+pkg_edges = {
+    return transpose(edges_in).map(row => ({
+        ...row,
+    }));
+}
 ```
 
+<!--------- break -------->
 
-```{ojs swatches}
-import {Swatches} from "@d3/color-legend"
-Swatches(chart.scales.color)
-```
 
 ```{ojs ForceGraph-plot}
 strength = -400;

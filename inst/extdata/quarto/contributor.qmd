@@ -1,5 +1,5 @@
 ---
-title: "Maintainers"
+title: "Contributors and Maintainers"
 execute:
   echo: false
 format: 
@@ -100,6 +100,8 @@ viewof maintainer = Inputs.select(
     }
 )
 s = localStorage.setItem("orgmetricsMaintainer", maintainer.toString());
+maintainer_gh_url =
+    htl.html`<a href="https://github.com/${maintainer}" target="_blank"><i>${maintainer}</i></a>`
 ```
 
 <!---- break --->
@@ -127,9 +129,11 @@ htl.html`<div><a href="https://github.com/${maintainer}" target="_blank">github.
 
 This is a sub-set of the main table on [the _Organization_ page](/org.html),
 showing repository metrics aggregated across the four categories described there.
-Values are shown only for repositories maintained by _`{ojs} maintainer`_, and are scaled
-between 0 and 1 based on the distribution of values across the entire
-organization, with higher values always better than lower values.
+Values are shown only for any repositories to which
+`{ojs} maintainer_gh_url` has
+contributed, and are scaled between 0 and 1 based on the distribution of values
+across the entire organization, with higher values always better than lower
+values.
 
 <!---
 ******** START REPO-LEVEL METRICS TABLE ********
@@ -359,7 +363,7 @@ drag = simulation => {
 ```
 
 
-## Co-Maintainers
+## Co-Contributors
 
 ```{ojs comaintainers-list}
 htl.html`<ul>${these_cos_list}</ul>`

@@ -424,11 +424,11 @@ maintainer_gh = [].concat(ctbs_gh.slice(0, maintainer_count) || []);
 maintainer_gh_list = maintainer_gh.length == 0 ? undefined:
     (maintainer_gh.length == 1 ? htl.html`
 <div onclick=${() => localStorage.setItem('orgmetricsMaintainer', maintainer_gh)}>
-<li><a href='/maintainer.html'>${maintainer_gh}</a></li>
+<li><a href='/contributor.html'>${maintainer_gh}</a></li>
 </div>
 ` : maintainer_gh.map(m => htl.html`
 <div onclick=${() => localStorage.setItem('orgmetricsMaintainer', m)}>
-<li><a href='/maintainer.html'>${m}</a></li>
+<li><a href='/contributor.html'>${m}</a></li>
 </div>
 `));
 maintainer_gh_list_txt = maintainer_gh.length > 0 ? htl.html`<ul>${maintainer_gh_list}</ul>` : undefined;
@@ -438,7 +438,7 @@ ctb_count = ctb_gh.length;
 ctb_count_txt = pluraliseObjects(ctb_count, "additional contributor");
 ctb_count_list = ctb_gh.map((item, i) => htl.html`
 <span onclick=${() => localStorage.setItem('orgmetricsMaintainer', item)}>
-<a href='/maintainer.html'>${item}</a>${i < ctb_gh.length - 1 ? ", " : ""}</span>`);
+<a href='/contributor.html'>${item}</a>${i < ctb_gh.length - 1 ? ", " : ""}</span>`);
 ctb_count_html = ctb_count == 0 ? htl.html`<div>No additional contributors</div>` :
     htl.html`<div>${ctb_count_txt}: ${ctb_count_list}</div>`;
 

@@ -9,7 +9,7 @@ website:
     left:
       - org.qmd
       - repo.qmd
-      - maintainer.qmd
+      - contributor.qmd
       - models.qmd
     right:
       - icon: "github"

@@ -272,8 +272,8 @@ The dashboard currently has four main pages:
    priorities across all repositories within all organizations.
 2. A [repository maintenance](./repo.html) page providing additional
    detail on maintenance needs of any selected repository.
-3. A [maintainer](/maintainer.html) page with details of individual
-   maintainers, their packages and co-maintainers.
+3. A [contributor](/contributor.html) page with details of individual
+   maintainers and contributors, their packages and co-contributors.
 4. A [*Community Health*](./models.html) providing additional detail on scores
    for the various [CHAOSS (*Community Health Analytics in Open Source
     Software*) models and

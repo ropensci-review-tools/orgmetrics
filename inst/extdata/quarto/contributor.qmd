@@ -111,7 +111,7 @@ these_cos = comaintainers[maintainer] || null
 these_cos_list = these_cos ?
 these_cos.map(i => htl.html`
 <div onclick=${() => localStorage.setItem('orgmetricsMaintainer', i)}>
-<li><a href="/maintainer.html">${i}</a></li>
+<li><a href="/contributor.html">${i}</a></li>
 </div>`) : htl.html`<li>No co-maintainers</li>`;
 ```
 
@@ -299,7 +299,7 @@ chart = {
         .attr("y", "0.31em")
         .text(d => d.id)
         .html(d => d.group === "Co-maintainer" ?
-            `<a href="/maintainer.html"
+            `<a href="/contributor.html"
                 onclick="localStorage.setItem('orgmetricsMaintainer', '${d.id}')">${d.id}</a>` :
             ((d.group === "packages" || d.group === "otherPackages") ?
                 `<a href="/repo.html"

@@ -451,10 +451,10 @@ test_coverage_txt = "Test coverage: " + (test_coverage ? (test_coverage * 100) +
 
 num_stars = repoMetrics.filter(function(m) {
     return m.name == "num_stars"
-})[0].value * 100;
+})[0].value;
 num_forks = repoMetrics.filter(function(m) {
     return m.name == "num_forks"
-})[0].value * 100;
+})[0].value;
 stars_forks = (num_stars + num_forks).toLocaleString();
 
 num_dl = repoMetrics.filter(function(m) {

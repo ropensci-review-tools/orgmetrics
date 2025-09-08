@@ -107,8 +107,9 @@ pkgcheck_summaries <- lapply (data_pkgcheck, function (d) {
     gsub ("^\\-(\\s?)", "", grep ("^\\-", out, value = TRUE))
 })
 measures_rm <- c (
-    "loc_vignettes", "data_size_median", "n_fns_r_not_exported",
-    "rel_whitespace_R", "rel_whitespace_vignettes", "rel_whitespace_tests"
+    "files_vignettes", "loc_vignettes", "data_size_median",
+    "n_fns_r_not_exported", "rel_whitespace_R", "rel_whitespace_vignettes",
+    "rel_whitespace_tests"
 )
 pkgcheck_stats <- lapply (data_pkgcheck, function (d) {
     d$info$pkgstats |>

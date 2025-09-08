@@ -96,7 +96,7 @@ bslib::page_fillable (
         bslib::value_box (
             full_screen = FALSE,
             fill = FALSE,
-            title = "Urgent maintance required on",
+            title = "Urgent mainetance required",
             value = paste0 (npkgs_requiring_maintenance, " packages"),
             # showcase = bsicons::bs_icon ("heart-pulse"),
             showcase = bsicons::bs_icon ("tools"),

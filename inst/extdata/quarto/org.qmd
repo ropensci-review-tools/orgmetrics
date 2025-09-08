@@ -56,9 +56,26 @@ function sparkbar(max) {
 
 function tooltip(title, expl) {
     const th = document.createElement("th");
+
     th.title = expl
-    th.style.background = "#f0f8ff";
-    th.textContent = title;
+
+    th.style.display = "flex";
+    th.style.justifyContent = "flex-end";
+    th.style.backgroundColor = "#f0f8ff";
+    th.style.width = "100%";
+    th.style.position = "relative";
+
+    const textSpan = document.createElement("span");
+
+    textSpan.textContent = title;
+    textSpan.style.flex = "1";
+    textSpan.style.textAlign = "right";
+    textSpan.style.position = "static";
+    textSpan.style.wordWrap = "break-word";
+    textSpan.style.overflowWrap = "break-word";
+    textSpan.style.whiteSpace = "normal";
+
+    th.appendChild(textSpan);
 
     th.addEventListener("mouseover", () => th.style.background = "#d0e8ff");
     th.addEventListener("mouseout", () => th.style.background = "#f0f8ff");
@@ -713,6 +730,11 @@ ctb_abs_ctb_len = ctb_abs_ctb.length;
 // the inputs here are full names, no GitHub handles, so unless the are
 // identical, this currently fails and needs to be fixed.
 Inputs.table(ctb_abs_ctb, {
+    width: {
+        name: 200,
+        login: 200,
+        measure: 200,
+    },
     format: {
         login: d => ctbfmt(d),
         measure: sparkbar(d3.max(ctb_abs_ctb, d => d.measure)),

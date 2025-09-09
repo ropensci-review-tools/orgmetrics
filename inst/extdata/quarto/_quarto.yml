@@ -14,10 +14,16 @@ website:
     right:
       - icon: "github"
         menu:
+          - text: Feedback
+            url: https://github.com/ropensci-review-tools/orgmetrics/discussions
           - text: Source Code
             url: https://github.com/ropensci-review-tools/orgmetrics
-          - text: Request a Feature
-            url: https://github.com/ropensci-review-tools/orgmetrics/issues/new
+          - text: github.com/reconhub
+            url: https://github.com/reconhub
+          - text: github.com/epiverse-trace
+            url: https://github.com/epiverse-trace
+          - text: github.com/reconverse
+            url: https://github.com/reconverse
 
 format:
   html:

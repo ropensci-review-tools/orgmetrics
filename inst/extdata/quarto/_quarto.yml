@@ -7,9 +7,9 @@ website:
     type: express
   navbar:
     left:
-      - org.qmd
       - repo.qmd
-      - contributor.qmd
+      - text: "Contributors"
+        href: contributor.qmd
       - models.qmd
     right:
       - icon: "github"

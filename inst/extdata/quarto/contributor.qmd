@@ -90,7 +90,8 @@ maintainers = Object.keys(maintainer_pkgs);
 <!---- break --->
 
 ```{ojs maintainer-select}
-maintainerSet = localStorage.getItem("orgmetricsMaintainer") || maintainers [0]
+maintainerSet = localStorage.getItem("orgmetricsMaintainer") ||
+    maintainers [Math.floor(Math.random() * maintainers.length)]
 viewof maintainer = Inputs.select(
     maintainers,
     {

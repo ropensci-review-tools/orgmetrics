@@ -287,7 +287,7 @@ reposAll = metricsTranspose.map(function(item) {
     return item.package;
 });
 repos = Array.from(new Set(reposAll));
-repoSet = localStorage.getItem("orgmetricsRepo") || repos [0]
+repoSet = localStorage.getItem("orgmetricsRepo") || repos [Math.floor(Math.random() * repos.length)]
 viewof repo = Inputs.select(
     repos,
     {

@@ -86,7 +86,30 @@ the `r bsicons::bs_icon("github")` symbol and selecting "_Feedback_".
 
 
 ```{r}
-lines <- paste0 (unname (repo_orgs), " from ", names (repo_orgs))
+# Style <a> hyperlinks in first card for repo overviews:
+org_links <- paste0 (
+    unname (repo_orgs), " from ",
+    "<a style='color:white; text-decoration:underline;' href='https://github.com/",
+    names (repo_orgs),
+    "'>",
+    names (repo_orgs),
+    "</a>"
+)
+org_icons <- lapply (seq_along (repo_orgs), function (i) {
+    bsicons::bs_icon (paste0 (i, "-square"))
+})
+
+# Style <a> hyperlinks for second card of urgent maintenance:
+style <- "color:white; text-decoration:underline;"
+onclick <- "localStorage.setItem('orgmetricsRepo', "
+pkg_links <- sprintf (
+    '<a href=\'/repo.html\' style="%s" onclick="%s \'%s\')">%s</a>',
+    style,
+    onclick,
+    data$package,
+    data$package
+)
+
 bslib::page_fillable (
     bslib::layout_columns (
         bslib::value_box (
@@ -98,16 +121,15 @@ bslib::page_fillable (
             showcase_layout = "top right",
             theme = "bg-gradient-blue-orange",
             htmltools::p ("including"),
-            htmltools::p (bsicons::bs_icon ("1-square"), lines [1]),
-            htmltools::p (bsicons::bs_icon ("2-square"), lines [2]),
-            htmltools::p (bsicons::bs_icon ("3-square"), lines [3])
+            lapply (seq_along (org_links), function (i) {
+                htmltools::p (org_icons [i], htmltools::HTML (org_links [i]))
+            })
         ),
         bslib::value_box (
             full_screen = FALSE,
             fill = FALSE,
             title = "Urgent mainetance required",
             value = paste0 (npkgs_requiring_maintenance, " packages"),
-            # showcase = bsicons::bs_icon ("heart-pulse"),
             showcase = bsicons::bs_icon ("tools"),
             showcase_layout = "top right",
             htmltools::div (
@@ -116,31 +138,16 @@ bslib::page_fillable (
                     "yet low developer responsiveness:"
                 )),
                 htmltools::br (),
-                if (nrow (data) == 1L) {
-                    tags$p (
-                        bsicons::bs_icon ("caret-right"),
-                        tags$a (
-                            href = "/repo.html",
-                            onclick = sprintf ("localStorage.setItem('orgmetricsRepo', '%s')", data$package),
-                            data$package
+                htmltools::tagList (
+                    lapply (seq_len (nrow (data)), function (i) {
+                        tags$p (
+                            bsicons::bs_icon ("caret-right"),
+                            htmltools::HTML (pkg_links [i])
                         )
-                    )
-                } else {
-                    htmltools::tagList (
-                        lapply (seq_len (nrow (data)), function (i) {
-                            tags$p (
-                                bsicons::bs_icon ("caret-right"),
-                                tags$a (
-                                    href = "/repo.html",
-                                    onclick = sprintf ("localStorage.setItem('orgmetricsRepo', '%s')", data$package [i]),
-                                    data$package [i]
-                                )
-                            )
-                        })
-                    )
-                }
+                    })
+                )
             ),
-            theme = "bg-yellow"
+            theme = "bg-gradient-yellow-orange"
         ),
         col_widths = c (6, 6)
     )

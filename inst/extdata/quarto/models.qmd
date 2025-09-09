@@ -206,7 +206,9 @@ Plot.plot({
 ## Community health for individual repositories
 
 The following section shows all models of community health for a selected
-repository.
+repository. The names of the models are hyperlinked to the definitions within
+the specific pages of the [CHAOSS
+models](https://chaoss.community/kbtopic/all-metrics-models/).
 
 ```{ojs get-all-models}
 // Get array of unique repo names for input selector:
@@ -242,11 +244,14 @@ model_repo = models_with_url.filter(function(mod) {
     return mod.package === repo && mod.name !== "final"
 })
 model_repo_len = model_repo.length
+bar_ht_mult = model_repo_len > 20 ? 20 : 40;
 ```
+
+
 
 ```{ojs plot-filtered-repo}
 Plot.plot({
-    height: 40 * model_repo_len,
+    height: bar_ht_mult * model_repo_len,
     marginLeft: 60,
     marginRight: 160,
     marginTop: 50,
@@ -260,25 +265,25 @@ Plot.plot({
     y: { grid: true },
     marks: [
         Plot.barX(model_repo, {
-            y: "name",
-            x: "value",
+            y: d => d.fullname,
+            x: d => d.value,
             sort: {y: "-x" },
-            fill: "value",
+            fill: d => d.value,
         }),
         Plot.barX(model_repo,
             Plot.pointer(
             {
-                y: "name",
-                x: "value",
+                y: d => d.fullname,
+                x: d => d.value,
                 sort: {y: "-x" },
                 stroke: "gray",
-                fill: "value",
+                fill: d => d.value,
                 strokeWidth: 2,
             })
         ),
         Plot.text(model_repo, {
-            x: (d) => d.value < 0 ? 0 : d.value,
-            y: d => d.name,
+            x: d => d.value,
+            y: d => d.fullname,
             text: d => d.fullname,
             href: d => d.url,
             textAnchor: "start",

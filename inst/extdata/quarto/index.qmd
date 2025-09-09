@@ -78,7 +78,7 @@ This dashboard presents metrics and models for each repository within the
 [`epiverse-trace`](https://github.com/epiverse-trace),
 [`reconhub`](https://github.com/reconhub), and
 [`reconverse`](https://github.com/reconverse) GitHub organizations, and some
-related packages from other sources. These organizations are linked under the
+related repositories from other sources. These organizations are linked under the
 `r bsicons::bs_icon("github")` icon on the top right. The dashboard is intended
 to demonstrate the kinds of analyses and insights that are possible, and is
 expected to change and develop a lot. Please provide feedback by clicking on
@@ -109,6 +109,11 @@ pkg_links <- sprintf (
     data$package,
     data$package
 )
+n_urgent <- paste0 (
+    npkgs_requiring_maintenance,
+    " repositor",
+    ifelse (npkgs_requiring_maintenance == 1, "y", "ies")
+)
 
 bslib::page_fillable (
     bslib::layout_columns (
@@ -129,7 +134,7 @@ bslib::page_fillable (
             full_screen = FALSE,
             fill = FALSE,
             title = "Urgent mainetance required",
-            value = paste0 (npkgs_requiring_maintenance, " packages"),
+            value = n_urgent,
             showcase = bsicons::bs_icon ("tools"),
             showcase_layout = "top right",
             htmltools::div (
@@ -281,14 +286,21 @@ The dashboard currently has four main pages:
 2. A [repository maintenance](./repo.html) page providing additional
    detail on maintenance needs of any selected repository.
 3. A [contributor](/contributor.html) page with details of individual
-   maintainers and contributors, their packages and co-contributors.
+   maintainers and contributors, their repositories and co-contributors.
 4. A [*Community Health*](./models.html) providing additional detail on scores
    for the various [CHAOSS (*Community Health Analytics in Open Source
     Software*) models and
     metrics](https://chaoss.community/kb-metrics-and-metrics-models/) for each
     repository.
 
-## Repository Network
+This dashboard currently only considers repositories which are R packages, and
+thus every repository is also a package. Some aspects measured here, like the
+following dependency network, rely on structures specific to R packages, while
+other aspects are more related to the structure of repositories on GitHub. The
+terms "repository" and "package" may nevertheless be considered
+interchangeable.
+
+## Package Network
 
 This graph shows dependencies between all packages which use any other
 organization package. Nodes show individual packages, with circles for each

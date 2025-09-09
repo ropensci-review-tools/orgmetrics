@@ -845,6 +845,9 @@ rm_metrics = rm_metrics_models['metrics'];
 metricsTextMap = rm_metrics.reduce((map, item) => {
     return map.set(String(item.name), item.airtable_name);
 }, new Map());
+metricsUrlMap = rm_metrics.reduce((map, item) => {
+    return map.set(String(item.name), item.url);
+}, new Map());
 modelsUrlMap = rm_model_text.reduce((map, item) => {
     return map.set(String(item.name), item.url);
 }, new Map());
@@ -882,7 +885,8 @@ metricsAll = metricsTranspose.map(item => {
     const key = String(item.name);
     return {
         ...item,
-        name: metricsTextMap.has(key) ? metricsTextMap.get(key) : item.name
+        name: metricsTextMap.has(key) ? metricsTextMap.get(key) : item.name,
+        url: metricsUrlMap.has(key) ? metricsUrlMap.get(key) : item.url
     }
 })
 ```
@@ -969,7 +973,8 @@ Plot.plot({
 This graph provides more detailed insight into the state of the selected
 repository, through showing values for individual [CHAOSS
 metrics](https://chaoss.community/kbtopic/all-metrics/) used to inform the
-aggregate models.
+aggregate models. As for models, the names of the metrics are hyperlinked to
+the CHAOSS definitions, many of which are for general collections of metrics.
 
 ```{ojs}
 metrics = outliersOnly === "true" ?
@@ -980,6 +985,7 @@ metrics = outliersOnly === "true" ?
 metricsRepo = metrics.filter(function(mod) {
     return mod.package === repo
 })
+
 metricsPlotHeight = metricsRepo.length * oneBarHeight + 100;
 ```
 
@@ -1018,8 +1024,9 @@ Plot.plot({
         ),
         Plot.text(metricsRepo, {
             x: (d) => d.value < 0 ? 0 : d.value,
-            y: "name",
-            text: "name",
+            y: d => d.name,
+            text: d => d.name,
+            href: d => d.url,
             textAnchor: "start",
             fontSize: 16,
             dx: 5

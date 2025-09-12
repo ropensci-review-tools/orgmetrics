@@ -91,7 +91,7 @@ org_links <- paste0 (
     unname (repo_orgs), " from ",
     "<a style='color:white; text-decoration:underline;' href='https://github.com/",
     names (repo_orgs),
-    "'>",
+    "' target='_blank'>",
     names (repo_orgs),
     "</a>"
 )

@@ -591,6 +591,9 @@ htl.html`<ul>
     <li>${issue_cmt_html}</li>
 </ul>`
 ```
+<div style="margin-left:20px; margin-top:-15px; font-size:14px; white-space:normal;">
+(<i>Recent</i> &#61; previous year)
+</div>
 </div>
 </div>
 ::::

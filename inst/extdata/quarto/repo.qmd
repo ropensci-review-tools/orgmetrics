@@ -357,6 +357,8 @@ r_univ_builds = data_r_univ_builds[repo];
 r_univ_stats = data_r_univ_stats.filter(function(r) {
     return r.package === repo
 })
+r_univ_score = r_univ_stats[0]['score'].toLocaleString();
+// r_univ_n_scripts = r_univ_stats[0]['n_scripts'].toLocaleString();
 
 r_univ_page = repos_on_r_univ.filter(function(r) {
     return r.package === repo
@@ -563,6 +565,7 @@ htl.html`<ul>
 htl.html`<ul>
     <li>${stars_forks} GitHub stars and forks</li>
     <li>${num_dl} CRAN downloads</li>
+    <li>r-universe score: ${r_univ_score}</li>
     <li>${issue_count}</li>
     <li>${issue_cmt_txt}</li>
 </ul>`

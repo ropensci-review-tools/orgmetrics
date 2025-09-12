@@ -343,6 +343,7 @@ cran_data = cranDataAll.filter(function(r) {
 })
 has_cran_data = cran_data.length > 0;
 not_on_cran = not_cran_in.includes(repo);
+
 gitlog = gitlogDataTranspose.filter(function(r) {
     return r.package === repo
 })
@@ -352,17 +353,25 @@ gitlog_first_commit = gitlog[0]['first_commit'].toLocaleDateString("en-GB", {
     year: 'numeric'
 });
 
-r_univ_jobs = data_r_univ_jobs[repo];
-r_univ_builds = data_r_univ_builds[repo];
-r_univ_stats = data_r_univ_stats.filter(function(r) {
-    return r.package === repo
-})
-r_univ_score = r_univ_stats[0]['score'].toLocaleString();
-// r_univ_n_scripts = r_univ_stats[0]['n_scripts'].toLocaleString();
-
 r_univ_page = repos_on_r_univ.filter(function(r) {
     return r.package === repo
 })
+is_on_r_univ = r_univ_page.length > 0;
+r_univ_universe = is_on_r_univ ? r_univ_page[0]['universe'] : undefined;
+r_univ_package = is_on_r_univ ? r_univ_page[0]['package'] : undefined;
+
+r_univ_jobs = data_r_univ_jobs[repo];
+r_univ_builds = data_r_univ_builds[repo];
+
+r_univ_stats = data_r_univ_stats.filter(function(r) {
+    return r.package === repo
+})
+r_univ_score = is_on_r_univ ? r_univ_stats[0]['score'].toLocaleString() : undefined;
+r_univ_url = "https://" + r_univ_universe + ".r-universe.dev/" + r_univ_package;
+r_univ_score_html = r_univ_score ?
+    htl.html`<a href=${r_univ_url} target="_blank">r-universe score</a>: ${r_univ_score}` :
+    htl.html`Repository not on r-universe`;
+// r_univ_n_scripts = r_univ_stats[0]['n_scripts'].toLocaleString();
 ```
 
 <!---- break --->
@@ -463,10 +472,14 @@ num_forks = repoMetrics.filter(function(m) {
     return m.name == "num_forks"
 })[0].value;
 stars_forks = (num_stars + num_forks).toLocaleString();
+stars_forks_html = htl.html`<a href=${repoURL} target="_blank">GitHub</a> stars and forks: ${stars_forks}`
 
 num_dl = repoMetrics.filter(function(m) {
     return m.name == "cran_downloads"
 })[0].value.toLocaleString();
+cran_dl_html = not_on_cran ?
+    htl.html`Package is not on CRAN` :
+    htl.html`Total <a href="https://cran.r-project.org/package=${repo}" target="_blank">CRAN</a> downloads: ${num_dl}`;
 
 issues_active = repoMetrics.filter(function(m) {
     return m.name == "issues_active"
@@ -474,14 +487,21 @@ issues_active = repoMetrics.filter(function(m) {
 change_req_n_opened = repoMetrics.filter(function(m) {
     return m.name == "change_req_n_opened"
 })[0].value;
-issue_count = pluraliseObjects(issues_active + change_req_n_opened, "Github Issue")
+issue_count = issues_active + change_req_n_opened;
+gh_text = (issue_count === 1) ? "GitHub Issue" : "GitHub Issues";
+issue_count_html = issues_active ?
+    htl.html`Recent <a href="${repoURL}/issues" target="_blank">${gh_text}</a>: ${issue_count}` :
+    htl.html`No GitHub issues`;
 
 // 'issue_cmt_count' from repometrics is *mean* value; convert back to
 // full count here:
 issue_cmt_count = Math.ceil(repoMetrics.filter(function(m) {
     return m.name == "issue_cmt_count"
 })[0].value * issues_active);
-issue_cmt_txt = pluraliseObjects(issue_cmt_count, "Issue comment")
+gh_issue_cmt_text = (issue_cmt_count === 1) ? "Issue comment" : "Issue comments";
+issue_cmt_html = issues_active ?
+    htl.html`Recent <a href="${repoURL}/issues" target="_blank">${gh_issue_cmt_text}</a>: ${issue_cmt_count}` :
+    htl.html`No issue comments`;
 
 imp_txt = 'Imports: ' + deps[0]['imports'];
 sug_txt = 'Suggests: ' + deps[0]['suggests'];
@@ -555,6 +575,7 @@ htl.html`<ul>
 </div>
 ::::
 
+
 <!--- CARD THREE: BOTTOM LEFT --->
 ::::{.g-col-12 .g-col-md-6}
 <div class="card" style="background: linear-gradient(to bottom, #00cc66 0%, #33ccff 100%); text-align:center;">
@@ -563,11 +584,11 @@ htl.html`<ul>
 <h2 style="margin-top:-20px; margin-left:20px;">Popularity &#38;<br>GitHub Activity</h2>
 ```{ojs}
 htl.html`<ul>
-    <li>${stars_forks} GitHub stars and forks</li>
-    <li>${num_dl} CRAN downloads</li>
-    <li>r-universe score: ${r_univ_score}</li>
-    <li>${issue_count}</li>
-    <li>${issue_cmt_txt}</li>
+    <li>${stars_forks_html}</li>
+    <li>${cran_dl_html}</li>
+    <li>${r_univ_score_html}</li>
+    <li>${issue_count_html}</li>
+    <li>${issue_cmt_html}</li>
 </ul>`
 ```
 </div>
@@ -629,9 +650,6 @@ htl.html`
 ## R-universe summary
 
 ```{ojs}
-is_on_r_univ = r_univ_page.length > 0;
-r_univ_universe = is_on_r_univ ? r_univ_page[0]['universe'] : undefined;
-r_univ_package = is_on_r_univ ? r_univ_page[0]['package'] : undefined;
 build_url = is_on_r_univ ? r_univ_builds[0]['buildurl'] : undefined;
 
 build_checks = is_on_r_univ ? r_univ_builds.filter(d => (d['status'] !== "success")) : [];

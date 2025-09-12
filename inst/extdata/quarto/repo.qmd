@@ -503,6 +503,12 @@ issue_cmt_html = issues_active ?
     htl.html`Recent <a href="${repoURL}/issues" target="_blank">${gh_issue_cmt_text}</a>: ${issue_cmt_count}` :
     htl.html`No issue comments`;
 
+recent_comment_html = (issue_count + issue_cmt_count) > 0 ?
+    htl.html`
+<div style="margin-left:20px; margin-top:-15px; margin-bottom:10px; font-size:14px; white-space:normal;">
+(<i>Recent</i> &#61; previous year)
+</div>` : htl.html`<div></div>`;
+
 imp_txt = 'Imports: ' + deps[0]['imports'];
 sug_txt = 'Suggests: ' + deps[0]['suggests'];
 
@@ -589,11 +595,9 @@ htl.html`<ul>
     <li>${r_univ_score_html}</li>
     <li>${issue_count_html}</li>
     <li>${issue_cmt_html}</li>
-</ul>`
+</ul>${recent_comment_html}`
 ```
-<div style="margin-left:20px; margin-top:-15px; font-size:14px; white-space:normal;">
-(<i>Recent</i> &#61; previous year)
-</div>
+
 </div>
 </div>
 ::::

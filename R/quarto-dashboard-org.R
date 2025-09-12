@@ -233,30 +233,40 @@ dashboard_data_r_universe <- function (data_org) {
     dat <- do.call (rbind, unname (dat))
     data_is_on_r_univ <- data.frame (universe = dat [, 1], package = dat [, 2])
 
-    r_univ_jobs <- lapply (data_org$repos, function (i) {
-        data.frame (
-            universe = i$rm$r_universe$universe,
-            package = i$rm$r_universe$package,
-            i$rm$r_universe$jobs
-        )
-    })
-    r_univ_jobs <- do.call (rbind, r_univ_jobs)
-    rownames (r_univ_jobs) <- NULL
-    r_univ_jobs <- split (r_univ_jobs, f = as.factor (r_univ_jobs$package))
+    r_univ_stats <- vapply (data_org$repos, function (i) {
+        r_i <- i$rm$r_universe
+        if (length (r_i) == 0L) {
+            return (rep (NA_real_, 3L))
+        }
+        c (r_i$score, r_i$downloads, r_i$n_scripts)
+    }, numeric (3L))
+    r_univ_stats <- data.frame (
+        univ_pkg = colnames (r_univ_stats),
+        score = r_univ_stats [1, ],
+        downloads = as.integer (r_univ_stats [2, ]),
+        n_scripts = as.integer (r_univ_stats [3, ]),
+        row.names = NULL
+    )
 
-    r_univ_builds <- lapply (data_org$repos, function (i) {
-        data.frame (
-            universe = i$rm$r_universe$universe,
-            package = i$rm$r_universe$package,
-            i$rm$r_universe$binaries
-        )
-    })
-    r_univ_builds <- do.call (rbind, r_univ_builds)
-    rownames (r_univ_builds) <- NULL
-    r_univ_builds <- split (r_univ_builds, f = as.factor (r_univ_builds$package))
+    make_r_univ_df <- function (repos, what = "jobs") {
+        dat <- lapply (repos, function (i) {
+            data.frame (
+                universe = i$rm$r_universe$universe,
+                package = i$rm$r_universe$package,
+                i$rm$r_universe [[what]]
+            )
+        })
+        dat <- do.call (rbind, dat)
+        rownames (dat) <- NULL
+        split (dat, f = as.factor (dat$package))
+    }
+
+    r_univ_jobs <- make_r_univ_df (data_org$repos, "jobs")
+    r_univ_builds <- make_r_univ_df (data_org$repos, "binaries")
 
     list (
         data_is_on_r_univ = data_is_on_r_univ,
+        r_univ_stats = r_univ_stats,
         r_univ_jobs = r_univ_jobs,
         r_univ_builds = r_univ_builds
     )

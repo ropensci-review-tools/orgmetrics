@@ -321,3 +321,42 @@ databoard_data_maintainers <- function (data_contributors) {
         comaintainers = comaintainers_json
     )
 }
+
+copy_pkg_logos <- function (data_org, path) {
+
+    logos_dir <- fs::path (path, "logos")
+    if (!fs::dir_exists (logos_dir)) {
+        fs::dir_create (logos_dir, recurse = TRUE)
+    }
+
+    lapply (data_org$repos, function (repo) {
+
+        path <- fs::path (repo$pkgcheck$pkg$path, "man")
+        message (path)
+
+        man_subdirs <- fs::dir_ls (path, type = "directory")
+        logo_path <- NULL
+
+        if (length (man_subdirs) > 0L) {
+            i <- grep ("figure", basename (man_subdirs))
+            if (length (i) == 1L) {
+                man_fig_subdir <- man_subdirs [i [1]]
+                figs <- fs::dir_ls (man_fig_subdir, type = "file")
+                fig_i <- grepl ("logo", basename (figs), ignore.case = TRUE)
+                if (length (fig_i) == 1L) {
+                    logo_path <- figs [fig_i]
+                }
+            }
+        }
+
+        if (!is.null (logo_path)) {
+            pkg_name <- repo$pkgcheck$pkg$name
+            logo_ext <- fs::path_ext (logo_path)
+            f <- fs::path (logos_dir, paste0 (pkg_name, ".", logo_ext))
+            if (!fs::file_exists (f)) {
+                fs::file_copy (logo_path, f)
+            }
+        }
+    })
+
+}

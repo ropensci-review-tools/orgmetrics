@@ -274,6 +274,7 @@ not_cran_in = json_data['not_cran'];
 repos_on_r_univ = json_data['r_universe']['data_is_on_r_univ'];
 data_r_univ_jobs = json_data['r_universe']['r_univ_jobs'];
 data_r_univ_builds = json_data['r_universe']['r_univ_builds'];
+data_r_univ_stats = json_data['r_universe']['r_univ_stats'];
 ```
 
 

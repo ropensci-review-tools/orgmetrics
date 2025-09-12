@@ -354,6 +354,9 @@ gitlog_first_commit = gitlog[0]['first_commit'].toLocaleDateString("en-GB", {
 
 r_univ_jobs = data_r_univ_jobs[repo];
 r_univ_builds = data_r_univ_builds[repo];
+r_univ_stats = data_r_univ_stats.filter(function(r) {
+    return r.package === repo
+})
 
 r_univ_page = repos_on_r_univ.filter(function(r) {
     return r.package === repo

@@ -241,8 +241,8 @@ dashboard_data_r_universe <- function (data_org) {
         c (r_i$score, r_i$downloads, r_i$n_scripts)
     }, numeric (3L))
     r_univ_stats <- data.frame (
-        pkg = gsub ("^.*\\/", "", colnames (r_univ_stats)),
-        univ = gsub ("\\/.*$", "", colnames (r_univ_stats)),
+        universe = gsub ("\\/.*$", "", colnames (r_univ_stats)),
+        package = gsub ("^.*\\/", "", colnames (r_univ_stats)),
         score = r_univ_stats [1, ],
         downloads = as.integer (r_univ_stats [2, ]),
         n_scripts = as.integer (r_univ_stats [3, ]),

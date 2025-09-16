@@ -288,7 +288,16 @@ reposAll = metricsTranspose.map(function(item) {
     return item.package;
 });
 repos = Array.from(new Set(reposAll));
-repoSet = localStorage.getItem("orgmetricsRepo") || repos [Math.floor(Math.random() * repos.length)]
+
+// Check whether repo specified in URL, and set if so:
+location = new URL(document.baseURI);
+repo_from_url = location.searchParams.get('repo');
+setRepoFromUrl = function (r) {
+    localStorage.setItem("orgmetricsRepo", r.toString());
+    return r;
+};
+repoSet = repo_from_url ? setRepoFromUrl(repo_from_url) :
+    (localStorage.getItem("orgmetricsRepo") || repos [Math.floor(Math.random() * repos.length)]);
 viewof repo = Inputs.select(
     repos,
     {
@@ -309,9 +318,18 @@ s = localStorage.setItem("orgmetricsRepo", repo.toString());
 repoURL = repo_src.filter(function(r) {
     return r.package === repo
 })[0].url;
+setLocation = function (repo) {
+    var location = new URL(document.baseURI);
+    location.searchParams.set('repo', repo);
+    return location;
+}
+repo_location = setLocation(repo);
+
 htl.html`<div>
 Click here for the source code of the
-<a href=${repoURL} target="_blank"><i>${repo}</i> repository</a>.
+<a href=${repoURL} target="_blank"><i>${repo}</i> repository</a>,
+or here for a
+<a href=${repo_location}>shareable link to this page</a>.
 </div>`
 ```
 

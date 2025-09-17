@@ -457,9 +457,13 @@ function pluraliseObjects(x, what) {
     }
 }
 
+release_latest = new Date(releases[0].latest).toLocaleDateString("en-GB", {
+    month: 'short',
+    year: 'numeric'
+});
 releases_txt_total = releases[0].total > 0 ?
-    (releases[0].total == 1 ? htl.html`1 release to date` :
-    htl.html`${releases[0].total} releases, ${releases[0].rel_per_year} per year`) :
+    (releases[0].total == 1 ? htl.html`1 release to date (${release_latest})` :
+htl.html`${releases[0].total} releases (latest: ${release_latest}), ${releases[0].rel_per_year} per year`) :
     htl.html`No releases to date`;
 
 gitlog_txt_total = htl.html`${gitlog_total_commits} commits since ${gitlog_first_commit}`;

@@ -457,7 +457,6 @@ function pluraliseObjects(x, what) {
     }
 }
 
-console.log("-------- " + JSON.stringify(releases));
 releases_txt_total = releases[0].total > 0 ?
     (releases[0].total == 1 ? htl.html`1 release to date` :
     htl.html`${releases[0].total} releases, ${releases[0].rel_per_year} per year`) :

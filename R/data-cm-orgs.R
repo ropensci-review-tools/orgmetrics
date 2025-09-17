@@ -85,6 +85,8 @@ orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_
         annual_gh_activity = annual_gh_activity
     )
 
+    attr (data, "end_date") <- end_date
+
     return (data)
 }
 

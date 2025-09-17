@@ -208,19 +208,31 @@ dashboard_data_cran <- function (data_org) {
     return (data_cran)
 }
 
-dashboard_data_gitlog <- function (data_org) {
+dashboard_data_gitlog <- function (data_org, period = 365) {
+
+    end_date <- attr (data_org, "end_date")
+    if (length (end_date) == 0L) {
+        end_date <- Sys.Date ()
+    }
+    start_date <- end_date - 365
 
     data_gitlog <- t (vapply (data_org$repos, function (i) {
+        log <- i$rm$gitlog
+        index <- which (as.Date (log$timestamp) >= start_date)
         c (
-            num_commits = as.character (nrow (i$rm$gitlog)),
-            first_commit = as.character (as.Date (min (i$rm$gitlog$timestamp)))
+            num_commits = as.character (nrow (log)),
+            first_commit = as.character (as.Date (min (log$timestamp))),
+            latest_commit = as.character (as.Date (log$timestamp [1])),
+            recent_commits = as.character (length (index))
         )
-    }, character (2L)))
+    }, character (4L)))
 
     data.frame (
         package = gsub ("^.*\\/", "", rownames (data_gitlog)),
         num_commits = as.integer (data_gitlog [, 1]),
         first_commit = as.Date (data_gitlog [, 2]),
+        latest_commit = as.Date (data_gitlog [, 3]),
+        recent_commits = as.integer (data_gitlog [, 4]),
         row.names = NULL
     )
 }

@@ -90,8 +90,17 @@ maintainers = Object.keys(maintainer_pkgs);
 <!---- break --->
 
 ```{ojs maintainer-select}
-maintainerSet = localStorage.getItem("orgmetricsMaintainer") ||
-    maintainers [Math.floor(Math.random() * maintainers.length)]
+// Check whether maintainer specified in URL, and set if so:
+location = new URL(document.baseURI);
+ctb_from_url = location.searchParams.get('contributor');
+setCtbFromUrl = function (r) {
+    localStorage.setItem("orgmetricsMaintainer", r.toString());
+    return r;
+};
+maintainerSet = ctb_from_url ? setCtbFromUrl(ctb_from_url) :
+    (localStorage.getItem("orgmetricsMaintainer") ||
+        maintainers [Math.floor(Math.random() * maintainers.length)]);
+
 viewof maintainer = Inputs.select(
     maintainers,
     {
@@ -103,6 +112,12 @@ viewof maintainer = Inputs.select(
 s = localStorage.setItem("orgmetricsMaintainer", maintainer.toString());
 maintainer_gh_url =
     htl.html`<a href="https://github.com/${maintainer}" target="_blank"><i>${maintainer}</i></a>`
+setLocation = function (ctb) {
+    var location = new URL(document.baseURI);
+    location.searchParams.set('contributor', maintainer);
+    return location;
+}
+ctb_location = setLocation(maintainer);
 ```
 
 <!---- break --->
@@ -121,7 +136,11 @@ these_cos.map(i => htl.html`
 <div style="margin-top: 10px; margin-bottom: 10px;"></div>
 
 ```{ojs maintainer-link}
-htl.html`<div><a href="https://github.com/${maintainer}" target="_blank">github.com/${maintainer}</a></div>`
+htl.html`<div>
+<a href="https://github.com/${maintainer}" target="_blank">github.com/${maintainer}</a>,
+or click here for a
+<a href=${ctb_location}>shareable link to this page</a>.
+</div>`
 ```
 
 <div style="margin-top: 10px; margin-bottom: 10px;"></div>

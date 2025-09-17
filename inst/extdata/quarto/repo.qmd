@@ -266,11 +266,13 @@ fnCallsTranspose = {
 json_data = FileAttachment("results-json-data.json").json();
 gitlogDataTranspose = json_data['gitlog'].map(row => ({
     ...row,
-    first_commit: new Date(row.first_commit)
+    first_commit: new Date(row.first_commit),
+    latest_commit: new Date(row.latest_commit)
 }));
 
 cranDataAll = json_data['cran'];
 not_cran_in = json_data['not_cran'];
+data_releases = json_data['data_releases'];
 repos_on_r_univ = json_data['r_universe']['data_is_on_r_univ'];
 data_r_univ_jobs = json_data['r_universe']['r_univ_jobs'];
 data_r_univ_builds = json_data['r_universe']['r_univ_builds'];
@@ -288,7 +290,16 @@ reposAll = metricsTranspose.map(function(item) {
     return item.package;
 });
 repos = Array.from(new Set(reposAll));
-repoSet = localStorage.getItem("orgmetricsRepo") || repos [Math.floor(Math.random() * repos.length)]
+
+// Check whether repo specified in URL, and set if so:
+location = new URL(document.baseURI);
+repo_from_url = location.searchParams.get('repo');
+setRepoFromUrl = function (r) {
+    localStorage.setItem("orgmetricsRepo", r.toString());
+    return r;
+};
+repoSet = repo_from_url ? setRepoFromUrl(repo_from_url) :
+    (localStorage.getItem("orgmetricsRepo") || repos [Math.floor(Math.random() * repos.length)]);
 viewof repo = Inputs.select(
     repos,
     {
@@ -309,9 +320,18 @@ s = localStorage.setItem("orgmetricsRepo", repo.toString());
 repoURL = repo_src.filter(function(r) {
     return r.package === repo
 })[0].url;
+setLocation = function (repo) {
+    var location = new URL(document.baseURI);
+    location.searchParams.set('repo', repo);
+    return location;
+}
+repo_location = setLocation(repo);
+
 htl.html`<div>
 Click here for the source code of the
-<a href=${repoURL} target="_blank"><i>${repo}</i> repository</a>.
+<a href=${repoURL} target="_blank"><i>${repo}</i> repository</a>,
+or here for a
+<a href=${repo_location}>shareable link to this page</a>.
 </div>`
 ```
 
@@ -348,10 +368,19 @@ gitlog = gitlogDataTranspose.filter(function(r) {
     return r.package === repo
 })
 gitlog_total_commits = gitlog[0]['num_commits'].toLocaleString();
+gitlog_recent_commits = gitlog[0]['recent_commits'].toLocaleString();
 gitlog_first_commit = gitlog[0]['first_commit'].toLocaleDateString("en-GB", {
     month: 'short',
     year: 'numeric'
 });
+gitlog_latest_commit = gitlog[0]['latest_commit'].toLocaleDateString("en-GB", {
+    month: 'short',
+    year: 'numeric'
+});
+
+releases = data_releases.filter(function(r) {
+    return r.package === repo
+})
 
 r_univ_page = repos_on_r_univ.filter(function(r) {
     return r.package === repo
@@ -428,7 +457,13 @@ function pluraliseObjects(x, what) {
     }
 }
 
-gitlog_txt = htl.html`<li>${gitlog_total_commits} commits since ${gitlog_first_commit}</li>`;
+releases_txt_total = releases[0].total > 0 ?
+    (releases[0].total == 1 ? htl.html`1 release to date` :
+    htl.html`${releases[0].total} releases, ${releases[0].rel_per_year} per year`) :
+    htl.html`No releases to date`;
+
+gitlog_txt_total = htl.html`${gitlog_total_commits} commits since ${gitlog_first_commit}`;
+gitlog_txt_recent = htl.html`${gitlog_recent_commits} commits in past year`;
 
 maintainer_count = repoMetrics.filter(function(m) {
     return m.name == "maintainer_count"
@@ -549,7 +584,9 @@ revdeps_list_txt = revdeps.length > 0 ? htl.html`<ul>${revdeps_list}</ul>` : und
 <h2 style="margin-top:-20px; margin-left:20px;">Maintenance</h2>
 ```{ojs}
 htl.html`<ul>
-    <li>${gitlog_txt}</li>
+    <li>${releases_txt_total}</li>
+    <li>${gitlog_txt_total}</li>
+    <li>${gitlog_txt_recent}</li>
     <li>${maintainer_count_txt}${maintainer_gh_list_txt}</li>
     <li>${ctb_count_html}</li>
     <li>${test_coverage_txt}</li>

@@ -46,6 +46,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, similarities, action = "pr
 
     # -------- ADDITIONAL DATA IN R -------
     data_maintenance <- org_maintenance_metric (data_org)
+    data_releases <- dashboard_data_releases (data_org)
     data_abs <- ctb_absence (data_org)
     data_resp <- issue_responses (data_org)
     data_bugs <- issue_bugs (data_org)
@@ -73,6 +74,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, similarities, action = "pr
         cran = data_cran,
         not_cran = not_cran,
         gitlog = data_gitlog,
+        data_releases = data_releases,
         r_universe = data_r_universe,
         rm_metrics_models = rm_metrics_models,
         maintainer_pkgs = maintainers$maintainers,
@@ -208,19 +210,31 @@ dashboard_data_cran <- function (data_org) {
     return (data_cran)
 }
 
-dashboard_data_gitlog <- function (data_org) {
+dashboard_data_gitlog <- function (data_org, period = 365) {
+
+    end_date <- attr (data_org, "end_date")
+    if (length (end_date) == 0L) {
+        end_date <- Sys.Date ()
+    }
+    start_date <- end_date - 365
 
     data_gitlog <- t (vapply (data_org$repos, function (i) {
+        log <- i$rm$gitlog
+        index <- which (as.Date (log$timestamp) >= start_date)
         c (
-            num_commits = as.character (nrow (i$rm$gitlog)),
-            first_commit = as.character (as.Date (min (i$rm$gitlog$timestamp)))
+            num_commits = as.character (nrow (log)),
+            first_commit = as.character (as.Date (min (log$timestamp))),
+            latest_commit = as.character (as.Date (log$timestamp [1])),
+            recent_commits = as.character (length (index))
         )
-    }, character (2L)))
+    }, character (4L)))
 
     data.frame (
         package = gsub ("^.*\\/", "", rownames (data_gitlog)),
         num_commits = as.integer (data_gitlog [, 1]),
         first_commit = as.Date (data_gitlog [, 2]),
+        latest_commit = as.Date (data_gitlog [, 3]),
+        recent_commits = as.integer (data_gitlog [, 4]),
         row.names = NULL
     )
 }
@@ -320,4 +334,76 @@ databoard_data_maintainers <- function (data_contributors) {
         maintainers = maintainer_pkgs_json,
         comaintainers = comaintainers_json
     )
+}
+
+dashboard_data_releases <- function (data_org) {
+
+    rel_dat <- t (vapply (data_org$repos, function (repo) {
+        releases <- repo$rm$releases_from_gh_api
+        if (nrow (releases) == 0L) {
+            return (rep (NA_character_, 3L))
+        }
+
+        latest <- as.Date (releases$published_at [1])
+        intervals <- diff (as.Date (releases$published_at))
+        intervals <- as.integer (-intervals)
+        rel_per_year <- NA
+        if (length (intervals) > 0L) {
+            rel_per_year <- format (365 / mean (intervals), digits = 2)
+        }
+
+        c (as.character (latest), as.character (nrow (releases)), rel_per_year)
+    }, character (3L)))
+
+    rel_dat <- data.frame (
+        package = gsub ("^.*\\/", "", rownames (rel_dat)),
+        latest = rel_dat [, 1],
+        total = as.integer (rel_dat [, 2]),
+        rel_per_year = as.numeric (rel_dat [, 3]),
+        row.names = NULL
+    )
+    rel_dat$latest [which (is.na (rel_dat$latest))] <- "no"
+    rel_dat$total [which (is.na (rel_dat$total))] <- 0
+    rel_dat$rel_per_year [which (is.na (rel_dat$rel_per_year))] <- 0
+
+    return (rel_dat)
+}
+
+copy_pkg_logos <- function (data_org, path) {
+
+    logos_dir <- fs::path (path, "logos")
+    if (!fs::dir_exists (logos_dir)) {
+        fs::dir_create (logos_dir, recurse = TRUE)
+    }
+
+    lapply (data_org$repos, function (repo) {
+
+        path <- fs::path (repo$pkgcheck$pkg$path, "man")
+        message (path)
+
+        man_subdirs <- fs::dir_ls (path, type = "directory")
+        logo_path <- NULL
+
+        if (length (man_subdirs) > 0L) {
+            i <- grep ("figure", basename (man_subdirs))
+            if (length (i) == 1L) {
+                man_fig_subdir <- man_subdirs [i [1]]
+                figs <- fs::dir_ls (man_fig_subdir, type = "file")
+                fig_i <- grepl ("logo", basename (figs), ignore.case = TRUE)
+                if (length (fig_i) == 1L) {
+                    logo_path <- figs [fig_i]
+                }
+            }
+        }
+
+        if (!is.null (logo_path)) {
+            pkg_name <- repo$pkgcheck$pkg$name
+            logo_ext <- fs::path_ext (logo_path)
+            f <- fs::path (logos_dir, paste0 (pkg_name, ".", logo_ext))
+            if (!fs::file_exists (f)) {
+                fs::file_copy (logo_path, f)
+            }
+        }
+    })
+
 }

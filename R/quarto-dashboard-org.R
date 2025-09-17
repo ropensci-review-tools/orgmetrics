@@ -46,6 +46,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, similarities, action = "pr
 
     # -------- ADDITIONAL DATA IN R -------
     data_maintenance <- org_maintenance_metric (data_org)
+    data_releases <- dashboard_data_releases (data_org)
     data_abs <- ctb_absence (data_org)
     data_resp <- issue_responses (data_org)
     data_bugs <- issue_bugs (data_org)
@@ -73,6 +74,7 @@ orgmetrics_dashboard <- function (data_org, fn_calls, similarities, action = "pr
         cran = data_cran,
         not_cran = not_cran,
         gitlog = data_gitlog,
+        data_releases = data_releases,
         r_universe = data_r_universe,
         rm_metrics_models = rm_metrics_models,
         maintainer_pkgs = maintainers$maintainers,
@@ -332,6 +334,39 @@ databoard_data_maintainers <- function (data_contributors) {
         maintainers = maintainer_pkgs_json,
         comaintainers = comaintainers_json
     )
+}
+
+dashboard_data_releases <- function (data_org) {
+
+    rel_dat <- t (vapply (data_org$repos, function (repo) {
+        releases <- repo$rm$releases_from_gh_api
+        if (nrow (releases) == 0L) {
+            return (rep (NA_character_, 3L))
+        }
+
+        latest <- as.Date (releases$published_at [1])
+        intervals <- diff (as.Date (releases$published_at))
+        intervals <- as.integer (-intervals)
+        rel_per_year <- NA
+        if (length (intervals) > 0L) {
+            rel_per_year <- format (365 / mean (intervals), digits = 2)
+        }
+
+        c (as.character (latest), as.character (nrow (releases)), rel_per_year)
+    }, character (3L)))
+
+    rel_dat <- data.frame (
+        package = gsub ("^.*\\/", "", rownames (rel_dat)),
+        latest = rel_dat [, 1],
+        total = as.integer (rel_dat [, 2]),
+        rel_per_year = as.numeric (rel_dat [, 3]),
+        row.names = NULL
+    )
+    rel_dat$latest [which (is.na (rel_dat$latest))] <- "no"
+    rel_dat$total [which (is.na (rel_dat$total))] <- 0
+    rel_dat$rel_per_year [which (is.na (rel_dat$rel_per_year))] <- 0
+
+    return (rel_dat)
 }
 
 copy_pkg_logos <- function (data_org, path) {

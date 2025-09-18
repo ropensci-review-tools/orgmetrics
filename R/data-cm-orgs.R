@@ -45,7 +45,8 @@ orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_
                     pkgs_dat$path [i],
                     end_date = end_date,
                     num_years = num_years
-                )
+                ),
+                contributoes = dat_repo_contributors (dat_repo)
             )
             saveRDS (dat_i, f_tmp)
         }
@@ -136,6 +137,25 @@ dat_repo_to_end_date <- function (dat_repo, end_date = Sys.Date ()) {
         dplyr::filter (as.Date (starred_at) <= end_date)
 
     return (dat_repo)
+}
+
+dat_repo_contributors <- function (dat_repo) {
+
+    res <- lapply (dat_repo$contributors, function (ctb) {
+        data.frame (
+            login = ctb$general$user$login,
+            num_repositories = ctb$general$user$num_repositories,
+            repos_contributed_to = ctb$general$user$repos_contributed_to,
+            num_starred_repos = ctb$general$user$num_starred_repos,
+            num_orgs = nrow (ctb$general$orgs),
+            commits = sum (ctb$commits$num_commits), # already restricted to past year
+            issues_opened = sum (nrow (ctb$issues)),
+            issues_num_repos = length (unique (ctb$issues$org_repo)),
+            issues_cmts = sum (nrow (ctb$issue_cmts)),
+            issue_cmt_num_repos = length (unique (ctb$issue_cmts$org_repo))
+        )
+    })
+    do.call (rbind, res)
 }
 
 org_annual_commits <- function (org_paths) {

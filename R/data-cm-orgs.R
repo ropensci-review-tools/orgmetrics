@@ -33,7 +33,10 @@ orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_
         if (fs::file_exists (f_tmp)) {
             dat_i <- readRDS (f_tmp)
         } else {
-            dat_repo <- repometrics::repometrics_data_repo (pkgs_dat$path [i])
+            dat_repo <- repometrics::repometrics_data_repo (
+                pkgs_dat$path [i],
+                date_interval = "year"
+            )
             dat_i <- list (
                 repo = dat_repo_to_end_date (dat_repo, end_date = end_date),
                 metrics = metrics_over_end_dates (

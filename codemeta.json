@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/ropensci-review-tools/orgmetrics",
   "issueTracker": "https://github.com/ropensci-review-tools/orgmetrics/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.1.2.067",
+  "version": "0.1.2.68",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -273,6 +273,18 @@
     },
     "7": {
       "@type": "SoftwareApplication",
+      "identifier": "gh",
+      "name": "gh",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=gh"
+    },
+    "8": {
+      "@type": "SoftwareApplication",
       "identifier": "git2r",
       "name": "git2r",
       "provider": {
@@ -283,7 +295,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=git2r"
     },
-    "8": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
@@ -295,7 +307,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "9": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "memoise",
       "name": "memoise",
@@ -307,7 +319,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=memoise"
     },
-    "10": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "pbapply",
       "name": "pbapply",
@@ -319,19 +331,16 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=pbapply"
     },
-    "11": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "repometrics",
       "name": "repometrics",
       "sameAs": "https://github.com/ropensci-review-tools/repometrics"
     },
-    "SystemRequirements": {}
+    "SystemRequirements": null
   },
-  "fileSize": "17760.434KB",
+  "fileSize": "41956.443KB",
   "readme": "https://github.com/ropensci-review-tools/orgmetrics/blob/main/README.md",
-  "contIntegration": [
-    "https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check.yaml",
-    "https://app.codecov.io/gh/ropensci-review-tools/orgmetrics"
-  ],
+  "contIntegration": ["https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check.yaml", "https://app.codecov.io/gh/ropensci-review-tools/orgmetrics"],
   "developmentStatus": "https://www.repostatus.org/#active"
 }

@@ -3,11 +3,11 @@
 
 #' Convert metrics data to rectangular `data.frame`.
 #'
-#' @param data_metrics An embedded list of [package] [date stamp] [metric],
-#' where some metrics are vectors of length > 1 which need to be reduced to
-#' single value.
-#' @return Single `data.frame` of metrics with aditional columns of [org, repo,
-#' date].
+#' @param data_metrics An embedded list of \[package\] [\date stamp\]
+#' [\metric\], where some metrics are vectors of length > 1 which need to be
+#' reduced to single value.
+#' @return Single `data.frame` of metrics with aditional columns of \[org,
+#' repo, date\].
 #'
 #' @noRd
 data_metrics_to_df <- function (data_metrics) {

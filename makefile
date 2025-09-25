@@ -3,6 +3,9 @@ VIGNETTE = orgmetrics
 
 all: help
 
+doc: ## Update package documentation with `roxygen2`
+	Rscript -e "roxygen2::roxygenise()"; \
+
 init: ## Initialize `pkgdown` site
 	echo "pkgdown::init_site()" | R --no-save -q
 

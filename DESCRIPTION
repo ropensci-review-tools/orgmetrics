@@ -1,6 +1,6 @@
 Package: orgmetrics
 Title: Metrics for Your GitHub Organization
-Version: 0.1.2.077
+Version: 0.1.2.078
 Authors@R: 
     person("Mark", "Padgham", , "mark.padgham@email.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2172-5265"))
@@ -48,4 +48,4 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-GB
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3

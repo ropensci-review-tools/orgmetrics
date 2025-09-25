@@ -186,10 +186,13 @@ gh_user_activity_internal <- function (login,
         parallel::stopCluster (cl)
     }
 
+    null2zero <- function (x) {
+        ifelse (length (x) == 0, 0L, x)
+    }
     end_dates <- vapply (res, function (i) as.character (i$end_date), character (1L))
-    total_commits <- vapply (res, function (i) i$total_commits, integer (1L))
-    total_issues <- vapply (res, function (i) i$total_issues, integer (1L))
-    total_prs <- vapply (res, function (i) i$total_prs, integer (1L))
+    total_commits <- vapply (res, function (i) null2zero (i$total_commits), integer (1L))
+    total_issues <- vapply (res, function (i) null2zero (i$total_issues), integer (1L))
+    total_prs <- vapply (res, function (i) null2zero (i$total_prs), integer (1L))
     get1unique <- function (res, what = "commits") {
         unique (unlist (unname (
             lapply (res, function (i) i [[paste0 ("repos_", what)]])

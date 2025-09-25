@@ -5,6 +5,9 @@ end_date <- as.Date ("2024-08-01")
 
 get_end_date_seq <- utils::getFromNamespace ("get_end_date_seq", "repometrics")
 
+requireNamespace ("tidyr", quietly = TRUE)
+requireNamespace ("zoo", quietly = TRUE)
+
 test_that ("collate_org_data output", {
 
     Sys.setenv ("REPOMETRICS_TESTS" = "true")

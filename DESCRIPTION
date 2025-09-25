@@ -1,6 +1,6 @@
 Package: orgmetrics
 Title: Metrics for Your GitHub Organization
-Version: 0.1.2.069
+Version: 0.1.2.070
 Authors@R: 
     person("Mark", "Padgham", , "mark.padgham@email.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2172-5265"))
@@ -36,7 +36,6 @@ Suggests:
     rprojroot,
     testthat (>= 3.0.0),
     tidyr,
-    visNetwork,
     withr,
     zoo
 Remotes:

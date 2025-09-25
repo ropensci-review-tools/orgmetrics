@@ -127,6 +127,10 @@ gh_user_activity_internal <- function (login,
 
     q <- gh_user_created_at_qry (login = login)
     dat <- gh::gh_gql (query = q)
+    if ("errors" %in% names (dat)) {
+        msg <- dat$errors [[1]]$message
+        cli::cli_abort (msg)
+    }
 
     created_at <- as.Date (dat$data$user$createdAt)
     dates <- seq (created_at, end_date, by = 365.25 * period)

@@ -122,21 +122,33 @@ dat_repo_to_end_date <- function (dat_repo, end_date = Sys.Date ()) {
         dplyr::filter (as.Date (created) <= end_date)
     dat_repo$rm$gitlog <- dat_repo$rm$gitlog |>
         dplyr::filter (as.Date (timestamp) <= end_date)
-    dat_repo$rm$issue_comments_from_gh_api <-
-        dat_repo$rm$issue_comments_from_gh_api |>
-        dplyr::filter (as.Date (created_at) <= end_date)
-    dat_repo$rm$issues_from_gh_api <-
-        dat_repo$rm$issues_from_gh_api |>
-        dplyr::filter (as.Date (created_at) <= end_date)
-    dat_repo$rm$prs_from_gh_api <- dat_repo$rm$prs_from_gh_api |>
-        dplyr::filter (as.Date (created_at) <= end_date)
-    dat_repo$rm$releases_from_gh_api <-
-        dat_repo$rm$releases_from_gh_api |>
-        dplyr::filter (as.Date (created_at) <= end_date)
-    dat_repo$rm$repo_forks <- dat_repo$rm$repo_forks |>
-        dplyr::filter (as.Date (created) <= end_date)
-    dat_repo$rm$repo_stargazers <- dat_repo$rm$repo_stargazers |>
-        dplyr::filter (as.Date (starred_at) <= end_date)
+    if (!is.null (dat_repo$issue_comments_from_gh_api)) {
+        dat_repo$rm$issue_comments_from_gh_api <-
+            dat_repo$rm$issue_comments_from_gh_api |>
+            dplyr::filter (as.Date (created_at) <= end_date)
+    }
+    if (!is.null (dat_repo$issues_from_gh_api)) {
+        dat_repo$rm$issues_from_gh_api <-
+            dat_repo$rm$issues_from_gh_api |>
+            dplyr::filter (as.Date (created_at) <= end_date)
+    }
+    if (!is.null (dat_repo$prs_from_gh_api)) {
+        dat_repo$rm$prs_from_gh_api <- dat_repo$rm$prs_from_gh_api |>
+            dplyr::filter (as.Date (created_at) <= end_date)
+    }
+    if (!is.null (dat_repo$releases_from_gh_api)) {
+        dat_repo$rm$releases_from_gh_api <-
+            dat_repo$rm$releases_from_gh_api |>
+            dplyr::filter (as.Date (created_at) <= end_date)
+    }
+    if (!is.null (dat_repo$repo_forks)) {
+        dat_repo$rm$repo_forks <- dat_repo$rm$repo_forks |>
+            dplyr::filter (as.Date (created) <= end_date)
+    }
+    if (!is.null (dat_repo$repo_stargazers)) {
+        dat_repo$rm$repo_stargazers <- dat_repo$rm$repo_stargazers |>
+            dplyr::filter (as.Date (starred_at) <= end_date)
+    }
 
     return (dat_repo)
 }

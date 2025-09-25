@@ -83,6 +83,8 @@ gh_user_activity_qry <- function (login = "", start_date, end_date) {
 # repositories are returned. The default here is thus to quarterly values.
 gh_user_activity_internal <- function (login, end_date = Sys.Date (), period = 0.25) {
 
+    requireNamespace ("parallel", quietly = TRUE)
+
     q <- gh_user_created_at_qry (login = login)
     dat <- gh::gh_gql (query = q)
 
@@ -91,6 +93,14 @@ gh_user_activity_internal <- function (login, end_date = Sys.Date (), period = 0
     dates <- c (dates, end_date)
     dates <- data.frame (start = dates [-length (dates)], stop = dates [-1])
     dates <- split (dates, f = as.factor (seq_len (nrow (dates))))
+
+    n_cores <- parallel::detectCores () - 1L
+    cl <- parallel::makeCluster (n_cores)
+    parallel::clusterExport (cl, c ("gh_user_activity_qry"))
+
+    # Let pbapply bar get applied over all "login" values, not here
+    opb <- pbapply::pboptions (type = "none")
+    on.exit (pbapply::pboptions (opb))
 
     res <- pbapply::pblapply (dates, function (d) {
         q <- gh_user_activity_qry (
@@ -119,7 +129,9 @@ gh_user_activity_internal <- function (login, end_date = Sys.Date (), period = 0
             n_repos_issues = length (cc$issueContributionsByRepository),
             n_repos_prs = length (cc$pullRequestContributionsByRepository)
         )
-    })
+    }, cl = cl)
+
+    parallel::stopCluster (cl)
 
     end_dates <- vapply (res, function (i) as.character (i$end_date), character (1L))
     total_commits <- vapply (res, function (i) i$total_commits, integer (1L))
@@ -137,11 +149,13 @@ gh_user_activity_internal <- function (login, end_date = Sys.Date (), period = 0
     n_repos_issues <- vapply (res, function (i) i$n_repos_issues, integer (1L))
     n_repos_prs <- vapply (res, function (i) i$n_repos_prs, integer (1L))
 
+    any_missing <- FALSE
     for (what in c ("issues", "prs", "commits")) {
         dat <- get (paste0 ("n_repos_", what))
         len_missing <- length (which (dat == 100L))
         len_total <- length (dat)
         if (len_missing > 0L) {
+            any_missing <- TRUE
             what_cap <- paste0 (
                 toupper (substring (what, 1, 1)),
                 substring (what, 2, nchar (what))
@@ -151,6 +165,12 @@ gh_user_activity_internal <- function (login, end_date = Sys.Date (), period = 0
                 " periods; maybe reduce time resolution?"
             ))
         }
+    }
+    if (any_missing) {
+        cli::cli_alert_info (paste0 (
+            "Missing data only mean lists of unique repositories may be ",
+            "incomplete; time series data are complete regardless."
+        ))
     }
 
     res <- list (

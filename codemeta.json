@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/ropensci-review-tools/orgmetrics",
   "issueTracker": "https://github.com/ropensci-review-tools/orgmetrics/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.1.2.075",
+  "version": "0.1.2.076",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -111,6 +111,11 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "parallel",
+      "name": "parallel"
     },
     {
       "@type": "SoftwareApplication",
@@ -339,7 +344,7 @@
     },
     "SystemRequirements": {}
   },
-  "fileSize": "127563.589KB",
+  "fileSize": "127840.554KB",
   "readme": "https://github.com/ropensci-review-tools/orgmetrics/blob/main/README.md",
   "contIntegration": [
     "https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check.yaml",

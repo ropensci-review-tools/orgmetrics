@@ -5,14 +5,26 @@ gh_user_follow <- utils::getFromNamespace ("gh_user_follow", "repometrics")
 #'
 #' @param data_org Partial result of 'orgmetrics_collate_org_data', including
 #' full data on all repos.
+#' @param end_date To up to which to extract data.
+#' @param num_cores Set `NULL` to calculate with single thread, which may take
+#' a very long time. Otherwise default will calculate with one less than all
+#' available cores, or specify an exact integer number.
 #' @return Same data with additional 'contributors' item.
-org_contributor_data <- function (data_org) {
+#' @noRd
+org_contributor_data <- function (data_org, end_date = Sys.Date (), num_cores = -1L) {
+
+    checkmate::assert_integerish (num_cores, len = 1L, lower = -1L)
 
     ctbs <- get_unique_ctbs (data_org)
 
     ctb_dat <- pbapply::pblapply (ctbs, function (ctb) {
 
-        ctb_dat <- gh_user_activity (login = ctb, period = 1 / 12)
+        ctb_dat <- gh_user_activity (
+            login = ctb,
+            end_date = end_date,
+            period = 1 / 12,
+            num_cores = num_cores
+        )
 
         dat_gen <- gh_user_general (login = ctb)
         dat_followers <- gh_user_follow (login = ctb, followers = TRUE)
@@ -108,9 +120,10 @@ gh_user_activity_qry <- function (login = "", start_date, end_date) {
 # of 'maxRepositories', so the only way to ensure all are captured is to
 # restrict the date ranges in the 'contributionsCollection' to ensure < 100
 # repositories are returned. The default here is thus to quarterly values.
-gh_user_activity_internal <- function (login, end_date = Sys.Date (), period = 0.25) {
-
-    requireNamespace ("parallel", quietly = TRUE)
+gh_user_activity_internal <- function (login,
+                                       end_date = Sys.Date (),
+                                       period = 0.25,
+                                       num_cores = -1L) {
 
     q <- gh_user_created_at_qry (login = login)
     dat <- gh::gh_gql (query = q)
@@ -121,9 +134,20 @@ gh_user_activity_internal <- function (login, end_date = Sys.Date (), period = 0
     dates <- data.frame (start = dates [-length (dates)], stop = dates [-1])
     dates <- split (dates, f = as.factor (seq_len (nrow (dates))))
 
-    n_cores <- parallel::detectCores () - 1L
-    cl <- parallel::makeCluster (n_cores)
-    parallel::clusterExport (cl, c ("gh_user_activity_qry"))
+    if (num_cores == 0L) {
+        num_cores <- NULL
+    }
+    cl <- NULL
+    if (!is.null (num_cores)) {
+
+        requireNamespace ("parallel", quietly = TRUE)
+
+        if (num_cores == -1L) {
+            num_cores <- parallel::detectCores () - 1L
+        }
+        cl <- parallel::makeCluster (n_cores)
+        parallel::clusterExport (cl, c ("gh_user_activity_qry"))
+    }
 
     # Let pbapply bar get applied over all "login" values, not here
     opb <- pbapply::pboptions (type = "none")
@@ -158,7 +182,9 @@ gh_user_activity_internal <- function (login, end_date = Sys.Date (), period = 0
         )
     }, cl = cl)
 
-    parallel::stopCluster (cl)
+    if (!is.null (num_cores)) {
+        parallel::stopCluster (cl)
+    }
 
     end_dates <- vapply (res, function (i) as.character (i$end_date), character (1L))
     total_commits <- vapply (res, function (i) i$total_commits, integer (1L))

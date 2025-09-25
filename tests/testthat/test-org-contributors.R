@@ -7,6 +7,7 @@ get_end_date_seq <- utils::getFromNamespace ("get_end_date_seq", "repometrics")
 
 requireNamespace ("tidyr", quietly = TRUE)
 requireNamespace ("zoo", quietly = TRUE)
+requireNamespace ("visNetwork", quietly = TRUE)
 
 test_that ("test org contributors", {
 

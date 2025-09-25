@@ -33,6 +33,16 @@ get_unique_ctbs <- function (data_org) {
     return (ctbs)
 }
 
+gh_user_created_at_qry <- function (login = "") {
+
+    paste0 ("{
+        user(login:\"", login, "\") {
+            login
+            createdAt
+        }
+    }")
+}
+
 gh_user_activity_qry <- function (login = "", start_date, end_date) {
 
     q <- paste0 ("{
@@ -73,68 +83,59 @@ gh_user_activity_qry <- function (login = "", start_date, end_date) {
 # repositories are returned. The default here is thus to quarterly values.
 gh_user_activity_internal <- function (login, end_date = Sys.Date (), period = 0.25) {
 
-    start_date <- end_date - 365.25 * period
-    end_date_fmt <- format (end_date, "%Y-%m-%dT%H:%M:%S")
-    start_date_fmt <- format (start_date, "%Y-%m-%dT%H:%M:%S")
-
-    q <- gh_user_activity_qry (
-        login = login,
-        start_date = start_date_fmt,
-        end_date = end_date_fmt
-    )
+    q <- gh_user_created_at_qry (login = login)
     dat <- gh::gh_gql (query = q)
-    cc <- dat$data$user$contributionsCollection
-
-    end_dates <- end_date
-    total_commits <- cc$totalCommitContributions
-    total_issues <- cc$totalIssueContributions
-    total_prs <- cc$totalPullRequestContributions
-
-    repos_commits <- vapply (cc$commitContributionsByRepository, function (repo) {
-        repo$repository$nameWithOwner
-    }, character (1L))
-    repos_issues <- vapply (cc$issueContributionsByRepository, function (repo) {
-        repo$repository$nameWithOwner
-    }, character (1L))
-    repos_prs <- vapply (cc$pullRequestContributionsByRepository, function (repo) {
-        repo$repository$nameWithOwner
-    }, character (1L))
-    n_repos_commits <- length (cc$commitContributionsByRepository)
-    n_repos_issues <- length (cc$issueContributionsByRepository)
-    n_repos_prs <- length (cc$pullRequestContributionsByRepository)
 
     created_at <- as.Date (dat$data$user$createdAt)
-    while (start_date > created_at) {
-        end_date <- start_date - 1 # The day prior
-        end_dates <- c (end_dates, end_date)
-        start_date <- end_date - 365.25 * period
-        end_date_fmt <- format (end_date, "%Y-%m-%dT%H:%M:%S")
-        start_date_fmt <- format (start_date, "%Y-%m-%dT%H:%M:%S")
+    dates <- seq (created_at, end_date, by = 365.25 * period)
+    dates <- c (dates, end_date)
+    dates <- data.frame (start = dates [-length (dates)], stop = dates [-1])
+    dates <- split (dates, f = as.factor (seq_len (nrow (dates))))
 
+    res <- pbapply::pblapply (dates, function (d) {
         q <- gh_user_activity_qry (
             login = login,
-            start_date = start_date_fmt,
-            end_date = end_date_fmt
+            start_date = format (d$start, "%Y-%m-%dT%H:%M:%S"),
+            end_date = format (d$stop, "%Y-%m-%dT%H:%M:%S")
         )
         dat <- gh::gh_gql (query = q)
         cc <- dat$data$user$contributionsCollection
 
-        total_commits <- c (total_commits, cc$totalCommitContributions)
-        total_issues <- c (total_issues, cc$totalIssueContributions)
-        total_prs <- c (total_prs, cc$totalPullRequestContributions)
-        repos_commits <- c (repos_commits, vapply (cc$commitContributionsByRepository, function (repo) {
-            repo$repository$nameWithOwner
-        }, character (1L)))
-        repos_issues <- c (repos_issues, vapply (cc$issueContributionsByRepository, function (repo) {
-            repo$repository$nameWithOwner
-        }, character (1L)))
-        repos_prs <- c (repos_prs, vapply (cc$pullRequestContributionsByRepository, function (repo) {
-            repo$repository$nameWithOwner
-        }, character (1L)))
-        n_repos_commits <- c (n_repos_commits, length (cc$commitContributionsByRepository))
-        n_repos_issues <- c (n_repos_issues, length (cc$issueContributionsByRepository))
-        n_repos_prs <- c (n_repos_prs, length (cc$pullRequestContributionsByRepository))
+        list (
+            end_date = d$stop,
+            total_commits = cc$totalCommitContributions,
+            total_issues = cc$totalIssueContributions,
+            total_prs = cc$totalPullRequestContributions,
+            repos_commits = vapply (cc$commitContributionsByRepository, function (repo) {
+                repo$repository$nameWithOwner
+            }, character (1L)),
+            repos_issues = vapply (cc$issueContributionsByRepository, function (repo) {
+                repo$repository$nameWithOwner
+            }, character (1L)),
+            repos_prs = vapply (cc$pullRequestContributionsByRepository, function (repo) {
+                repo$repository$nameWithOwner
+            }, character (1L)),
+            n_repos_commits = length (cc$commitContributionsByRepository),
+            n_repos_issues = length (cc$issueContributionsByRepository),
+            n_repos_prs = length (cc$pullRequestContributionsByRepository)
+        )
+    })
+
+    end_dates <- vapply (res, function (i) as.character (i$end_date), character (1L))
+    total_commits <- vapply (res, function (i) i$total_commits, integer (1L))
+    total_issues <- vapply (res, function (i) i$total_issues, integer (1L))
+    total_prs <- vapply (res, function (i) i$total_prs, integer (1L))
+    get1unique <- function (res, what = "commits") {
+        unique (unlist (unname (
+            lapply (res, function (i) i [[paste0 ("repos_", what)]])
+        )))
     }
+    repos_commits <- get1unique (res, "commits")
+    repos_issues <- get1unique (res, "issues")
+    repos_prs <- get1unique (res, "prs")
+    n_repos_commits <- vapply (res, function (i) i$n_repos_commits, integer (1L))
+    n_repos_issues <- vapply (res, function (i) i$n_repos_issues, integer (1L))
+    n_repos_prs <- vapply (res, function (i) i$n_repos_prs, integer (1L))
 
     for (what in c ("issues", "prs", "commits")) {
         dat <- get (paste0 ("n_repos_", what))

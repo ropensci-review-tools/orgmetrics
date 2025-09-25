@@ -6,11 +6,38 @@ gh_user_follow <- utils::getFromNamespace ("gh_user_follow", "repometrics")
 #' @param data_org Partial result of 'orgmetrics_collate_org_data', including
 #' full data on all repos.
 #' @return Same data with additional 'contributors' item.
-add_org_contributor_data <- function (data_org) {
+org_contributor_data <- function (data_org) {
 
     ctbs <- get_unique_ctbs (data_org)
-    ctb_dat <- pbapply::pblapply (ctbs, om_data_gh_contributor)
 
+    ctb_dat <- pbapply::pblapply (ctbs, function (ctb) {
+
+        ctb_dat <- gh_user_activity (login = ctb, period = 1 / 12)
+
+        dat_gen <- gh_user_general (login = ctb)
+        dat_followers <- gh_user_follow (login = ctb, followers = TRUE)
+        dat_following <- gh_user_follow (login = ctb, followers = FALSE)
+
+        data.frame (
+            login = ctb,
+            created_at = ctb_dat$created_at,
+            commits = sum (ctb_dat$dat_ts$commits),
+            issues = sum (ctb_dat$dat_ts$issues),
+            prs = sum (ctb_dat$dat_ts$prs),
+            n_repos_commits = length (unique (ctb_dat$commits)),
+            n_repos_issues = length (unique (ctb_dat$issues)),
+            n_repos_prs = length (unique (ctb_dat$prs)),
+            n_org_commits = length (unique (gsub ("\\/.*$", "", ctb_dat$commits))),
+            n_org_issues = length (unique (gsub ("\\/.*$", "", ctb_dat$issues))),
+            n_org_prs = length (unique (gsub ("\\/.*$", "", ctb_dat$prs))),
+            num_org_memberships = nrow (dat_gen$org),
+            n_starred_repos = dat_gen$user$num_starred_repos,
+            num_followers = length (dat_followers),
+            num_following = length (dat_following)
+        )
+    })
+
+    do.call (rbind, ctb_dat)
 }
 
 get_unique_ctbs <- function (data_org) {
@@ -174,6 +201,7 @@ gh_user_activity_internal <- function (login, end_date = Sys.Date (), period = 0
     }
 
     res <- list (
+        created_at = created_at,
         commits = unique (repos_commits),
         issues = unique (repos_issues),
         prs = unique (repos_prs),
@@ -186,22 +214,3 @@ gh_user_activity_internal <- function (login, end_date = Sys.Date (), period = 0
     )
 }
 gh_user_activity <- memoise::memoise (gh_user_activity_internal)
-
-om_data_gh_contributor <- function (login, end_date = Sys.Date (), nyears = 3) {
-
-    dat_gen <- gh_user_general (login, end_date = end_date, nyears = nyears)
-    dat_followers <- gh_user_follow (login, followers = TRUE)
-    dat_following <- gh_user_follow (login, followers = FALSE)
-    dat_activity <- gh_user_activity (login, end_date = end_date)
-
-    res <- dat_gen$user |>
-        dplyr::select (!c (email, bio, avatarUrl))
-    res$num_orgs <- nrow (dat_gen$orgs)
-    res$followers <- length (dat_followers)
-    res$following <- length (dat_following)
-    res$commits_total <- sum (dat_commits$commits)
-    res$commits_total_repos <- nrow (dat_commits)
-    res$commits_total_orgs <- length (unique (dat_commits$org))
-
-    return (res)
-}

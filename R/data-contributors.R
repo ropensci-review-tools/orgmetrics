@@ -9,6 +9,7 @@ gh_user_follow <- utils::getFromNamespace ("gh_user_follow", "repometrics")
 add_org_contributor_data <- function (data_org) {
 
     ctbs <- get_unique_ctbs (data_org)
+    ctb_dat <- pbapply::pblapply (ctbs, om_data_gh_contributor)
 
 }
 
@@ -32,47 +33,31 @@ get_unique_ctbs <- function (data_org) {
     return (ctbs)
 }
 
-# These are modified versions from repometrics functions. The GraphQL API only
-# allows "from" and "to" dates which span 1 year or less. The "gh_user_commits"
-# function here calls the query multiple times, adjusting the "end_year" each
-# time.
-gh_user_commits_qry <- function (login = "",
-                                 end_date = Sys.Date (),
-                                 nyears = 1,
-                                 n_per_page = 100L,
-                                 end_cursor = NULL) {
-
-    # These 'format' calls pad with hms = "00:00:00":
-    from <- format (end_date - 365.25, "%Y-%m-%dT%H:%M:%S")
-    end_date <- format (end_date, "%Y-%m-%dT%H:%M:%S")
-
-    after_txt <- ""
-    if (!is.null (end_cursor)) {
-        after_txt <- paste0 (", after:\"", end_cursor, "\"")
-    }
+gh_user_activity_qry <- function (login = "", start_date, end_date) {
 
     q <- paste0 ("{
         user(login:\"", login, "\") {
             login
             createdAt
-            contributionsCollection (from: \"", from, "\", to: \"", end_date, "\") {
+            contributionsCollection (from: \"", start_date, "\", to: \"", end_date, "\") {
                 startedAt
                 endedAt
                 totalCommitContributions
-                commitContributionsByRepository (maxRepositories: ", n_per_page, ") {
-                    contributions (first: ", n_per_page, after_txt, ") {
-                        pageInfo {
-                            hasNextPage
-                            endCursor
-                        }
-                        totalCount
-                        nodes {
-                            occurredAt
-                            commitCount
-                            repository {
-                                nameWithOwner
-                            }
-                        }
+                totalIssueContributions
+                totalPullRequestContributions
+                commitContributionsByRepository (maxRepositories: 100) {
+                    repository {
+                        nameWithOwner
+                    }
+                }
+                issueContributionsByRepository (maxRepositories: 100) {
+                    repository {
+                        nameWithOwner
+                    }
+                }
+                pullRequestContributionsByRepository (maxRepositories: 100) {
+                    repository {
+                        nameWithOwner
                     }
                 }
             }
@@ -82,114 +67,111 @@ gh_user_commits_qry <- function (login = "",
     return (q)
 }
 
-gh_user_commits_internal <- function (login, end_date = Sys.Date ()) {
+# The 'commitcontributionsByRepository' only accepts the single parameter
+# of 'maxRepositories', so the only way to ensure all are captured is to
+# restrict the date ranges in the 'contributionsCollection' to ensure < 100
+# repositories are returned. The default here is thus to quarterly values.
+gh_user_activity_internal <- function (login, end_date = Sys.Date (), period = 0.25) {
 
-    user <- repos <- num_commits <- dates <- end_cursor <- end_cursors <- NULL
+    start_date <- end_date - 365.25 * period
+    end_date_fmt <- format (end_date, "%Y-%m-%dT%H:%M:%S")
+    start_date_fmt <- format (start_date, "%Y-%m-%dT%H:%M:%S")
 
-    finished <- FALSE
-    year_count <- 0
-    n_per_page <- 100
+    q <- gh_user_activity_qry (
+        login = login,
+        start_date = start_date_fmt,
+        end_date = end_date_fmt
+    )
+    dat <- gh::gh_gql (query = q)
+    cc <- dat$data$user$contributionsCollection
 
-    while (!finished) {
+    end_dates <- end_date
+    total_commits <- cc$totalCommitContributions
+    total_issues <- cc$totalIssueContributions
+    total_prs <- cc$totalPullRequestContributions
 
-        has_next_page <- TRUE
-        end_cursor <- NULL
-        while (has_next_page) {
+    repos_commits <- vapply (cc$commitContributionsByRepository, function (repo) {
+        repo$repository$nameWithOwner
+    }, character (1L))
+    repos_issues <- vapply (cc$issueContributionsByRepository, function (repo) {
+        repo$repository$nameWithOwner
+    }, character (1L))
+    repos_prs <- vapply (cc$pullRequestContributionsByRepository, function (repo) {
+        repo$repository$nameWithOwner
+    }, character (1L))
+    n_repos_commits <- length (cc$commitContributionsByRepository)
+    n_repos_issues <- length (cc$issueContributionsByRepository)
+    n_repos_prs <- length (cc$pullRequestContributionsByRepository)
 
-            q <- gh_user_commits_qry (
-                login = login,
-                end_date = end_date,
-                nyears = nyears,
-                n_per_page = n_per_page,
-                end_cursor = end_cursor
+    created_at <- as.Date (dat$data$user$createdAt)
+    while (start_date > created_at) {
+        end_date <- start_date - 1 # The day prior
+        end_dates <- c (end_dates, end_date)
+        start_date <- end_date - 365.25 * period
+        end_date_fmt <- format (end_date, "%Y-%m-%dT%H:%M:%S")
+        start_date_fmt <- format (start_date, "%Y-%m-%dT%H:%M:%S")
+
+        q <- gh_user_activity_qry (
+            login = login,
+            start_date = start_date_fmt,
+            end_date = end_date_fmt
+        )
+        dat <- gh::gh_gql (query = q)
+        cc <- dat$data$user$contributionsCollection
+
+        total_commits <- c (total_commits, cc$totalCommitContributions)
+        total_issues <- c (total_issues, cc$totalIssueContributions)
+        total_prs <- c (total_prs, cc$totalPullRequestContributions)
+        repos_commits <- c (repos_commits, vapply (cc$commitContributionsByRepository, function (repo) {
+            repo$repository$nameWithOwner
+        }, character (1L)))
+        repos_issues <- c (repos_issues, vapply (cc$issueContributionsByRepository, function (repo) {
+            repo$repository$nameWithOwner
+        }, character (1L)))
+        repos_prs <- c (repos_prs, vapply (cc$pullRequestContributionsByRepository, function (repo) {
+            repo$repository$nameWithOwner
+        }, character (1L)))
+        n_repos_commits <- c (n_repos_commits, length (cc$commitContributionsByRepository))
+        n_repos_issues <- c (n_repos_issues, length (cc$issueContributionsByRepository))
+        n_repos_prs <- c (n_repos_prs, length (cc$pullRequestContributionsByRepository))
+    }
+
+    for (what in c ("issues", "prs", "commits")) {
+        dat <- get (paste0 ("n_repos_", what))
+        len_missing <- length (which (dat == 100L))
+        len_total <- length (dat)
+        if (len_missing > 0L) {
+            what_cap <- paste0 (
+                toupper (substring (what, 1, 1)),
+                substring (what, 2, nchar (what))
             )
-            dat <- gh::gh_gql (query = q)
-
-            collection <- dat$data$user$contributionsCollection
-            commits <- collection$commitContributionsByRepository
-
-            # Query always returns `n_per_page` items, even when empty, so empty
-            # ones must first be removed:
-            lens <- vapply (
-                commits,
-                function (i) length (i$contributions$nodes),
-                integer (1L)
-            )
-            commits <- commits [which (lens > 0)]
-
-            repos_i <- vapply (
-                commits,
-                function (i) i$contributions$nodes [[1]]$repository$nameWithOwner,
-                character (1L)
-            )
-
-            dates_i <- lapply (commits, function (i) {
-                vapply (
-                    i$contributions$nodes,
-                    function (j) j$occurredAt,
-                    character (1L)
-                )
-            })
-            n_i <- vapply (dates_i, length, integer (1L))
-            dates <- c (dates, paste0 (as.Date (unlist (dates_i))))
-            commit_count_i <- lapply (commits, function (i) {
-                vapply (
-                    i$contributions$nodes,
-                    function (j) j$commitCount,
-                    integer (1L)
-                )
-            })
-            num_commits <- c (num_commits, unlist (commit_count_i))
-
-            repos <- c (repos, rep (repos_i, times = n_i))
-
-            has_next_pages <- vapply (commits, function (i) {
-                i$contributions$pageInfo$hasNextPage
-            }, logical (1L))
-            end_cursors_these <- vapply (commits, function (i) {
-                i$contributions$pageInfo$endCursor
-            }, character (1L))
-            end_cursors_these <- unique (end_cursors_these [which (has_next_pages)])
-            end_cursors <- c (end_cursors, end_cursors_these)
-            has_next_page <- length (end_cursors) > 0L
-            if (has_next_page) {
-                end_cursor <- end_cursors [1L]
-                end_cursors <- end_cursors [-1L]
-            }
-        }
-        end_date <- min (as.Date (dates)) - 1
-
-        user_created_at <- as.Date (dat$data$user$createdAt)
-        dat_started_at <- as.Date (dat$data$user$contributionsCollection$startedAt)
-        td <- difftime (dat_started_at, user_created_at, units = "weeks")
-        if (td < 52) {
-            finished <- TRUE
-        }
-
-        year_count <- year_count + 1
-        if (year_count > 50) {
-            finished <- TRUE
+            cli::cli_alert_danger (paste0 (
+                "{what_cap} is missing data for {len_missing} / {len_total} ",
+                " periods; maybe reduce time resolution?"
+            ))
         }
     }
 
-    data.frame (
-        repo = repos,
-        commits = num_commits
-    ) |>
-        dplyr::group_by (repo) |>
-        dplyr::summarise (commits = sum (commits)) |>
-        dplyr::ungroup () |>
-        dplyr::mutate (org = gsub ("\\/.*$", "", repo), .after = repo) |>
-        dplyr::mutate (login = login, .before = repo)
+    res <- list (
+        commits = unique (repos_commits),
+        issues = unique (repos_issues),
+        prs = unique (repos_prs),
+        dat_ts = data.frame (
+            end_date = end_dates,
+            commits = total_commits,
+            issues = total_issues,
+            prs = total_prs
+        )
+    )
 }
-gh_user_commits <- memoise::memoise (gh_user_commits_internal)
+gh_user_activity <- memoise::memoise (gh_user_activity_internal)
 
 om_data_gh_contributor <- function (login, end_date = Sys.Date (), nyears = 3) {
 
     dat_gen <- gh_user_general (login, end_date = end_date, nyears = nyears)
     dat_followers <- gh_user_follow (login, followers = TRUE)
     dat_following <- gh_user_follow (login, followers = FALSE)
-    dat_commits <- gh_user_commits (login, end_date = end_date)
+    dat_activity <- gh_user_activity (login, end_date = end_date)
 
     res <- dat_gen$user |>
         dplyr::select (!c (email, bio, avatarUrl))

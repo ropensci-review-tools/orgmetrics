@@ -14,6 +14,8 @@ gh_user_general <- utils::getFromNamespace ("gh_user_general", "repometrics")
 org_contributor_data <- function (data_org) {
 
     ctbs <- get_unique_ctbs (data_org)
+    num_ctbs <- length (ctbs)
+    cli::cli_inform ("Extracting data on {num_ctbs} contributors ...")
 
     ctb_dat <- pbapply::pblapply (ctbs, function (ctb) {
 

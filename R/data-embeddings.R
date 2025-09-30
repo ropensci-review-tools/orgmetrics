@@ -13,8 +13,9 @@ rm_org_data_embeddings <- function (pkgs_json) {
     dir <- fs::path_common (pkgs_dat$path)
     pkgs_root <- fs::path (dir, pkgs_dat$root)
     pkg_names <- get_all_pkg_names (pkgs_dat)
+    pkg_paths <- fs::path (dir, pkg_names$pkg_name)
 
-    embeddings <- pkgmatch::pkgmatch_embeddings_from_pkgs (pkgs_root)
+    embeddings <- pkgmatch::pkgmatch_embeddings_from_pkgs (pkg_paths)
 
     return (embeddings)
 }

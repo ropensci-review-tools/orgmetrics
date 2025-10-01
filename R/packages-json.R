@@ -24,7 +24,7 @@ om_packages_json <- function (org_path = NULL) {
     })
     repos <- do.call (rbind, repos)
 
-    extra_path <- fs::path (path, "extra")
+    extra_path <- fs::path (org_path, "extra")
     if (fs::dir_exists (extra_path)) {
         extra_repos <- list_gh_extra_repos (extra_path)
         extra_path <- vapply (strsplit (extra_repos, "\\/"), function (i) i [2], character (1L))

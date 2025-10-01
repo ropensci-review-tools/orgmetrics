@@ -13,6 +13,9 @@ gh_user_general <- utils::getFromNamespace ("gh_user_general", "repometrics")
 #' @noRd
 org_contributor_data <- function (repo_data) {
 
+    # Suppress no visible binding notes:
+    email <- location <- company <- bio <- NULL
+
     ctbs <- get_unique_ctbs (repo_data)
     num_ctbs <- length (ctbs)
     cli::cli_inform ("Extracting data on {num_ctbs} contributors ...")

@@ -50,6 +50,6 @@ list_gh_extra_repos <- function (org_path) {
             return (NULL)
         }
         u <- strsplit (u, "\\/") [[1]]
-        paste0 (tail (u, n = 2L), collapse = "/")
+        paste0 (utils::tail (u, n = 2L), collapse = "/")
     }, character (1L)))
 }

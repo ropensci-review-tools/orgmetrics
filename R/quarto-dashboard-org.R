@@ -71,7 +71,7 @@ orgmetrics_dashboard <- function (data_org,
         package = "repometrics"
     )
     rm_metrics_models <- jsonlite::read_json (rm_metrics_json, simplify = TRUE)
-    maintainers <- databoard_data_maintainers (data_contributors)
+    maintainers <- dashboard_data_maintainers (data_contributors)
 
     data_json <- list (
         cran = data_cran,
@@ -291,7 +291,10 @@ dashboard_data_r_universe <- function (data_org) {
 }
 
 # data_contributors is package-based; this inverts to be maintainer-based:
-databoard_data_maintainers <- function (data_contributors) {
+dashboard_data_maintainers <- function (data_contributors) {
+
+    # Suppress no visible binding notes:
+    gh_handle <- package <- X1 <- NULL
 
     data_maintainers <- do.call (rbind, data_contributors)
     pkgs <- gsub ("\\.[0-9]+$", "", rownames (data_maintainers))
@@ -319,7 +322,7 @@ databoard_data_maintainers <- function (data_contributors) {
         if (nrow (m) < 2L) {
             return (NULL)
         }
-        t (combn (unique (m$gh_handle), 2L))
+        t (utils::combn (unique (m$gh_handle), 2L))
     })
     comaintainers <- rbind (
         do.call (rbind, comaintainers),

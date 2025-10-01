@@ -44,6 +44,9 @@ om_packages_json <- function (org_path = NULL) {
 #' @noRd
 write_pkgs_json <- function (pkgs, dir = getwd ()) {
 
+    # Supress no visible binding notes:
+    is_r_pkg <- root <- NULL
+
     requireNamespace ("jsonlite", quietly = TRUE)
     requireNamespace ("rprojroot", quietly = TRUE)
 

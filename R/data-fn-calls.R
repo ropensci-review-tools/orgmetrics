@@ -11,7 +11,7 @@ rm_org_data_fn_call_network <- function (pkgs_json) {
     requireNamespace ("jsonlite", quietly = TRUE)
 
     # Suppress no visible binding notes:
-    is_r_pkg <- package <- n <- NULL
+    is_r_pkg <- target_pkg <- n <- NULL
 
     pkgs_dat <- jsonlite::read_json (pkgs_json, simplify = TRUE) |>
         dplyr::filter (is_r_pkg)
@@ -35,7 +35,7 @@ rm_org_data_fn_call_network <- function (pkgs_json) {
 rm_org_data_fn_calls <- function (pkgs_dat) {
 
     # Suppress no visible binding notes:
-    fn <- NULL
+    fn <- name <- package <- NULL
 
     requireNamespace ("pkgmatch", quietly = TRUE)
 

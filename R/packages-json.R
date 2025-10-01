@@ -45,7 +45,7 @@ om_packages_json <- function (org_path = NULL) {
 write_pkgs_json <- function (pkgs, dir = getwd ()) {
 
     # Supress no visible binding notes:
-    is_r_pkg <- root <- NULL
+    is_r_pkg <- root <- p <- NULL
 
     requireNamespace ("jsonlite", quietly = TRUE)
     requireNamespace ("rprojroot", quietly = TRUE)
@@ -70,7 +70,8 @@ write_pkgs_json <- function (pkgs, dir = getwd ()) {
     names (pkgs) <- c ("path", "orgrepo")
     path <- fs::path_common (pkgs$path)
     # If there is only one sub-dir, step down:
-    root_minus1 <- fs::path_common (fs::path_dir (pkg_root))
+    root_dirs <- fs::path_dir (pkg_root [which (nzchar (pkg_root))])
+    root_minus1 <- fs::path_common (root_dirs)
     if (identical (path, root_minus1)) {
         path <- fs::path_dir (path)
     }
@@ -79,6 +80,9 @@ write_pkgs_json <- function (pkgs, dir = getwd ()) {
     # These have initial path separators which are removed here:
     rm_init_path_sep <- function (pkgs, what) {
         pkgs [[what]] <- vapply (fs::path_split (pkgs [[what]]), function (p) {
+            if (length (p) == 0L) {
+                return ("")
+            }
             p_red <- p [which (p != .Platform$file.sep)]
             do.call (fs::path, as.list (p_red))
         }, character (1L))

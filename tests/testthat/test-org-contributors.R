@@ -34,7 +34,18 @@ test_that ("test org contributors", {
 
     fs::dir_delete (org_dir)
 
-    ctbs <- get_unique_ctbs (org_data)
+    ctbs <- get_unique_ctbs (org_data$repos)
     expect_type (ctbs, "character")
     expect_gt (length (ctbs), 1L)
+    expect_equal (length (ctbs), nrow (org_data$contributors))
+    expect_identical (sort (ctbs), sort (org_data$contributors$login))
+
+    expect_named (
+        org_data$contributors,
+        c (
+            "login", "name", "avatarUrl", "num_repositories",
+            "repos_contributed_to", "num_issues_opened", "num_prs_opened",
+            "num_starred_repos", "num_orgs"
+        )
+    )
 })

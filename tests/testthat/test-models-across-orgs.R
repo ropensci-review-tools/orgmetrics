@@ -37,7 +37,10 @@ test_that ("collate_org_data output", {
     expect_type (org_data, "list")
     expect_named (
         org_data,
-        c ("repos", "metrics", "models", "annual_commits", "annual_gh_activity")
+        c (
+            "repos", "metrics", "models", "contributors",
+            "annual_commits", "annual_gh_activity"
+        )
     )
     npkgs <- 2L
     expect_length (org_data$repos, npkgs)

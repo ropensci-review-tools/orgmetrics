@@ -14,7 +14,10 @@
 #' that the site must be served with `action = "preview"`, and will not work by
 #' simply opening this "index.html" file.
 #' @export
-orgmetrics_dashboard <- function (data_org, fn_calls, similarities, action = "preview") {
+orgmetrics_dashboard <- function (data_org,
+                                  fn_calls,
+                                  similarities,
+                                  action = "preview") {
 
     # Suppress no visible binding notes:
     org <- package <- NULL

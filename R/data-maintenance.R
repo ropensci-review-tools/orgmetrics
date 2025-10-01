@@ -53,6 +53,7 @@ ctb_absence <- function (data_org,
         ctbs_log <- repo$rm$contribs_from_log |>
             dplyr::filter (!grepl ("github", handle, ignore.case = TRUE))
         log <- repo$rm$gitlog |>
+            dplyr::mutate (aut_name = iconv (aut_name, to = "UTF-8", sub = "byte")) |>
             dplyr::filter (!grepl ("github", aut_name, ignore.case = TRUE))
 
         # Reconcile names:

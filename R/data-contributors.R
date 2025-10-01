@@ -3,7 +3,7 @@ gh_user_general <- utils::getFromNamespace ("gh_user_general", "repometrics")
 
 #' Add full data on each contributor after assembling all repo-level data.
 #'
-#' @param data_org Partial result of 'orgmetrics_collate_org_data', including
+#' @param repo_data Partial result of 'orgmetrics_collate_org_data', including
 #' full data on all repos.
 #' @param end_date To up to which to extract data.
 #' @param num_cores Set `NULL` to calculate with single thread, which may take
@@ -11,9 +11,9 @@ gh_user_general <- utils::getFromNamespace ("gh_user_general", "repometrics")
 #' available cores, or specify an exact integer number.
 #' @return Same data with additional 'contributors' item.
 #' @noRd
-org_contributor_data <- function (data_org) {
+org_contributor_data <- function (repo_data) {
 
-    ctbs <- get_unique_ctbs (data_org)
+    ctbs <- get_unique_ctbs (repo_data)
     num_ctbs <- length (ctbs)
     cli::cli_inform ("Extracting data on {num_ctbs} contributors ...")
 
@@ -29,9 +29,9 @@ org_contributor_data <- function (data_org) {
     do.call (rbind, ctb_dat)
 }
 
-get_unique_ctbs <- function (data_org) {
+get_unique_ctbs <- function (repo_data) {
 
-    ctbs <- lapply (data_org$repos, function (repo) {
+    ctbs <- lapply (repo_data, function (repo) {
         repo$rm$contribs_from_gh_api$login
     }) |>
         unlist () |>

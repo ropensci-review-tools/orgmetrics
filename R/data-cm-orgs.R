@@ -80,7 +80,7 @@ orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_
     annual_commits <- org_annual_commits (org_paths)
     annual_gh_activity <- org_annual_gh_activity (pkgs_repos)
 
-    ctb_dat <- org_contributor_data (data_org)
+    ctb_dat <- org_contributor_data (pkgs_repos)
 
     data <- list (
         repos = pkgs_repos,

@@ -12,7 +12,11 @@ test_that ("function call network", {
     repos <- c ("orgmetrics", "repometrics")
     repos <- vapply (repos, function (repo) {
         tmp <- generate_test_pkg ()
-        path <- fs::dir_copy (tmp, fs::path (d, "ropensci-review-tools", repo))
+        path <- fs::dir_copy (
+            tmp,
+            fs::path (d, "ropensci-review-tools", repo),
+            overwrite = TRUE
+        )
         fs::path_rel (path, start = d)
     }, character (1L))
     pkgs <- data.frame (

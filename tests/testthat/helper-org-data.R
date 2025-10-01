@@ -63,8 +63,16 @@ mock_collate_org_data <- function (end_date = Sys.Date ()) {
     if (!fs::dir_exists (org_dir)) {
         fs::dir_create (org_dir)
     }
-    path1 <- fs::dir_copy (path, fs::path (org_dir, "testpkg1"))
-    path2 <- fs::dir_copy (path, fs::path (org_dir, "testpkg2"))
+    path1 <- fs::dir_copy (
+        path,
+        fs::path (org_dir, "testpkg1"),
+        overwrite = TRUE
+    )
+    path2 <- fs::dir_copy (
+        path,
+        fs::path (org_dir, "testpkg2"),
+        overwrite = TRUE
+    )
     fs::dir_delete (path)
 
     d1 <- desc::desc_set ("Package" = "testpkg1", file = path1)

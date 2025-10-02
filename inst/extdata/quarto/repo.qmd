@@ -291,15 +291,24 @@ reposAll = metricsTranspose.map(function(item) {
 });
 repos = Array.from(new Set(reposAll));
 
-// Check whether repo specified in URL, and set if so:
-location = new URL(document.baseURI);
-repo_from_url = location.searchParams.get('repo');
-setRepoFromUrl = function (r) {
-    localStorage.setItem("orgmetricsRepo", r.toString());
-    return r;
-};
-repoSet = repo_from_url ? setRepoFromUrl(repo_from_url) :
-    (localStorage.getItem("orgmetricsRepo") || repos [Math.floor(Math.random() * repos.length)]);
+// -------- 5A. SEARCH PARAMETERS VS LOCALSTORAGE
+searchParams = new URLSearchParams(window.location.search);
+initialRepoSet = function(searchParams, repos) {
+    var initialRepo = searchParams.get('repo');
+    if (initialRepo) {
+        localStorage.setItem("orgmetricsRepo", initialRepo);
+    } else {
+        initialRepo = localStorage.getItem("orgmetricsRepo");
+    }
+
+    if (!initialRepo) {
+        initialRepo = repos [Math.floor(Math.random() * repos.length)];
+    }
+
+    return initialRepo;
+}
+
+repoSet = initialRepoSet(searchParams, repos);
 viewof repo = Inputs.select(
     repos,
     {
@@ -309,6 +318,18 @@ viewof repo = Inputs.select(
     }
 )
 s = localStorage.setItem("orgmetricsRepo", repo.toString());
+
+updateSearchParams = function(searchParams, key, value) {
+    if (value) {
+        searchParams.set(key, value);
+    }
+    return searchParams;
+}
+searchParamsRepo = updateSearchParams(searchParams, 'repo', repo.toString());
+url = window.location.pathname;
+hash = window.location.hash;
+url_new = `${url}?${searchParamsRepo.toString()}${hash}`;
+tempvar = window.history.replaceState(null, '', url_new);
 ```
 
 <!---- break --->
@@ -320,18 +341,10 @@ s = localStorage.setItem("orgmetricsRepo", repo.toString());
 repoURL = repo_src.filter(function(r) {
     return r.package === repo
 })[0].url;
-setLocation = function (repo) {
-    var location = new URL(document.baseURI);
-    location.searchParams.set('repo', repo);
-    return location;
-}
-repo_location = setLocation(repo);
 
 htl.html`<div>
 Click here for the source code of the
-<a href=${repoURL} target="_blank"><i>${repo}</i> repository</a>,
-or here for a
-<a href=${repo_location}>shareable link to this page</a>.
+<a href=${repoURL} target="_blank"><i>${repo}</i> repository</a>.
 </div>`
 ```
 
@@ -438,7 +451,7 @@ similar_pkgs = matched_names.map(i => {
     const url = (repo_src.filter(function(r) {
         return r.package === i
     }, i)[0] || {}).url || null;
-    return htl.html`<li><a href="/repo.html" onclick="localStorage.setItem('orgmetricsRepo', '${i}')">${i}</a></li>`
+    return htl.html`<li><a href="/repo.html?repo=${i}" onclick="localStorage.setItem('orgmetricsRepo', '${i}')">${i}</a></li>`
 });
 ```
 
@@ -558,7 +571,7 @@ deps_in_org_txt = deps_in_org.length == 0 ?
 deps_in_org_list = deps_in_org.length === 0 ? undefined :
     deps_in_org.map(d => htl.html`
 <li>
-<a href='/repo.html' onclick="localStorage.setItem('orgmetricsRepo', '${d}')">${d}</a>
+<a href='/repo.html?repo=${d}' onclick="localStorage.setItem('orgmetricsRepo', '${d}')">${d}</a>
 </li>`);
 n_deps_in_org_txt = deps_in_org.length > 0 ? htl.html`<ul>${deps_in_org_list}</ul>` : undefined;
 
@@ -566,7 +579,7 @@ revdeps = [].concat(deps[0]['revdeps'] || []);
 revdeps_list = revdeps.length == 0 ? undefined :
     revdeps.map(d => htl.html`
 <li>
-<a href='/repo.html' onclick="localStorage.setItem('orgmetricsRepo', '${d}')">${d}</a>
+<a href='/repo.html?repo=${d}' onclick="localStorage.setItem('orgmetricsRepo', '${d}')">${d}</a>
 </li>`);
 revdeps_in_org = revdeps.length > 0 ?
     'Dependend on by org pkgs:' :

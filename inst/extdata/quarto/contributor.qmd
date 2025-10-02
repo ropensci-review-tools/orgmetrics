@@ -12,7 +12,7 @@ format:
 
 
 <!---
-******** START UTILITY FUNCTIONS ********
+******** 1. START UTILITY FUNCTIONS ********
 --->
 
 
@@ -57,7 +57,7 @@ function pkgfmt(pkg) {
     th.addEventListener("click", () => {
         localStorage.setItem("orgmetricsRepo", pkg);
         th.style.background="#a0f8ff";
-        window.location.href="/repo.html";
+        window.location.href="/repo.html?repo=" + pkg;
     });
 
     return th;
@@ -75,7 +75,7 @@ ojs_define (repo_src_in = data_repo_src)
 ```
 
 ```{ojs load-json-data}
-// -------- READ JS DATA
+// -------- 2. READ JS DATA
 repo_src = {
     return transpose(repo_src_in).map(row => ({
         ...row,
@@ -90,16 +90,24 @@ maintainers = Object.keys(maintainer_pkgs);
 <!---- break --->
 
 ```{ojs maintainer-select}
-// Check whether maintainer specified in URL, and set if so:
-location = new URL(document.baseURI);
-ctb_from_url = location.searchParams.get('contributor');
-setCtbFromUrl = function (r) {
-    localStorage.setItem("orgmetricsMaintainer", r.toString());
-    return r;
-};
-maintainerSet = ctb_from_url ? setCtbFromUrl(ctb_from_url) :
-    (localStorage.getItem("orgmetricsMaintainer") ||
-        maintainers [Math.floor(Math.random() * maintainers.length)]);
+// -------- 3. MAINTAINER SELECTOR
+
+searchParams = new URLSearchParams(window.location.search);
+setInitialMaintainer = function(searchParams, maintainers) {
+    var initialMaintainer = searchParams.get('ctb');
+    if (initialMaintainer) {
+        localStorage.setItem("orgmetricsMaintainer", initialMaintainer);
+    } else {
+        initialMaintainer = localStorage.getItem("orgmetricsMaintainer");
+    }
+
+    if (!initialMaintainer) {
+        initialMaintainer = maintainers [Math.floor(Math.random() * maintainers.length)];
+    }
+
+    return initialMaintainer;
+}
+maintainerSet = setInitialMaintainer(searchParams, maintainers);
 
 viewof maintainer = Inputs.select(
     maintainers,
@@ -112,12 +120,18 @@ viewof maintainer = Inputs.select(
 s = localStorage.setItem("orgmetricsMaintainer", maintainer.toString());
 maintainer_gh_url =
     htl.html`<a href="https://github.com/${maintainer}" target="_blank"><i>${maintainer}</i></a>`
-setLocation = function (ctb) {
-    var location = new URL(document.baseURI);
-    location.searchParams.set('contributor', maintainer);
-    return location;
+
+updateSearchParams = function(searchParams, key, value) {
+    if (value) {
+        searchParams.set(key, value);
+    }
+    return searchParams;
 }
-ctb_location = setLocation(maintainer);
+searchParamsMaintainer = updateSearchParams(searchParams, 'ctb', maintainer.toString());
+url = window.location.pathname;
+hash = window.location.hash;
+url_new = `${url}?${searchParamsMaintainer.toString()}${hash}`;
+tempvar = window.history.replaceState(null, '', url_new);
 ```
 
 <!---- break --->
@@ -131,16 +145,6 @@ these_cos.map(i => htl.html`
 <div onclick=${() => localStorage.setItem('orgmetricsMaintainer', i)}>
 <li><a href="/contributor.html">${i}</a></li>
 </div>`) : htl.html`<li>No co-maintainers</li>`;
-```
-
-<div style="margin-top: 10px; margin-bottom: 10px;"></div>
-
-```{ojs maintainer-link}
-htl.html`<div>
-<a href="https://github.com/${maintainer}" target="_blank">github.com/${maintainer}</a>,
-or click here for a
-<a href=${ctb_location}>shareable link to this page</a>.
-</div>`
 ```
 
 <div style="margin-top: 10px; margin-bottom: 10px;"></div>
@@ -326,7 +330,7 @@ chart = {
             `<a href="/contributor.html"
                 onclick="localStorage.setItem('orgmetricsMaintainer', '${d.id}')">${d.id}</a>` :
             ((d.group === "packages" || d.group === "otherPackages") ?
-                `<a href="/repo.html"
+                `<a href="/repo.html?repo=${d.id}"
                     onclick="localStorage.setItem('orgmetricsRepo', '${d.id}')">${d.id}</a>` :
             d.id))
         .clone(true).lower()

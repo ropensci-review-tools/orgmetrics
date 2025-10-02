@@ -863,7 +863,9 @@ which are aggregations of
 <a href=${url_chaoss_metrics} target="_blank">metrics</a>
 into conceptual or thematic groups, and the second provides more detail into
 individual metrics. All values are standardised between 0 and 1 such that
-higher values are always better than lower values.
+higher values are always better than lower values. Note that metrics and models
+are only assessed over the previous year. Respositories that have been inactive
+during this time will thus have many scores of zero.
 </div>`
 ```
 

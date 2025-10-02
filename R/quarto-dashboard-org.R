@@ -160,18 +160,41 @@ dashboard_data_repo_metrics <- function (data_metrics, dates) {
     return (repo_metrics)
 }
 
-dashboard_data_contributors <- function (data_org) {
+match_names <- utils::getFromNamespace ("match_names", "repometrics")
+
+dashboard_data_contributors <- function (data_org, desc_name_match = 0.8) {
 
     # Suppress no visible binding notes:
     name <- login <- contributions <- NULL
 
     data_contributors <- lapply (data_org$repos, function (repo) {
-        ctbs_gh <- repo$rm$contribs_from_gh_api |>
+
+        auts <- gsub ("(\\s?)(\\[|<).*$", "", repo$authors)
+        ctbs <- repo$rm$contribs_from_gh_api |>
             dplyr::select (login, name, contributions)
-        repo$rm$contributors |>
-            dplyr::left_join (ctbs_gh, by = c ("gh_handle" = "login", "name")) |>
-            dplyr::filter (!name == "GitHub Actions") |>
-            dplyr::arrange (dplyr::desc (contributions))
+        aut_matches <- do.call (rbind, lapply (
+            auts,
+            function (a) {
+                rbind (
+                    cbind (match_names (a, ctbs$name) [1, ], what = "name"),
+                    cbind (match_names (a, ctbs$login) [1, ], what = "login")
+                )
+            }
+        ))
+        login_matches <- dplyr::filter (aut_matches, what == "login")
+        aut_matches <- aut_matches |>
+            dplyr::filter (what == "name") |>
+            dplyr::filter (match >= desc_name_match)
+        if (nrow (aut_matches) == 0) {
+            desc_name_match <- desc_name_match * max (login_matches$match)
+        }
+        login_matches <- login_matches |>
+            dplyr::filter (match >= desc_name_match)
+
+        ctbs$is_author <- ctbs$name %in% aut_matches$name |
+            ctbs$login %in% login_matches
+
+        return (ctbs)
     })
     names (data_contributors) <- gsub ("^.*\\/", "", names (data_contributors))
 

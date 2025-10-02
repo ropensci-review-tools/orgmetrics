@@ -429,7 +429,8 @@ ctbs = {
         ...row,
     }))
 }
-ctbs_gh = ctbs.map((ctb) => ctb['gh_handle']).filter(item => item != null);
+
+ctbs_gh = ctbs.map((ctb) => ctb['login']).filter(item => item != null);
 ```
 
 

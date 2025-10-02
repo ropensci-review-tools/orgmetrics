@@ -8,6 +8,7 @@ models_over_end_dates <-
 orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_years = 3) {
 
     requireNamespace ("jsonlite", quietly = TRUE)
+    requireNamespace ("desc", quietly = TRUE)
 
     # Suppress no visible binding notes:
     is_r_pkg <- NULL
@@ -39,6 +40,7 @@ orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_
             )
             dat_i <- list (
                 repo = dat_repo_to_end_date (dat_repo, end_date = end_date),
+                authors = dat_repo_authors (dat_repo),
                 metrics = metrics_over_end_dates (
                     pkgs_dat$path [i],
                     end_date = end_date,
@@ -103,6 +105,31 @@ rm_tmp_pkg_files <- function (pkgs) {
     if (length (f_tmp_list) > 0L) {
         fs::file_delete (f_tmp_list)
     }
+}
+
+dat_repo_authors <- function (dat_repo) {
+
+    auts <- NULL
+    desc_path <- fs::path (repo$pkgcheck$pkg$path, "DESCRIPTION")
+
+    if (fs::file_exists (desc_path)) {
+        auts <- tryCatch (
+            desc::desc_get_authors (desc_path),
+            error = function (e) NULL
+        )
+        if (is.null (auts)) {
+            auts <- tryCatch (
+                desc::desc_get_maintainer (desc_path),
+                error = function (e) NULL
+            )
+        }
+    }
+
+    if (!is.null (auts)) {
+        dat_repo$authors <- auts
+    }
+
+    return (dat_repo)
 }
 
 dat_repo_to_end_date <- function (dat_repo, end_date = Sys.Date ()) {

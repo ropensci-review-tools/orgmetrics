@@ -827,7 +827,7 @@ other packages. Numbers may be less than total numbers of packages listed above
 in <q><i>Dependencies: Used by org pkgs</i></q> because some of those usages may be only
 in tests, whereas the following usage counts are within actual R code only.
 </div>` :
-htl.html`<div>This package uses no other packages from the organizations,
+htl.html`<div>This package is not used in any other packages from the organization,
 and so its functions are not used anywhere else.</div>`;
 ```
 

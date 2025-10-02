@@ -57,7 +57,7 @@ function pkgfmt(pkg) {
     th.addEventListener("click", () => {
         localStorage.setItem("orgmetricsRepo", pkg);
         th.style.background="#a0f8ff";
-        window.location.href="/repo.html";
+        window.location.href="/repo.html?repo=" + pkg;
     });
 
     return th;
@@ -326,7 +326,7 @@ chart = {
             `<a href="/contributor.html"
                 onclick="localStorage.setItem('orgmetricsMaintainer', '${d.id}')">${d.id}</a>` :
             ((d.group === "packages" || d.group === "otherPackages") ?
-                `<a href="/repo.html"
+                `<a href="/repo.html?repo=${d.id}"
                     onclick="localStorage.setItem('orgmetricsRepo', '${d.id}')">${d.id}</a>` :
             d.id))
         .clone(true).lower()

@@ -103,7 +103,8 @@ org_icons <- lapply (seq_along (repo_orgs), function (i) {
 style <- "color:white; text-decoration:underline;"
 onclick <- "localStorage.setItem('orgmetricsRepo', "
 pkg_links <- sprintf (
-    '<a href=\'/repo.html\' style="%s" onclick="%s \'%s\')">%s</a>',
+    '<a href=\'/repo.html?repo=%s\' style="%s" onclick="%s \'%s\')">%s</a>',
+    data$package,
     style,
     onclick,
     data$package,
@@ -406,7 +407,7 @@ chart = {
         .attr("y", "0.31em")
         .text(d => d.id)
         .html(d =>
-            `<a href="/repo.html"
+            `<a href="/repo.html?repo=${d.id}"
                 onclick="localStorage.setItem('orgmetricsRepo', '${d.id}')">${d.id}</a>`)
         .clone(true).lower()
             .attr("fill", "none")
@@ -527,7 +528,7 @@ function pkgfmt(pkg) {
     th.addEventListener("click", () => {
         localStorage.setItem("orgmetricsRepo", pkg);
         th.style.background="#a0f8ff";
-        window.location.href="/repo.html";
+        window.location.href="/repo.html?repo=" + pkg;
     });
 
     return th;
@@ -1102,7 +1103,7 @@ bslib::page_fillable (
                 tags$p (
                     bsicons::bs_icon ("caret-right"),
                     tags$a (
-                        href = "/repo.html",
+                        href = sprintf ("/repo.html?repo=%s", i$text),
                         onclick = sprintf ("localStorage.setItem('orgmetricsRepo', '%s')", i$text),
                         i$text
                     )
@@ -1112,7 +1113,7 @@ bslib::page_fillable (
                     tags$p (
                         bsicons::bs_icon ("caret-right"),
                         tags$a (
-                            href = "/repo.html",
+                            href = sprintf ("/repo.html?repo=%s", i$text [j]),
                             onclick = sprintf ("localStorage.setItem('orgmetricsRepo', '%s')", i$text [j]),
                             i$text [j]
                         )

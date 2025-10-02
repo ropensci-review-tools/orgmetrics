@@ -327,7 +327,8 @@ updateSearchParams = function(searchParams, key, value) {
 }
 searchParamsRepo = updateSearchParams(searchParams, 'repo', repo.toString());
 url = window.location.pathname;
-url_new = `${url}?${searchParamsRepo.toString()}`;
+hash = window.location.hash;
+url_new = `${url}?${searchParamsRepo.toString()}${hash}`;
 tempvar = window.history.replaceState(null, '', url_new);
 ```
 

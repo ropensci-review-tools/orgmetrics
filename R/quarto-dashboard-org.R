@@ -171,7 +171,8 @@ dashboard_data_contributors <- function (data_org, desc_name_match = 0.8) {
 
         auts <- gsub ("(\\s?)(\\[|<).*$", "", repo$authors)
         ctbs <- repo$rm$contribs_from_gh_api |>
-            dplyr::select (login, name, contributions)
+            dplyr::select (login, name, contributions) |>
+            dplyr::filter (!grepl ("github\\-actions|\\[bot\\]", login))
         aut_matches <- do.call (rbind, lapply (
             auts,
             function (a) {

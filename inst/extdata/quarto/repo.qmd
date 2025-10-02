@@ -291,13 +291,14 @@ reposAll = metricsTranspose.map(function(item) {
 });
 repos = Array.from(new Set(reposAll));
 
+// -------- 5A. SEARCH PARAMETERS VS LOCALSTORAGE
 searchParams = new URLSearchParams(window.location.search);
 initialRepoSet = function(searchParams, repos) {
     var initialRepo = searchParams.get('repo');
     if (initialRepo) {
-        localStorage.setItem("orgMetricsRepo", initialRepo);
+        localStorage.setItem("orgmetricsRepo", initialRepo);
     } else {
-        initialRepo = localStorage.getItem("orgMetricsRepo");
+        initialRepo = localStorage.getItem("orgmetricsRepo");
     }
 
     if (!initialRepo) {

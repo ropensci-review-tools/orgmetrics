@@ -92,8 +92,22 @@ maintainers = Object.keys(maintainer_pkgs);
 ```{ojs maintainer-select}
 // -------- 3. MAINTAINER SELECTOR
 
-maintainerSet = localStorage.getItem("orgmetricsMaintainer") ||
-    maintainers [Math.floor(Math.random() * maintainers.length)];
+searchParams = new URLSearchParams(window.location.search);
+setInitialMaintainer = function(searchParams, maintainers) {
+    var initialMaintainer = searchParams.get('ctb');
+    if (initialMaintainer) {
+        localStorage.setItem("orgmetricsMaintainer", initialMaintainer);
+    } else {
+        initialMaintainer = localStorage.getItem("orgmetricsMaintainer");
+    }
+
+    if (!initialMaintainer) {
+        initialMaintainer = maintainers [Math.floor(Math.random() * maintainers.length)];
+    }
+
+    return initialMaintainer;
+}
+maintainerSet = setInitialMaintainer(searchParams, maintainers);
 
 viewof maintainer = Inputs.select(
     maintainers,
@@ -106,12 +120,18 @@ viewof maintainer = Inputs.select(
 s = localStorage.setItem("orgmetricsMaintainer", maintainer.toString());
 maintainer_gh_url =
     htl.html`<a href="https://github.com/${maintainer}" target="_blank"><i>${maintainer}</i></a>`
-setLocation = function (ctb) {
-    var location = new URL(document.baseURI);
-    location.searchParams.set('contributor', maintainer);
-    return location;
+
+updateSearchParams = function(searchParams, key, value) {
+    if (value) {
+        searchParams.set(key, value);
+    }
+    return searchParams;
 }
-ctb_location = setLocation(maintainer);
+searchParamsMaintainer = updateSearchParams(searchParams, 'ctb', maintainer.toString());
+url = window.location.pathname;
+hash = window.location.hash;
+url_new = `${url}?${searchParamsMaintainer.toString()}${hash}`;
+tempvar = window.history.replaceState(null, '', url_new);
 ```
 
 <!---- break --->
@@ -125,16 +145,6 @@ these_cos.map(i => htl.html`
 <div onclick=${() => localStorage.setItem('orgmetricsMaintainer', i)}>
 <li><a href="/contributor.html">${i}</a></li>
 </div>`) : htl.html`<li>No co-maintainers</li>`;
-```
-
-<div style="margin-top: 10px; margin-bottom: 10px;"></div>
-
-```{ojs maintainer-link}
-htl.html`<div>
-<a href="https://github.com/${maintainer}" target="_blank">github.com/${maintainer}</a>,
-or click here for a
-<a href=${ctb_location}>shareable link to this page</a>.
-</div>`
 ```
 
 <div style="margin-top: 10px; margin-bottom: 10px;"></div>

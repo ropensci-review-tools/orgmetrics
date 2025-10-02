@@ -424,13 +424,21 @@ repoMetrics = {
         ...row,
     }))
 }
-ctbs = {
+ctbs_all = {
     return transpose(ctbs_in[repo]).map(row => ({
         ...row,
     }))
 }
 
+auts = ctbs_all.filter(function(ctb) {
+    return ctb.is_author
+})
+ctbs = ctbs_all.filter(function(ctb) {
+    return !ctb.is_author
+})
+
 ctbs_gh = ctbs.map((ctb) => ctb['login']).filter(item => item != null);
+auts_gh = auts.map((aut) => aut['login']).filter(item => item != null);
 ```
 
 
@@ -483,30 +491,26 @@ htl.html`${releases[0].total} releases (latest: ${release_latest}), ${releases[0
 gitlog_txt_total = htl.html`${gitlog_total_commits} commits since ${gitlog_first_commit}`;
 gitlog_txt_recent = htl.html`${gitlog_recent_commits} commits in past year`;
 
-maintainer_count = repoMetrics.filter(function(m) {
-    return m.name == "maintainer_count"
-})[0].value;
-maintainer_count_txt = pluraliseObjects(maintainer_count, "primary maintainer");
+author_count = auts_gh.length;
+author_count_txt = pluraliseObjects(author_count, "primary author");
 
-maintainer_gh = [].concat(ctbs_gh.slice(0, maintainer_count) || []);
-maintainer_gh_list = maintainer_gh.length == 0 ? undefined:
-    (maintainer_gh.length == 1 ? htl.html`
-<div onclick=${() => localStorage.setItem('orgmetricsMaintainer', maintainer_gh)}>
-<li><a href='/contributor.html'>${maintainer_gh}</a></li>
+author_gh_list = auts_gh.length == 0 ? undefined:
+    (auts_gh.length == 1 ? htl.html`
+<div onclick=${() => localStorage.setItem('orgmetricsMaintainer', auts_gh)}>
+<li><a href='/contributor.html'>${auts_gh}</a></li>
 </div>
-` : maintainer_gh.map(m => htl.html`
+` : auts_gh.map(m => htl.html`
 <div onclick=${() => localStorage.setItem('orgmetricsMaintainer', m)}>
 <li><a href='/contributor.html'>${m}</a></li>
 </div>
 `));
-maintainer_gh_list_txt = maintainer_gh.length > 0 ? htl.html`<ul>${maintainer_gh_list}</ul>` : undefined;
+author_gh_list_txt = auts_gh.length > 0 ? htl.html`<ul>${author_gh_list}</ul>` : undefined;
 
-ctb_gh = [].concat(ctbs_gh.slice(maintainer_count) || []);
-ctb_count = ctb_gh.length;
+ctb_count = ctbs_gh.length;
 ctb_count_txt = pluraliseObjects(ctb_count, "additional contributor");
-ctb_count_list = ctb_gh.map((item, i) => htl.html`
+ctb_count_list = ctbs_gh.map((item, i) => htl.html`
 <span onclick=${() => localStorage.setItem('orgmetricsMaintainer', item)}>
-<a href='/contributor.html'>${item}</a>${i < ctb_gh.length - 1 ? ", " : ""}</span>`);
+<a href='/contributor.html'>${item}</a>${i < ctbs_gh.length - 1 ? ", " : ""}</span>`);
 ctb_count_html = ctb_count == 0 ? htl.html`<div>No additional contributors</div>` :
     htl.html`<div>${ctb_count_txt}: ${ctb_count_list}</div>`;
 
@@ -605,7 +609,7 @@ htl.html`<ul>
     <li>${releases_txt_total}</li>
     <li>${gitlog_txt_total}</li>
     <li>${gitlog_txt_recent}</li>
-    <li>${maintainer_count_txt}${maintainer_gh_list_txt}</li>
+    <li>${author_count_txt}${author_gh_list_txt}</li>
     <li>${ctb_count_html}</li>
     <li>${test_coverage_txt}</li>
 </ul>`

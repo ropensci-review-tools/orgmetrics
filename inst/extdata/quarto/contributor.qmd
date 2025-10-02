@@ -12,7 +12,7 @@ format:
 
 
 <!---
-******** START UTILITY FUNCTIONS ********
+******** 1. START UTILITY FUNCTIONS ********
 --->
 
 
@@ -75,7 +75,7 @@ ojs_define (repo_src_in = data_repo_src)
 ```
 
 ```{ojs load-json-data}
-// -------- READ JS DATA
+// -------- 2. READ JS DATA
 repo_src = {
     return transpose(repo_src_in).map(row => ({
         ...row,
@@ -90,16 +90,10 @@ maintainers = Object.keys(maintainer_pkgs);
 <!---- break --->
 
 ```{ojs maintainer-select}
-// Check whether maintainer specified in URL, and set if so:
-location = new URL(document.baseURI);
-ctb_from_url = location.searchParams.get('contributor');
-setCtbFromUrl = function (r) {
-    localStorage.setItem("orgmetricsMaintainer", r.toString());
-    return r;
-};
-maintainerSet = ctb_from_url ? setCtbFromUrl(ctb_from_url) :
-    (localStorage.getItem("orgmetricsMaintainer") ||
-        maintainers [Math.floor(Math.random() * maintainers.length)]);
+// -------- 3. MAINTAINER SELECTOR
+
+maintainerSet = localStorage.getItem("orgmetricsMaintainer") ||
+    maintainers [Math.floor(Math.random() * maintainers.length)];
 
 viewof maintainer = Inputs.select(
     maintainers,

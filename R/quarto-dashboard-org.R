@@ -326,18 +326,18 @@ dashboard_data_maintainers <- function (data_contributors) {
     data_maintainers$package <- pkgs
 
     maintainer_pkgs <- data_maintainers |>
-        dplyr::arrange (gh_handle, package) |>
-        dplyr::filter (!is.na (gh_handle)) |>
-        dplyr::select (gh_handle, package)
+        dplyr::arrange (login, package) |>
+        dplyr::filter (!is.na (login)) |>
+        dplyr::select (login, package)
     maintainer_pkgs_json <- lapply (split (
         maintainer_pkgs,
-        f = as.factor (maintainer_pkgs$gh_handle)
+        f = as.factor (maintainer_pkgs$login)
     ), function (m) unique (m$package))
 
     comaintainers <- maintainer_pkgs |>
-        dplyr::filter (!is.na (gh_handle)) |>
+        dplyr::filter (!is.na (login)) |>
         dplyr::arrange (package) |>
-        dplyr::select (gh_handle, package) |>
+        dplyr::select (login, package) |>
         dplyr::distinct ()
     comaintainers <- lapply (split (
         comaintainers,
@@ -346,7 +346,7 @@ dashboard_data_maintainers <- function (data_contributors) {
         if (nrow (m) < 2L) {
             return (NULL)
         }
-        t (utils::combn (unique (m$gh_handle), 2L))
+        t (utils::combn (unique (m$login), 2L))
     })
     comaintainers <- rbind (
         do.call (rbind, comaintainers),

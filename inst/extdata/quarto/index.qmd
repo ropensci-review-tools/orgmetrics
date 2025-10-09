@@ -355,12 +355,46 @@ pkg_edges = {
 
 
 ```{ojs ForceGraph-plot}
-strength = -400;
+width = 928;
+height = 600;
+
+viewof x0 = {
+    let input = Inputs.range([-width, width],
+        {
+            value: -width / 2,
+            step: 10,
+            label: "x"
+        }
+    )
+    d3.select(input).select('input[type="number"]').style("display", "none");
+    return input;
+}
+
+viewof y0 = {
+    let input = Inputs.range([-height, height],
+        {
+            value: -height / 2,
+            step: 10,
+            label: "y"
+        }
+    )
+    d3.select(input).select('input[type="number"]').style("display", "none");
+    return input;
+}
+
+viewof strength = {
+    let input = Inputs.range([0, 800],
+        {
+            value: 50,
+            step: 10,
+            label: "zoom"
+        }
+    )
+    d3.select(input).select('input[type="number"]').style("display", "none");
+    return input;
+}
 
 chart = {
-
-    const width = 928;
-    const height = 600;
 
     const types = Array.from(new Set(pkg_nodes.map(d => d.group)));
 
@@ -368,12 +402,12 @@ chart = {
 
     const simulation = d3.forceSimulation(pkg_nodes)
         .force("link", d3.forceLink(pkg_edges).id(d => d.id))
-        .force("charge", d3.forceManyBody().strength(strength))
+        .force("charge", d3.forceManyBody().strength(-strength))
         .force("x", d3.forceX())
         .force("y", d3.forceY());
 
     const svg = d3.create("svg")
-        .attr("viewBox", [-width / 2, -height / 2, width, height])
+        .attr("viewBox", [x0, y0, width, height])
         .attr("width", width)
         .attr("height", height)
         .attr("style", "max-width: 100%; height: auto; font: 14px sans-serif;");
@@ -383,9 +417,9 @@ chart = {
         .attr("stroke-width", 1.5)
         .selectAll("path")
         .data(pkg_edges)
-        .join("path")
+        .enter().append("path")
             .attr("stroke", "gray")
-            .attr("stroke-width", d => d.value);
+            .attr("stroke-width", d => 5 * Math.log10(d.value));
 
     const node = svg.append("g")
         .selectAll("g")
@@ -399,7 +433,7 @@ chart = {
         .data(pkg_nodes)
         .join("circle")
             .attr("fill", d => color(d.group))
-            .attr("r", d => d.size);
+            .attr("r", d => 5 * Math.log10(d.size));
 
     node.append("text")
         .attr("x", 8)
@@ -412,6 +446,13 @@ chart = {
             .attr("fill", "none")
             .attr("stroke", "white")
             .attr("stroke-width", 3);
+
+    const nodeData = node._groups[0].map(item => item.__data__);
+    const thispkg = "osmdata";
+    const these_data = nodeData.filter(function(n) {
+        return n.id === thispkg;
+    })
+    console.log("----- THESE_DATA " + JSON.stringify(these_data));
 
     simulation.on("tick", () => {
         link.attr("d", linkArc);
@@ -1127,3 +1168,84 @@ bslib::page_fillable (
 
 
 -----
+
+### zoomable
+
+```{ojs}
+chart2 = {
+  let transform = d3.zoomIdentity;
+
+  const simulation = d3.forceSimulation(pkg_nodes)
+      .force("link", d3.forceLink(pkg_edges).id(d => d.id)
+        .distance((d) => 30 + 30 * (1 - d.value))
+        .strength(0.1)
+      )
+      .force("charge", d3.forceManyBody()
+        .strength(-100)
+      )
+      .force("x", d3.forceX())
+      .force("y", d3.forceY());
+
+  const svg = d3.select(DOM.svg(width, height))
+
+  const link = svg.append("g")
+    .attr("stroke", "#999")
+    .attr("stroke-opacity", 0.3)
+    .selectAll("line")
+    .data(pkg_edges)
+    .enter().append("line")
+      .attr("stroke-width", d => 0.5 + 1 * d.value);
+
+  const zoomRect = svg.append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    .style("fill", "none")
+    .style("pointer-events", "all")
+
+  const node = svg.append("g")
+    .attr("stroke", "#fff")
+    .attr("stroke-width", 1.5)
+    .selectAll("circle")
+    .data(pkg_nodes)
+    .enter().append("circle")
+      .attr("r", d => 5 * Math.log(d.size))
+      .attr("fill", "black");
+
+  const zoom = d3.zoom()
+      .scaleExtent([1/2, 64])
+      .on("zoom", (event) => zoomed(event));
+
+  zoomRect.call(zoom)
+    .call(zoom.translateTo, 0, 0);
+
+  node.append("text")
+    .text(d => d.id)
+    .clone(true).lower()
+        .attr("fill", "none")
+        .attr("stroke", "white")
+        .attr("stroke-width", 3);
+
+  simulation.on("tick", () => {
+    link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+    node
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .append("text")
+            .text(d => d.id);
+  });
+
+  invalidation.then(() => simulation.stop());
+
+  return svg.node();
+
+  function zoomed(event) {
+    node.attr("transform", event.transform);
+    link.attr("transform", event.transform);
+  }
+}
+```

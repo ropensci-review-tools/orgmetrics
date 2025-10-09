@@ -303,11 +303,19 @@ interchangeable.
 ## Package Network
 
 This graph shows dependencies between all packages which use any other
-organization package. Nodes show individual packages, with circles for each
-package scaled by total numbers of dependent packages; that is, numbers of
-other packages which depend on that package. Edges connect dependent packages,
-with thicknesses scaled by total numbers of function calls by all dependent
-packages.
+organization package.
+
+- Nodes show individual packages, with circles for each package scaled by total
+numbers of dependent packages; that is, numbers of other packages which depend
+on that package.
+- Edges connect dependent packages, with thicknesses scaled by total numbers of
+function calls by all dependent packages.
+
+The diagram can be moved and dragged to dynamically explore how packages
+inter-related. To avoid confusion with gestures or mouse events, moving and
+zooming are controlled using the sliders below. The initial "Repository"
+control highlights the selected repository in red.
+
 
 ```{r}
 data_pkgcheck <- readRDS (fs::path ("data", "results-pkgcheck.Rds"))
@@ -342,6 +350,7 @@ ojs_define (edges_in = edges)
 pkg_nodes = {
     return transpose(nodes_in).map(row => ({
         ...row,
+        colour: "blue"
     }));
 }
 pkg_edges = {
@@ -353,14 +362,71 @@ pkg_edges = {
 
 <!--------- break -------->
 
+<div style="margin-top: 20px; margin-bottom: 20px;"></div>
+
+```{ojs}
+nodeIds = pkg_nodes.map(item => item.id);
+initialId = localStorage.getItem("orgmetricsRepo") ||
+        nodeIds [Math.floor(Math.random() * nodeIds.length)];
+viewof selectedNode = Inputs.select(
+    nodeIds,
+    {
+        multiple: false,
+        value: initialId,
+        label: htl.html`<b>Repository:</b>`
+    }
+)
+s = localStorage.setItem("orgmetricsRepo", selectedNode.toString());
+```
+
 
 ```{ojs ForceGraph-plot}
-strength = -400;
+width = 928;
+height = 600;
 
+viewof x0 = {
+    let input = Inputs.range([-width, width],
+        {
+            value: -width / 2,
+            step: 10,
+            label: "x"
+        }
+    )
+    d3.select(input).select('input[type="number"]').style("display", "none");
+    return input;
+}
+
+viewof y0 = {
+    let input = Inputs.range([-height, height],
+        {
+            value: -height / 2,
+            step: 10,
+            label: "y"
+        }
+    )
+    d3.select(input).select('input[type="number"]').style("display", "none");
+    return input;
+}
+
+viewof strength = {
+    let input = Inputs.range([0, 800],
+        {
+            value: 50,
+            step: 10,
+            label: "zoom"
+        }
+    )
+    d3.select(input).select('input[type="number"]').style("display", "none");
+    return input;
+}
+```
+
+
+<div style="margin-top: 20px; margin-bottom: 20px;"></div>
+
+
+```{ojs}
 chart = {
-
-    const width = 928;
-    const height = 600;
 
     const types = Array.from(new Set(pkg_nodes.map(d => d.group)));
 
@@ -368,12 +434,12 @@ chart = {
 
     const simulation = d3.forceSimulation(pkg_nodes)
         .force("link", d3.forceLink(pkg_edges).id(d => d.id))
-        .force("charge", d3.forceManyBody().strength(strength))
+        .force("charge", d3.forceManyBody().strength(-strength))
         .force("x", d3.forceX())
         .force("y", d3.forceY());
 
     const svg = d3.create("svg")
-        .attr("viewBox", [-width / 2, -height / 2, width, height])
+        .attr("viewBox", [x0, y0, width, height])
         .attr("width", width)
         .attr("height", height)
         .attr("style", "max-width: 100%; height: auto; font: 14px sans-serif;");
@@ -383,9 +449,9 @@ chart = {
         .attr("stroke-width", 1.5)
         .selectAll("path")
         .data(pkg_edges)
-        .join("path")
+        .enter().append("path")
             .attr("stroke", "gray")
-            .attr("stroke-width", d => d.value);
+            .attr("stroke-width", d => 5 * Math.log10(d.value));
 
     const node = svg.append("g")
         .selectAll("g")
@@ -399,19 +465,28 @@ chart = {
         .data(pkg_nodes)
         .join("circle")
             .attr("fill", d => color(d.group))
-            .attr("r", d => d.size);
+            .attr("r", d => 5 * Math.log10(d.size));
 
     node.append("text")
         .attr("x", 8)
         .attr("y", "0.31em")
+        .style("font-size", "14px")
+        .attr("fill", d => (d.id === selectedNode ? "red" : ""))
         .text(d => d.id)
         .html(d =>
             `<a href="/repo.html"
-                onclick="localStorage.setItem('orgmetricsRepo', '${d.id}')">${d.id}</a>`)
+                onclick="localStorage.setItem('orgmetricsRepo', '${d.id}')">${d.id}
+            </a>`)
         .clone(true).lower()
             .attr("fill", "none")
             .attr("stroke", "white")
             .attr("stroke-width", 3);
+
+    const nodeData = node._groups[0].map(item => item.__data__);
+    const thispkg = "osmdata";
+    const these_data = nodeData.filter(function(n) {
+        return n.id === thispkg;
+    })
 
     simulation.on("tick", () => {
         link.attr("d", linkArc);
@@ -1124,6 +1199,3 @@ bslib::page_fillable (
     })
 )
 ```
-
-
------

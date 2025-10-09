@@ -303,11 +303,19 @@ interchangeable.
 ## Package Network
 
 This graph shows dependencies between all packages which use any other
-organization package. Nodes show individual packages, with circles for each
-package scaled by total numbers of dependent packages; that is, numbers of
-other packages which depend on that package. Edges connect dependent packages,
-with thicknesses scaled by total numbers of function calls by all dependent
-packages.
+organization package.
+
+- Nodes show individual packages, with circles for each package scaled by total
+numbers of dependent packages; that is, numbers of other packages which depend
+on that package.
+- Edges connect dependent packages, with thicknesses scaled by total numbers of
+function calls by all dependent packages.
+
+The diagram can be moved and dragged to dynamically explore how packages
+inter-related. To avoid confusion with gestures or mouse events, moving and
+zooming are controlled using the sliders below. The initial "Repository"
+control highlights the selected repository in red.
+
 
 ```{r}
 data_pkgcheck <- readRDS (fs::path ("data", "results-pkgcheck.Rds"))
@@ -353,6 +361,8 @@ pkg_edges = {
 ```
 
 <!--------- break -------->
+
+<div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
 ```{ojs}
 nodeIds = pkg_nodes.map(item => item.id);
@@ -409,7 +419,13 @@ viewof strength = {
     d3.select(input).select('input[type="number"]').style("display", "none");
     return input;
 }
+```
 
+
+<div style="margin-top: 20px; margin-bottom: 20px;"></div>
+
+
+```{ojs}
 chart = {
 
     const types = Array.from(new Set(pkg_nodes.map(d => d.group)));

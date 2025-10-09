@@ -35,11 +35,11 @@ ctb_absence <- function (data_org,
     login <- handle <- aut_name <- timestamp <- what <- measure <- NULL
 
     start_date <- end_date - as.integer (period)
-    obj_nms <- c ("pkgstats", "pkgcheck", "cran_checks", "rm")
+    obj_nms <- c ("pkgstats", "pkgcheck", "cran_checks", "rm", "authors")
 
     abs <- lapply (data_org$repos, function (repo) {
 
-        if (!identical (names (repo), obj_nms)) {
+        if (!all (names (repo) %in% obj_nms)) {
             return (data.frame (
                 repo = character (0L),
                 name = character (0L),

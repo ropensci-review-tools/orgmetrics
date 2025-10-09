@@ -342,6 +342,7 @@ ojs_define (edges_in = edges)
 pkg_nodes = {
     return transpose(nodes_in).map(row => ({
         ...row,
+        colour: "blue"
     }));
 }
 pkg_edges = {
@@ -352,6 +353,21 @@ pkg_edges = {
 ```
 
 <!--------- break -------->
+
+```{ojs}
+nodeIds = pkg_nodes.map(item => item.id);
+initialId = localStorage.getItem("orgmetricsRepo") ||
+        nodeIds [Math.floor(Math.random() * nodeIds.length)];
+viewof selectedNode = Inputs.select(
+    nodeIds,
+    {
+        multiple: false,
+        value: initialId,
+        label: htl.html`<b>Repository:</b>`
+    }
+)
+s = localStorage.setItem("orgmetricsRepo", selectedNode.toString());
+```
 
 
 ```{ojs ForceGraph-plot}
@@ -438,10 +454,13 @@ chart = {
     node.append("text")
         .attr("x", 8)
         .attr("y", "0.31em")
+        .style("font-size", "14px")
+        .attr("fill", d => (d.id === selectedNode ? "red" : ""))
         .text(d => d.id)
         .html(d =>
             `<a href="/repo.html"
-                onclick="localStorage.setItem('orgmetricsRepo', '${d.id}')">${d.id}</a>`)
+                onclick="localStorage.setItem('orgmetricsRepo', '${d.id}')">${d.id}
+            </a>`)
         .clone(true).lower()
             .attr("fill", "none")
             .attr("stroke", "white")
@@ -452,7 +471,6 @@ chart = {
     const these_data = nodeData.filter(function(n) {
         return n.id === thispkg;
     })
-    console.log("----- THESE_DATA " + JSON.stringify(these_data));
 
     simulation.on("tick", () => {
         link.attr("d", linkArc);
@@ -1164,88 +1182,4 @@ bslib::page_fillable (
         )
     })
 )
-```
-
-
------
-
-### zoomable
-
-```{ojs}
-chart2 = {
-  let transform = d3.zoomIdentity;
-
-  const simulation = d3.forceSimulation(pkg_nodes)
-      .force("link", d3.forceLink(pkg_edges).id(d => d.id)
-        .distance((d) => 30 + 30 * (1 - d.value))
-        .strength(0.1)
-      )
-      .force("charge", d3.forceManyBody()
-        .strength(-100)
-      )
-      .force("x", d3.forceX())
-      .force("y", d3.forceY());
-
-  const svg = d3.select(DOM.svg(width, height))
-
-  const link = svg.append("g")
-    .attr("stroke", "#999")
-    .attr("stroke-opacity", 0.3)
-    .selectAll("line")
-    .data(pkg_edges)
-    .enter().append("line")
-      .attr("stroke-width", d => 0.5 + 1 * d.value);
-
-  const zoomRect = svg.append("rect")
-    .attr("width", width)
-    .attr("height", height)
-    .style("fill", "none")
-    .style("pointer-events", "all")
-
-  const node = svg.append("g")
-    .attr("stroke", "#fff")
-    .attr("stroke-width", 1.5)
-    .selectAll("circle")
-    .data(pkg_nodes)
-    .enter().append("circle")
-      .attr("r", d => 5 * Math.log(d.size))
-      .attr("fill", "black");
-
-  const zoom = d3.zoom()
-      .scaleExtent([1/2, 64])
-      .on("zoom", (event) => zoomed(event));
-
-  zoomRect.call(zoom)
-    .call(zoom.translateTo, 0, 0);
-
-  node.append("text")
-    .text(d => d.id)
-    .clone(true).lower()
-        .attr("fill", "none")
-        .attr("stroke", "white")
-        .attr("stroke-width", 3);
-
-  simulation.on("tick", () => {
-    link
-        .attr("x1", d => d.source.x)
-        .attr("y1", d => d.source.y)
-        .attr("x2", d => d.target.x)
-        .attr("y2", d => d.target.y);
-
-    node
-        .attr("cx", d => d.x)
-        .attr("cy", d => d.y)
-        .append("text")
-            .text(d => d.id);
-  });
-
-  invalidation.then(() => simulation.stop());
-
-  return svg.node();
-
-  function zoomed(event) {
-    node.attr("transform", event.transform);
-    link.attr("transform", event.transform);
-  }
-}
 ```

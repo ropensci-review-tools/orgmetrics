@@ -311,10 +311,9 @@ on that package.
 - Edges connect dependent packages, with thicknesses scaled by total numbers of
 function calls by all dependent packages.
 
-The diagram can be moved and dragged to dynamically explore how packages
-inter-related. To avoid confusion with gestures or mouse events, moving and
-zooming are controlled using the sliders below. The initial "Repository"
-control highlights the selected repository in red.
+The diagram can be zoom, moved, and dragged to dynamically explore how packages
+inter-related. The initial "Repository" control highlights the selected
+repository in red.
 
 
 ```{r}
@@ -380,53 +379,18 @@ s = localStorage.setItem("orgmetricsRepo", selectedNode.toString());
 ```
 
 
-```{ojs ForceGraph-plot}
-width = 928;
-height = 600;
-
-viewof x0 = {
-    let input = Inputs.range([-width, width],
-        {
-            value: -width / 2,
-            step: 10,
-            label: "x"
-        }
-    )
-    d3.select(input).select('input[type="number"]').style("display", "none");
-    return input;
-}
-
-viewof y0 = {
-    let input = Inputs.range([-height, height],
-        {
-            value: -height / 2,
-            step: 10,
-            label: "y"
-        }
-    )
-    d3.select(input).select('input[type="number"]').style("display", "none");
-    return input;
-}
-
-viewof strength = {
-    let input = Inputs.range([0, 800],
-        {
-            value: 50,
-            step: 10,
-            label: "zoom"
-        }
-    )
-    d3.select(input).select('input[type="number"]').style("display", "none");
-    return input;
-}
-```
-
-
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
 
-```{ojs}
+```{ojs forceSimulation}
+width = 928;
+height = 600;
+
 chart = {
+
+    const x0 = -width / 2;
+    const y0 = -height / 2;
+    const strength = 50;
 
     const types = Array.from(new Set(pkg_nodes.map(d => d.group)));
 
@@ -444,7 +408,33 @@ chart = {
         .attr("height", height)
         .attr("style", "max-width: 100%; height: auto; font: 14px sans-serif;");
 
-    const link = svg.append("g")
+    const zoom = d3.zoom()
+        .scaleExtent([0.1, 10])
+        .on("zoom", (event) => {
+            // Update the viewBox for panning
+            const transform = event.transform;
+            const newX0 = -transform.x;
+            const newY0 = -transform.y;
+            const newWidth = width / transform.k;
+            const newHeight = height / transform.k;
+
+            svg.attr("viewBox", [newX0, newY0, newWidth, newHeight]);
+
+            // Update strength based on zoom level (inverse relationship)
+            const newStrength = Math.max(10, Math.min(800, strength * transform.k));
+
+            // Update simulation with new strength
+            simulation.force("charge", d3.forceManyBody().strength(-newStrength));
+            simulation.alpha(0.3).restart();
+        });
+
+    // apply zoom behaviour to svg:
+    svg.call(zoom);
+
+    // create container for all context that will be transformed:
+    const container = svg.append("g");
+
+    const link = container.append("g")
         .attr("fill", "none")
         .attr("stroke-width", 1.5)
         .selectAll("path")
@@ -453,7 +443,7 @@ chart = {
             .attr("stroke", "gray")
             .attr("stroke-width", d => 5 * Math.log10(d.value));
 
-    const node = svg.append("g")
+    const node = container.append("g")
         .selectAll("g")
         .data(pkg_nodes)
         .join("g")
@@ -493,6 +483,10 @@ chart = {
         node.attr("transform", d => `translate(${d.x},${d.y})`);
     });
 
+    // set initial zoom transform to match current x0, y0:
+    const initialTransform = d3.zoomIdentity.translate(-x0, -y0);
+    svg.call(zoom.transform, initialTransform);
+
     invalidation.then(() => simulation.stop());
 
     return Object.assign(svg.node(), {scales: {color}});
@@ -516,6 +510,9 @@ drag = simulation => {
         if (!event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
         d.fy = d.y;
+
+        // prevent zoom behaviour during drag:
+        event.sourceEvent.stopPropagation();
     }
 
     function dragged(event, d) {

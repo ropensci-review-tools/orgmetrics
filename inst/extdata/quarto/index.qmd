@@ -311,9 +311,9 @@ on that package.
 - Edges connect dependent packages, with thicknesses scaled by total numbers of
 function calls by all dependent packages.
 
-The diagram can be zoom, moved, and dragged to dynamically explore how packages
-inter-related. The initial "Repository" control highlights the selected
-repository in red.
+The diagram can be zoomed, moved, and dragged to dynamically explore how
+packages inter-related. The initial "Repository" control highlights the
+selected repository in red.
 
 
 ```{r}
@@ -471,12 +471,6 @@ chart = {
             .attr("fill", "none")
             .attr("stroke", "white")
             .attr("stroke-width", 3);
-
-    const nodeData = node._groups[0].map(item => item.__data__);
-    const thispkg = "osmdata";
-    const these_data = nodeData.filter(function(n) {
-        return n.id === thispkg;
-    })
 
     simulation.on("tick", () => {
         link.attr("d", linkArc);

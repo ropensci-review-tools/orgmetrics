@@ -221,6 +221,14 @@ Inputs.table(metricsTable, {
 
 ## Network
 
+The following network diagram can be zoomed, moved, and dragged to dynamically
+explore how the selected maintainer is related to both packages and other
+maintainers. Although zooming and moving can be controlled within the diagram
+itself using either mouse or gestures, gestures may become confused for large,
+dense diagrams. The sliders immediately below may offer an easier way to
+control movement.
+
+
 ```{ojs ForceGraph-controls}
 width = 928;
 height = 600;
@@ -262,8 +270,6 @@ viewof strength = {
 }
 ```
 
-
-<div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
 ```{ojs network-in}
 // Connect co-maintainers to all of their packages:
@@ -341,7 +347,38 @@ chart = {
         .attr("height", height)
         .attr("style", "max-width: 100%; height: auto; font: 14px sans-serif;");
 
-    const link = svg.append("g")
+    const zoom = d3.zoom()
+        .scaleExtent([0.1, 10])
+        .on("zoom", (event) => {
+            // Update the viewBox for panning
+            const transform = event.transform;
+            const newX0 = -transform.x;
+            const newY0 = -transform.y;
+            const newWidth = width / transform.k;
+            const newHeight = height / transform.k;
+
+            svg.attr("viewBox", [newX0, newY0, newWidth, newHeight]);
+
+            // update observable variables:
+            if (viewof x0) viewof x0.value = newX0;
+            if (viewof y0) viewof y0.value = newY0;
+
+            // Update strength based on zoom level (inverse relationship)
+            const newStrength = Math.max(10, Math.min(800, strength * transform.k));
+            if (viewof strength) viewof strength.value = newStrength;
+
+            // Update simulation with new strength
+            simulation.force("charge", d3.forceManyBody().strength(-newStrength));
+            simulation.alpha(0.3).restart();
+        });
+
+    // apply zoom behaviour to svg:
+    svg.call(zoom);
+
+    // create container for all context that will be transformed:
+    const container = svg.append("g");
+
+    const link = container.append("g")
         .attr("fill", "none")
         .attr("stroke-width", 1.5)
         .selectAll("path")
@@ -350,7 +387,7 @@ chart = {
             .attr("stroke", "gray")
             .attr("stroke-width", d => d.value);
 
-    const node = svg.append("g")
+    const node = container.append("g")
         .selectAll("g")
         .data(nodes)
         .join("g")
@@ -385,6 +422,10 @@ chart = {
         node.attr("transform", d => `translate(${d.x},${d.y})`);
     });
 
+    // set initial zoom transform to match current x0, y0:
+    const initialTransform = d3.zoomIdentity.translate(-x0, -y0);
+    svg.call(zoom.transform, initialTransform);
+
     invalidation.then(() => simulation.stop());
 
     return Object.assign(svg.node(), {scales: {color}});
@@ -408,6 +449,9 @@ drag = simulation => {
         if (!event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
         d.fy = d.y;
+
+        // prevent zoom behaviour during drag:
+        event.sourceEvent.stopPropagation();
     }
 
     function dragged(event, d) {

@@ -327,7 +327,8 @@ pkg_deps <- do.call (rbind, unname (pkg_deps)) |>
 nodes <- data.frame (
     id = unique (c (pkg_deps$package, pkg_deps$name)),
     size = 0L
-)
+) |>
+    dplyr::arrange (tolower (id))
 pkg_counts <- table (pkg_deps$package)
 index <- match (names (pkg_counts), nodes$id)
 nodes$size [index] <- as.integer (pkg_counts)

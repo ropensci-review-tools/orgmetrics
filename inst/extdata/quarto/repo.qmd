@@ -289,8 +289,7 @@ data_r_univ_stats = json_data['r_universe']['r_univ_stats'];
 reposAll = metricsTranspose.map(function(item) {
     return item.package;
 });
-reposUnique = Array.from(new Set(reposAll));
-repos = reposUnique.sort((a, b) =>
+repos = Array.from(new Set(reposAll)).sort((a, b) =>
     a.localeCompare(b, undefined, { sensitivity: 'base' })
 );
 

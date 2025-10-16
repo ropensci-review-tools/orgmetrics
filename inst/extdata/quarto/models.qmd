@@ -215,7 +215,9 @@ models](https://chaoss.community/kbtopic/all-metrics-models/).
 reposAll = models_all.map(function(item) {
     return item.package;
 });
-repos = Array.from(new Set(reposAll));
+repos = Array.from(new Set(reposAll)).sort((a, b) =>
+    a.localeCompare(b, undefined, { sensitivity: 'base' })
+);
 repoSet = localStorage.getItem("orgmetricsRepo") || repos [0]
 viewof repo = Inputs.select(
     repos,

@@ -121,13 +121,9 @@ orgmetrics_dashboard <- function (data_org,
     })
 }
 
-dashboard_data_repo_metrics <- function (data_metrics, dates) {
-
-    # Suppress no visible binding notes:
-    org <- package <- date <- name <- NULL
-
-    # Repo summaries for repo page:
-    repo_summary_vars <- c (
+# Repo summaries for repo page:
+get_repo_summary_vars <- function () {
+    c (
         "change_req_n_opened",
         "code_change_lines",
         "commit_count",
@@ -147,11 +143,20 @@ dashboard_data_repo_metrics <- function (data_metrics, dates) {
         "release_freq",
         "test_coverage"
     )
+}
+
+dashboard_data_repo_metrics <- function (data_metrics, dates) {
+
+    # Suppress no visible binding notes:
+    org <- package <- date <- name <- NULL
+
+    repo_vars <- c ("package", get_repo_summary_vars ())
+
     repo_metrics <- data_metrics |>
         dplyr::filter (date == max (dates)) |>
         dplyr::select (-org, -date) |>
-        tidyr::pivot_longer (-package) |>
-        dplyr::filter (name %in% repo_summary_vars)
+        dplyr::select (dplyr::all_of (repo_vars)) |>
+        tidyr::pivot_longer (-package)
 
     pkgs <- unique (repo_metrics$package)
     repo_metrics <- split (repo_metrics, f = as.factor (repo_metrics$package)) |>
@@ -229,8 +234,11 @@ dashboard_data_cran <- function (data_org) {
         function (i) !inherits (i, "data.frame"),
         logical (1L)
     ))
-    index <- seq_along (data_cran) [-(not_cran)]
-    data_cran <- do.call (rbind, data_cran [index])
+    if (length (not_cran) > 0L) {
+        data_cran <- data_cran [-(not_cran)]
+    }
+
+    data_cran <- do.call (rbind, data_cran)
     attr (data_cran, "not_cran") <- names (not_cran)
     rownames (data_cran) <- NULL
 

@@ -88,6 +88,7 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
         dplyr::group_by (package) |>
         dplyr::slice_head (n = 1L) |>
         dplyr::select (-org, -date) |>
+        dplyr::select (dplyr::all_of (get_repo_summary_vars ())) |>
         tidyr::pivot_longer (-package) |>
         dplyr::left_join (metric_direction, by = "name")
     # libyears is log-scaled, but can be negative

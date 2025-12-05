@@ -41,7 +41,6 @@ orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_
             )
             dat_i <- list (
                 repo = dat_repo_to_end_date (dat_repo, end_date = end_date),
-                authors = dat_repo_authors (dat_repo),
                 metrics = metrics_over_end_dates (
                     pkgs_dat$path [i],
                     end_date = end_date,
@@ -148,6 +147,7 @@ dat_repo_to_end_date <- function (dat_repo, end_date = Sys.Date ()) {
         }
         p |> dplyr::filter (as.Date (date) <= end_date)
     })
+    dat_repo <- dat_repo_authors (dat_repo)
 
     dat_repo$rm$gh_repo_workflow <- dat_repo$rm$gh_repo_workflow |>
         dplyr::filter (as.Date (created) <= end_date)

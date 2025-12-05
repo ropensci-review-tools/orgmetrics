@@ -206,7 +206,11 @@ clone_gh_org_repos <- function (pkgs_json = NULL, pkgs_dir = NULL) {
     pkgs_dir <- fs::path_dir (pkgs_json)
     if ("path" %in% names (pj)) {
         path_dir <- vapply (fs::path_split (pj$path), function (p) {
-            do.call (fs::path, as.list (p [seq_len (length (p) - 2)]))
+            ifelse (
+                length (p) <= 2,
+                "",
+                do.call (fs::path, as.list (p [seq_len (length (p) - 2)]))
+            )
         }, character (1L))
         index <- which (!fs::dir_exists (path_dir))
         pj$path [index] <- fs::path (pkgs_dir, pj$path [index])

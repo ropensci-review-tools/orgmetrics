@@ -28,6 +28,7 @@ test_that ("pkgs are r", {
 })
 
 test_that ("write pkgs_json", {
+
     d <- fs::path (fs::path_temp (), "tmpjson")
     expect_false (fs::dir_exists (d))
     fs::dir_create (d)
@@ -60,6 +61,7 @@ skip_if (!test_all)
 
 # No mocking here, just actual cloning on 1st two rOpenSci repos
 test_that ("clone gh org repos", {
+
     Sys.setenv ("ORGMETRICS_TESTS" = "true")
     Sys.setenv ("REPOMETRICS_TESTS" = "true") # n_per_page = 2
 

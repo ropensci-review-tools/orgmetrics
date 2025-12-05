@@ -165,7 +165,7 @@ match_names <- utils::getFromNamespace ("match_names", "repometrics")
 dashboard_data_contributors <- function (data_org, desc_name_match = 0.8) {
 
     # Suppress no visible binding notes:
-    name <- login <- contributions <- NULL
+    name <- login <- contributions <- what <- NULL
 
     data_contributors <- lapply (data_org$repos, function (repo) {
 
@@ -318,7 +318,7 @@ dashboard_data_r_universe <- function (data_org) {
 dashboard_data_maintainers <- function (data_contributors) {
 
     # Suppress no visible binding notes:
-    gh_handle <- package <- X1 <- NULL
+    gh_handle <- package <- login <- X1 <- NULL
 
     data_maintainers <- do.call (rbind, data_contributors)
     pkgs <- gsub ("\\.[0-9]+$", "", rownames (data_maintainers))

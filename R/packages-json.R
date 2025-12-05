@@ -258,13 +258,13 @@ clone_r_univ_pkgs_json <- function (pkgs_json = NULL, pkgs_dir = fs::path_temp (
 
     pj <- jsonlite::read_json (pkgs_json, simplify = TRUE)
     pj$orgrepo <- vapply (strsplit (pj$url, "\\/"), function (i) {
-        paste0 (tail (i, 2L), collapse = "/")
+        paste0 (utils::tail (i, 2L), collapse = "/")
     }, character (1L))
     pj$is_r_pkg <- pkgs_are_r (pj$orgrepo)
 
     dir_parts <- fs::path_split (pkgs_dir) [[1]]
     pj$path <- vapply (strsplit (pj$orgrepo, "\\/"), function (i) {
-        do.call (fs::path, as.list (c (dir_parts, tail (i, 2L))))
+        do.call (fs::path, as.list (c (dir_parts, utils::tail (i, 2L))))
     }, character (1L))
 
     pkgs_json_new <- fs::path (pkgs_dir, "packages.json")

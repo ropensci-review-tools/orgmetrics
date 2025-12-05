@@ -4,12 +4,15 @@
 \alias{clone_gh_org_repos}
 \title{Clone or update all repositories defined in 'packages.json'}
 \usage{
-clone_gh_org_repos(pkgs_json = NULL)
+clone_gh_org_repos(pkgs_json = NULL, pkgs_dir = NULL)
 }
 \arguments{
 \item{pkgs_json}{Local path to 'packages.json' as created or updated by
 running \link{om_packages_json}. That function must be run first, prior to
 calling this function!}
+
+\item{pkgs_dir}{Defaults to cloning repositories in the root directory of
+'packages.json'. A specific path may be specified here to clone elsewhere.}
 }
 \value{
 Function primarily called for side-effect of clone or updating all

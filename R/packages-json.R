@@ -177,18 +177,25 @@ pkgs_are_r <- function (pkgs) {
 #' @param pkgs_json Local path to 'packages.json' as created or updated by
 #' running \link{om_packages_json}. That function must be run first, prior to
 #' calling this function!
+#' @param pkgs_dir Defaults to cloning repositories in the root directory of
+#' 'packages.json'. A specific path may be specified here to clone elsewhere.
 #' @return Function primarily called for side-effect of clone or updating all
 #' repositories defined in 'packages.json', but does invisibly return a vector
 #' of paths to all local repositories of R packages as listed in `pkgs_json`.
 #'
 #'
 #' @export
-clone_gh_org_repos <- function (pkgs_json = NULL) {
+clone_gh_org_repos <- function (pkgs_json = NULL, pkgs_dir = NULL) {
 
     requireNamespace ("jsonlite", quietly = TRUE)
 
     checkmate::assert_character (pkgs_json, len = 1L)
     checkmate::assert_file_exists (pkgs_json)
+    if (is.null (pkgs_dir)) {
+        pkgs_dir <- fs::path_dir (pkgs_json)
+    } else {
+        checkmate::assert_directory_exists (pkgs_dir)
+    }
 
     # Supress no visible binding notes:
     is_r_pkg <- NULL
@@ -196,8 +203,8 @@ clone_gh_org_repos <- function (pkgs_json = NULL) {
     pj <- jsonlite::read_json (pkgs_json, simplify = TRUE) |>
         dplyr::filter (is_r_pkg)
 
-    dir <- fs::path_dir (pkgs_json)
-    pj$path <- fs::path (dir, pj$path)
+    pkgs_dir <- fs::path_dir (pkgs_json)
+    pj$path <- fs::path (pkgs_dir, pj$path)
 
     cli::cli_alert_info ("Cloning or updating {nrow (pj)} repositories.")
 

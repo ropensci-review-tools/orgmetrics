@@ -14,8 +14,8 @@ rm_org_data_fn_call_network <- function (pkgs_json) {
     is_r_pkg <- target_pkg <- n <- NULL
 
     pkgs_dat <- jsonlite::read_json (pkgs_json, simplify = TRUE) |>
-        dplyr::filter (is_r_pkg)
-    pkgs_dat$path <- fs::path (fs::path_dir (pkgs_json), pkgs_dat$path)
+        dplyr::filter (is_r_pkg) |>
+        update_pj_path (fs::path_dir (pkgs_json))
 
     fn_calls <- rm_org_data_fn_calls (pkgs_dat)
 
@@ -54,15 +54,10 @@ rm_org_data_fn_calls <- function (pkgs_dat) {
 
 get_all_pkg_names <- function (pkgs_dat = NULL) {
 
-    dir <- fs::path_common (pkgs_dat$path)
-    if (length (unique (fs::path_dir (pkgs_dat$path))) == 1L) {
-        dir <- fs::path_dir (dir)
-    }
-    pkgs_root <- fs::path (dir, pkgs_dat$root)
-    pkg_names <- vapply (pkgs_root, function (i) {
+    pkg_names <- vapply (pkgs_dat$path, function (i) {
         get_pkg_name (i)
     }, character (1L), USE.NAMES = FALSE)
-    res <- data.frame (path = as.character (pkgs_root), pkg_name = pkg_names)
+    res <- data.frame (path = as.character (pkgs_dat$path), pkg_name = pkg_names)
     res [which (nzchar (pkg_names)), ]
 }
 

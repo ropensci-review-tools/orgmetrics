@@ -201,22 +201,8 @@ clone_gh_org_repos <- function (pkgs_json = NULL, pkgs_dir = NULL) {
     is_r_pkg <- NULL
 
     pj <- jsonlite::read_json (pkgs_json, simplify = TRUE) |>
-        dplyr::filter (is_r_pkg)
-
-    pkgs_dir <- fs::path_dir (pkgs_json)
-    if ("path" %in% names (pj)) {
-        path_dir <- vapply (fs::path_split (pj$path), function (p) {
-            ifelse (
-                length (p) <= 2,
-                "",
-                do.call (fs::path, as.list (p [seq_len (length (p) - 2)]))
-            )
-        }, character (1L))
-        index <- which (!fs::dir_exists (path_dir))
-        pj$path [index] <- fs::path (pkgs_dir, pj$path [index])
-    } else {
-        pj$path <- fs::path (pkgs_dir, pj$package)
-    }
+        dplyr::filter (is_r_pkg) |>
+        update_pj_path (fs::path_dir (pkgs_json))
 
     cli::cli_alert_info ("Cloning or updating {nrow (pj)} repositories.")
 
@@ -240,6 +226,25 @@ clone_gh_org_repos <- function (pkgs_json = NULL, pkgs_dir = NULL) {
     })
 
     invisible (unlist (out))
+}
+
+update_pj_path <- function (pj, pkgs_dir) {
+
+    if ("path" %in% names (pj)) {
+        path_dir <- vapply (fs::path_split (pj$path), function (p) {
+            ifelse (
+                length (p) <= 2,
+                "",
+                do.call (fs::path, as.list (p [seq_len (length (p) - 2)]))
+            )
+        }, character (1L))
+        index <- which (!fs::dir_exists (path_dir))
+        pj$path [index] <- fs::path (pkgs_dir, pj$path [index])
+    } else {
+        pj$path <- fs::path (pkgs_dir, pj$package)
+    }
+
+    return (pj)
 }
 
 #' Read a single r-universe "packages.json" file, clone all repos, and update

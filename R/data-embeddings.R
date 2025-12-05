@@ -7,17 +7,10 @@ rm_org_data_embeddings <- function (pkgs_json) {
     is_r_pkg <- NULL
 
     pkgs_dat <- jsonlite::read_json (pkgs_json, simplify = TRUE) |>
-        dplyr::filter (is_r_pkg)
-    pkgs_dat$path <- fs::path (fs::path_dir (pkgs_json), pkgs_dat$path)
+        dplyr::filter (is_r_pkg) |>
+        update_pj_path (fs::path_dir (pkgs_json))
 
-    dir <- fs::path_common (pkgs_dat$path)
-    pkgs_root <- fs::path (dir, pkgs_dat$root)
-    pkg_names <- get_all_pkg_names (pkgs_dat)
-    pkg_paths <- fs::path (dir, pkg_names$pkg_name)
-
-    embeddings <- pkgmatch::pkgmatch_embeddings_from_pkgs (pkg_paths)
-
-    return (embeddings)
+    pkgmatch::pkgmatch_embeddings_from_pkgs (pkgs_dat$path)
 }
 
 rm_org_emb_distances <- function (org_paths, embeddings_data = NULL, what = "code") {

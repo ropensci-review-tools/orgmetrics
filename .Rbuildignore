@@ -22,6 +22,7 @@
 ^inst/precommit$
 ^makefile$
 ^pkgdown$
+^quarto$
 ^update-data.R$
 ^vignettes/makefile$
 ^windows$

@@ -270,5 +270,5 @@ clone_r_univ_pkgs_json <- function (pkgs_json = NULL, pkgs_dir = fs::path_temp (
     pkgs_json_new <- fs::path (pkgs_dir, "packages.json")
     jsonlite::write_json (pj, pkgs_json_new, pretty = TRUE)
 
-    repo_paths <- clone_gh_org_repos (pkgs_json_new)
+    clone_gh_org_repos (pkgs_json_new)
 }

@@ -204,7 +204,15 @@ clone_gh_org_repos <- function (pkgs_json = NULL, pkgs_dir = NULL) {
         dplyr::filter (is_r_pkg)
 
     pkgs_dir <- fs::path_dir (pkgs_json)
-    pj$path <- fs::path (pkgs_dir, pj$path)
+    if ("path" %in% names (pj)) {
+        path_dir <- vapply (fs::path_split (pj$path), function (p) {
+            do.call (fs::path, as.list (p [seq_len (length (p) - 2)]))
+        }, character (1L))
+        index <- which (!fs::dir_exists (path_dir))
+        pj$path [index] <- fs::path (pkgs_dir, pj$path [index])
+    } else {
+        pj$path <- fs::path (pkgs_dir, pj$package)
+    }
 
     cli::cli_alert_info ("Cloning or updating {nrow (pj)} repositories.")
 
@@ -228,4 +236,39 @@ clone_gh_org_repos <- function (pkgs_json = NULL, pkgs_dir = NULL) {
     })
 
     invisible (unlist (out))
+}
+
+#' Read a single r-universe "packages.json" file, clone all repos, and update
+#' "packages.json" to expected format.
+#'
+#' Standard r-universe "packages.json" has just "package" and "url". The format
+#' here requires these additional fields:
+#' - "is_r_pkg", generated from the `pkgs_are_r()` function applied to
+#' 'org/repo' strings.
+#'  - "orgrepo" as the GitHub 'org/repo' strings.
+#' - "path" as a local path to "pkgs_dir" which must include org-level
+#' sub-directories.
+#'
+#' @noRd
+clone_r_univ_pkgs_json <- function (pkgs_json = NULL, pkgs_dir = fs::path_temp ()) {
+
+    checkmate::assert_character (pkgs_json, len = 1L)
+    checkmate::assert_file_exists (pkgs_json)
+    checkmate::assert_directory_exists (pkgs_dir)
+
+    pj <- jsonlite::read_json (pkgs_json, simplify = TRUE)
+    pj$orgrepo <- vapply (strsplit (pj$url, "\\/"), function (i) {
+        paste0 (tail (i, 2L), collapse = "/")
+    }, character (1L))
+    pj$is_r_pkg <- pkgs_are_r (pj$orgrepo)
+
+    dir_parts <- fs::path_split (pkgs_dir) [[1]]
+    pj$path <- vapply (strsplit (pj$orgrepo, "\\/"), function (i) {
+        do.call (fs::path, as.list (c (dir_parts, tail (i, 2L))))
+    }, character (1L))
+
+    pkgs_json_new <- fs::path (pkgs_dir, "packages.json")
+    jsonlite::write_json (pj, pkgs_json_new, pretty = TRUE)
+
+    repo_paths <- clone_gh_org_repos (pkgs_json_new)
 }

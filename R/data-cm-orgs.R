@@ -15,7 +15,8 @@ orgmetrics_collate_org_data <- function (pkgs_json, end_date = Sys.Date (), num_
 
     pkgs_dat <- jsonlite::read_json (pkgs_json, simplify = TRUE) |>
         dplyr::filter (is_r_pkg)
-    pkgs_dat$path <- fs::path (fs::path_dir (pkgs_json), pkgs_dat$path)
+    index <- which (!fs::dir_exists (pkgs_dat$path))
+    pkgs_dat$path [index] <- fs::path (fs::path_dir (pkgs_json), pkgs_dat$path [index])
     is_test_env <- Sys.getenv ("ORGMETRICS_TESTS") == "true"
 
     # pkgs_dat has [path, orgrepo, root, is_r_pkg]
@@ -110,7 +111,7 @@ rm_tmp_pkg_files <- function (pkgs) {
 dat_repo_authors <- function (dat_repo) {
 
     auts <- NULL
-    desc_path <- fs::path (repo$pkgcheck$pkg$path, "DESCRIPTION")
+    desc_path <- fs::path (dat_repo$pkgcheck$pkg$path, "DESCRIPTION")
 
     if (fs::file_exists (desc_path)) {
         auts <- tryCatch (

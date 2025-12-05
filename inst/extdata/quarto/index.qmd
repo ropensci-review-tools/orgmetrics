@@ -61,7 +61,9 @@ data <- cbind (m, ci) |>
     dplyr::rename (comm_engage = x, dev_resp = y)
 repo_urls <- repo_data |>
     dplyr::select (package, url)
-data <- dplyr::left_join (data, repo_urls, by = "package")
+if (nrow (data) > 0L) {
+    data <- dplyr::left_join (data, repo_urls, by = "package")
+}
 
 npkgs_requiring_maintenance <- nrow (data)
 
@@ -241,7 +243,7 @@ sparkline_plot_gh <- function () {
 }
 ```
 
-```{r echo = FALSE, message = TRUE}
+```{r cards-with-time-series, echo = FALSE, message = TRUE}
 lines <- paste0 (unname (repo_orgs), " from ", names (repo_orgs))
 bslib::page_fillable (
     bslib::layout_columns (
@@ -316,7 +318,7 @@ packages inter-related. The initial "Repository" control highlights the
 selected repository in red.
 
 
-```{r}
+```{r network-data-from-r}
 data_pkgcheck <- readRDS (fs::path ("data", "results-pkgcheck.Rds"))
 pkg_deps <- lapply (data_pkgcheck, function (i) {
     cbind (name = i$pkg$name, i$pkg$dependencies)
@@ -324,9 +326,11 @@ pkg_deps <- lapply (data_pkgcheck, function (i) {
 pkg_deps <- do.call (rbind, unname (pkg_deps)) |>
     dplyr::filter (package %in% unique (name))
 
+size <- 0L
+if (nrow (pkg_deps) == 0L) size <- integer (0L)
 nodes <- data.frame (
     id = unique (c (pkg_deps$package, pkg_deps$name)),
-    size = 0L
+    size = size
 ) |>
     dplyr::arrange (tolower (id))
 pkg_counts <- table (pkg_deps$package)
@@ -346,7 +350,7 @@ ojs_define (nodes_in = nodes)
 ojs_define (edges_in = edges)
 ```
 
-```{ojs}
+```{ojs ojs-nodes-edges}
 pkg_nodes = {
     return transpose(nodes_in).map(row => ({
         ...row,
@@ -364,7 +368,7 @@ pkg_edges = {
 
 <div style="margin-top: 20px; margin-bottom: 20px;"></div>
 
-```{ojs}
+```{ojs ojs-node-selector}
 nodeIds = pkg_nodes.map(item => item.id);
 initialId = localStorage.getItem("orgmetricsRepo") ||
         nodeIds [Math.floor(Math.random() * nodeIds.length)];
@@ -488,7 +492,7 @@ chart = {
 }
 ```
 
-```{ojs}
+```{ojs forceSimulation-drag-fn}
 function linkArc(d) {
     const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
     return `
@@ -536,7 +540,7 @@ drag = simulation => {
 --->
 
 
-```{ojs}
+```{ojs osj-sparkbar-tooltip}
 function sparkbar(max) {
   const colourScale = d3.scaleSequential(d3.interpolateCool)
     .domain([0, max]);
@@ -652,7 +656,7 @@ categorical groupings, and provides an overall metric of repository health.
 ******** START PLOT OF AVERAGE METRICS OVER DATES ********
 --->
 
-```{r}
+```{r metrics-data}
 data_metrics <- readRDS (fs::path ("data", "results-metrics.Rds"))
 # These currently have too many datees, and will be fixed with next update
 # (already fixed via #27). These lines can then be deleted.
@@ -696,7 +700,7 @@ ojs_define (metrics_dates_in = metrics_dates)
 ```
 
 
-```{ojs}
+```{ojs osj-metrics-data-in}
 metricsData = {
     return transpose(metrics_dates_in).map(row => ({
         ...row,
@@ -705,7 +709,7 @@ metricsData = {
 }
 ```
 
-```{ojs}
+```{ojs ojs-metrics-data-plot}
 Plot.plot({
     color: {
         legend: true,
@@ -759,7 +763,7 @@ only aggregated into each of the four groups. Clicking on the "package" values
 will lead to the repository maintenance page with further details of the
 selected package or repository.
 
-```{r}
+```{r metrics-table-from-r}
 data_metrics <- readRDS (fs::path ("data", "results-metrics.Rds"))
 
 # Main table of most recent metrics:
@@ -768,13 +772,15 @@ index1 <- which (names (data_metrics) == max (names (data_metrics)))
 m <- data_metrics [[index1]] |>
     tidyr::pivot_wider (names_from = name, values_from = value) |>
     orgmetrics:::data_metrics_group () |>
-    dplyr::select (-none) |>
     dplyr::relocate (total, .after = package) |>
     dplyr::arrange (by = desc (total))
+if ("none" %in% names (m)) {
+    m <- dplyr::select (m, -none)
+}
 ojs_define (metrics_table_in = m)
 ```
 
-```{ojs}
+```{ojs ojs-metrics-grouped-table}
 metricsGroupedTable = {
     return transpose(metrics_table_in).map(row => ({
         ...row,

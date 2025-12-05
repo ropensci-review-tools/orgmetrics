@@ -16,7 +16,7 @@ format:
 --->
 
 
-```{ojs}
+```{ojs osj-sparkbar-def}
 function sparkbar(max) {
   const colourScale = d3.scaleSequential(d3.interpolateCool)
     .domain([0, max]);
@@ -163,7 +163,7 @@ values.
 ******** START REPO-LEVEL METRICS TABLE ********
 --->
 
-```{r}
+```{r read-results-metrics}
 data_metrics <- readRDS (fs::path ("data", "results-metrics.Rds"))
 
 # Main table of most recent metrics:
@@ -172,9 +172,11 @@ index1 <- which (names (data_metrics) == max (names (data_metrics)))
 m <- data_metrics [[index1]] |>
     tidyr::pivot_wider (names_from = name, values_from = value) |>
     orgmetrics:::data_metrics_group () |>
-    dplyr::select (-none) |>
     dplyr::relocate (total, .after = package) |>
     dplyr::arrange (by = desc (total))
+if ("none" %in% names (m)) {
+    m <- dplyr::select (m, -none)
+}
 ojs_define (metrics_table_in = m)
 ```
 

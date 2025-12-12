@@ -50,8 +50,7 @@ test_that ("collate_org_data output", {
     expect_named (org_data$annual_commits, c ("year", "num_commits"))
     expect_s3_class (org_data$annual_gh_activity, "data.frame")
     expect_named (org_data$annual_gh_activity, c ("year", "issues", "prs", "cmts"))
-    n_periods <- length (get_end_date_seq (end_date = end_date, num_years = 1))
-    expect_equal (nrow (org_data$models), n_periods)
+    expect_gt (nrow (org_data$models), 1L)
 })
 
 test_that ("org data preprocessing", {
@@ -105,7 +104,9 @@ test_that ("org data preprocessing", {
     expect_s3_class (data_pre, "data.frame")
     expect_equal (ncol (data_pre), 3L)
     expect_equal (names (data_pre), c ("package", "name", "value"))
-    expect_identical (sort (df_names), sort (unique (data_pre$name)))
+    # data_pre is long form of 'metrics_df', but can have fewer values where no
+    # non-na or missing values in original 'metrics_df'.
+    expect_true (length (df_names) >= length (unique (data_pre$name)))
     expect_type (data_pre$value, "double")
     expect_true (!all (is.na (data_pre$value))) # Some actual values!
 

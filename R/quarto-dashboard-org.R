@@ -8,15 +8,16 @@
 #' @param action One of "preview", to start and open a live preview of the
 #' dashboard website, or "render" to render a static version without previewing
 #' or opening.
-#' @param similarities Matrix of cosine similarities from embeddings between
-#' packages, returned from `rm_org_emb_distances()` function.
+#' @param embeddings List of language model embeddings returned from
+#' `rm_org_emb_distances()`. These are calculated with the 'pkgmatch' package
+#' which in turn relies on \url{https://ollama.com}.
 #' @return (Invisibly) Path to main "index.html" document of quarto site. Note
 #' that the site must be served with `action = "preview"`, and will not work by
 #' simply opening this "index.html" file.
 #' @export
 orgmetrics_dashboard <- function (data_org,
                                   fn_calls,
-                                  similarities,
+                                  embeddings,
                                   action = "preview") {
 
     # Suppress no visible binding notes:

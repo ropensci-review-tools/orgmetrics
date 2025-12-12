@@ -10,7 +10,20 @@ rm_org_data_embeddings <- function (pkgs_json) {
         dplyr::filter (is_r_pkg) |>
         update_pj_path (fs::path_dir (pkgs_json))
 
-    pkgmatch::pkgmatch_embeddings_from_pkgs (pkgs_dat$path)
+    embedings <- pkgmatch::pkgmatch_embeddings_from_pkgs (pkgs_dat$path)
+    embeddings_to_similarities (embeddings)
+}
+
+embeddings_to_similarities <- function (embeddings) {
+
+    npkgs <- ncol (embeddings [[1]])
+
+    lapply (embeddings, function (emb_type) {
+        simil <- lapply (seq_len (npkgs), function (i) {
+            cosine_similarity (emb_type [, i], emb_type)
+        })
+        do.call (rbind, simil)
+    })
 }
 
 rm_org_emb_distances <- function (org_paths, embeddings_data = NULL, what = "code") {

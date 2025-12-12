@@ -5,7 +5,7 @@
 \title{Start quarto dashboard with results of
 \code{orgmetrics_collate_org_data} function for collation of data across orgs.}
 \usage{
-orgmetrics_dashboard(data_org, fn_calls, similarities, action = "preview")
+orgmetrics_dashboard(data_org, fn_calls, embeddings, action = "preview")
 }
 \arguments{
 \item{data_org}{Data on GitHub organization as returned from
@@ -14,8 +14,9 @@ orgmetrics_dashboard(data_org, fn_calls, similarities, action = "preview")
 \item{fn_calls}{Data on function calls between packages of the specified
 organization, as returned from the \code{rm_org_data_fn_call_network()} function.}
 
-\item{similarities}{Matrix of cosine similarities from embeddings between
-packages, returned from \code{rm_org_emb_distances()} function.}
+\item{embeddings}{List of language model embeddings returned from
+\code{rm_org_emb_distances()}. These are calculated with the 'pkgmatch' package
+which in turn relies on \url{https://ollama.com}.}
 
 \item{action}{One of "preview", to start and open a live preview of the
 dashboard website, or "render" to render a static version without previewing

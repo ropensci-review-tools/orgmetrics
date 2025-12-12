@@ -88,13 +88,17 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
         dplyr::group_by (package) |>
         dplyr::slice_head (n = 1L) |>
         dplyr::select (-org, -date) |>
-        dplyr::select (dplyr::all_of (get_repo_summary_vars ())) |>
+        dplyr::select (c (
+            "package", dplyr::all_of (get_repo_summary_vars ())
+        )) |>
         tidyr::pivot_longer (-package) |>
         dplyr::left_join (metric_direction, by = "name")
     # libyears is log-scaled, but can be negative
     i <- which (metrics$name == "libyears")
-    metrics$value [i] <-
-        metrics$value [i] - min (metrics$value [i], na.rm = TRUE)
+    if (length (i) > 0L) {
+        metrics$value [i] <-
+            metrics$value [i] - min (metrics$value [i], na.rm = TRUE)
+    }
 
     # Use random metrics values for tests:
     is_test_env <- Sys.getenv ("ORGMETRICS_TESTS") == "true"
@@ -156,7 +160,6 @@ data_metrics_preprocess <- function (data_metrics, longer = TRUE) {
             values_from = value
         )
     }
-
 
     return (metrics)
 }

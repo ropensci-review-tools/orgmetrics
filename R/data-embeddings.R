@@ -10,7 +10,7 @@ rm_org_data_embeddings <- function (pkgs_json) {
         dplyr::filter (is_r_pkg) |>
         update_pj_path (fs::path_dir (pkgs_json))
 
-    embedings <- pkgmatch::pkgmatch_embeddings_from_pkgs (pkgs_dat$path)
+    embeddings <- pkgmatch::pkgmatch_embeddings_from_pkgs (pkgs_dat$path)
     embeddings_to_similarities (embeddings)
 }
 

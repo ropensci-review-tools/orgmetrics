@@ -115,6 +115,8 @@ orgmetrics_dashboard <- function (data_org,
     jsonlite::write_json (data_json, fs::path (dir, "results-json-data.json"))
 
     saveRDS (fn_calls, fs::path (dir_data, "fn-calls.Rds"))
+
+    similarities <- embeddings_to_similarities (embeddings)
     saveRDS (similarities, fs::path (dir_data, "similarities.Rds"))
 
     withr::with_dir (dir, {

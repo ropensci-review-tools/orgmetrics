@@ -160,7 +160,7 @@ rm_old_data_from_cloned_univ <- function (dest_dir) {
     fn_dat <- deploy_fn_data ()
     f <- fs::path (dest_dir, paste0 (fn_dat [, 2], ".Rds"))
     info <- fs::file_info (f)
-    td <- difftime (Sys.time (), info$modification_time, unit = "days")
+    td <- difftime (Sys.time (), info$modification_time, units = "days")
     files_to_rm <- info$path [which (td > 1)]
     if (length (files_to_rm) > 0L) {
         fs::file_delete (files_to_rm)

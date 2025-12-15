@@ -22,7 +22,7 @@ clone_univ <- function (url, dest_dir) {
         type = "file"
     )
     config <- grep ("orgmetrics.*config\\.yaml", flist, value = TRUE)
-    fs::file_copy (config, dest_dir)
+    fs::file_copy (config, dest_dir, overwrite = TRUE)
     config <- fs::dir_ls (
         dest_dir,
         regexp = "config\\.yaml$",

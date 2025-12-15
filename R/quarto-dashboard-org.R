@@ -11,6 +11,8 @@
 #' @param embeddings List of language model embeddings returned from
 #' `rm_org_emb_distances()`. These are calculated with the 'pkgmatch' package
 #' which in turn relies on \url{https://ollama.com}.
+#' @param title If not `NULL` (default), a string specifying the organizational
+#' title for the dashboard.
 #' @return (Invisibly) Path to main "index.html" document of quarto site. Note
 #' that the site must be served with `action = "preview"`, and will not work by
 #' simply opening this "index.html" file.
@@ -18,6 +20,7 @@
 orgmetrics_dashboard <- function (data_org,
                                   fn_calls,
                                   embeddings,
+                                  title = NULL,
                                   action = "preview") {
 
     # Suppress no visible binding notes:
@@ -88,6 +91,9 @@ orgmetrics_dashboard <- function (data_org,
     path_src <- system.file ("extdata", "quarto", package = "orgmetrics")
     path_dest <- fs::path (fs::path_temp (), "quarto")
     dir <- fs::dir_copy (path_src, path_dest, overwrite = TRUE)
+    if (!is.null (title)) {
+        update_quarto_yml_title (dir, title)
+    }
     dir_data <- fs::path (dir, "data")
     if (!fs::dir_exists (dir_data)) {
         fs::dir_create (dir_data, recurse = TRUE)
@@ -447,4 +453,32 @@ copy_pkg_logos <- function (data_org, path) {
         }
     })
 
+}
+
+update_quarto_yml_title <- function (dir, title) {
+
+    requireNamespace ("yaml", quietly = TRUE)
+
+    qml_file <- fs::dir_ls (dir, regexp = "\\_quarto\\.yml$", type = "file")
+    qml <- yaml::read_yaml (qml_file)
+    qml$website$title <- title
+    # But standard yaml::write_yaml fails to re-map these items for quarto
+    # yaml format:
+    qml$website$navbar$left [[2]]$text <-
+        quarto::yaml_quote_string (qml$website$navbar$left [[2]]$text)
+    qml$website$navbar$right [[1]]$icon <-
+        quarto::yaml_quote_string (qml$website$navbar$right [[1]]$icon)
+    yaml::write_yaml (
+        qml,
+        file = qml_file,
+        indent.mapping.sequence = TRUE,
+        handlers = list (logical = yaml::verbatim_logical)
+    )
+
+    # Then also the title in "index.qmd"
+    index_file <- fs::dir_ls (dir, regexp = "\\index\\.qmd$", type = "file")
+    index <- readLines (index_file)
+    i <- grep ("title\\:\\s\"", index)
+    index [i] <- gsub ("EpiVerse", title, index [i])
+    writeLines (index, index_file)
 }

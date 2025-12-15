@@ -121,6 +121,8 @@ get_data_from_cloned_univ <- function (url, dest_dir) {
         return (x)
     })
 
+    attr (data, "title") <- config$title
+
     return (data)
 }
 

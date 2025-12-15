@@ -28,8 +28,11 @@ which in turn relies on \url{https://ollama.com}.}
 title for the dashboard.}
 
 \item{action}{One of "preview", to start and open a live preview of the
-dashboard website, or "render" to render a static version without previewing
-or opening.}
+dashboard website, "render" to render a static version without previewing
+or opening, or \code{NULL} to set up the quarto structure in the current
+temporary directory without doing anything. This option is useful to
+generate the dashboard structure so that it can be moved to a non-temporary
+location, and deployed or previewed from there.}
 }
 \value{
 (Invisibly) Path to main "index.html" document of quarto site. Note

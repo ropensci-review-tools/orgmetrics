@@ -1,5 +1,6 @@
 #' Deploy a dashboard from an 'r-universe' "packages.json" file.
 #'
+#' @inheritParams orgmetrics_dashboard
 #' @param url URL of a '<username>.r-universe.dev' GitHub repository,
 #' containing these two files:
 #' \enumerate{
@@ -15,7 +16,7 @@
 #' re-generating the same data each time.
 #'
 #' @export
-orgmetrics_deploy_r_univ <- function (url, dest_dir = fs::path_temp ()) {
+orgmetrics_deploy_r_univ <- function (url, dest_dir = fs::path_temp (), action = NULL) {
 
     data <- get_data_from_cloned_univ (url, dest_dir)
     title <- attr (data, "title")
@@ -24,7 +25,7 @@ orgmetrics_deploy_r_univ <- function (url, dest_dir = fs::path_temp ()) {
     embeddings <- data [[3]]
     rm (data)
 
-    orgmetrics_dashboard (data_org, fn_calls, embeddings, title = title)
+    orgmetrics_dashboard (data_org, fn_calls, embeddings, title = title, action = action)
 }
 
 #' Clone an r-universe

@@ -4,7 +4,7 @@
 \alias{orgmetrics_deploy_r_univ}
 \title{Deploy a dashboard from an 'r-universe' "packages.json" file.}
 \usage{
-orgmetrics_deploy_r_univ(url, dest_dir = fs::path_temp())
+orgmetrics_deploy_r_univ(url, dest_dir = fs::path_temp(), action = NULL)
 }
 \arguments{
 \item{url}{URL of a '\if{html}{\out{<username>}}.r-universe.dev' GitHub repository,
@@ -21,6 +21,13 @@ containing these two files:
 'orgmetrics' dashboard will be stored. The default is a temporary path, but
 a permanent local path is better for local usage of this function, to avoid
 re-generating the same data each time.}
+
+\item{action}{One of "preview", to start and open a live preview of the
+dashboard website, "render" to render a static version without previewing
+or opening, or \code{NULL} to set up the quarto structure in the current
+temporary directory without doing anything. This option is useful to
+generate the dashboard structure so that it can be moved to a non-temporary
+location, and deployed or previewed from there.}
 }
 \description{
 Deploy a dashboard from an 'r-universe' "packages.json" file.

@@ -5,12 +5,15 @@
 #' `orgmetrics_collate_org_data` function.
 #' @param fn_calls Data on function calls between packages of the specified
 #' organization, as returned from the `rm_org_data_fn_call_network()` function.
-#' @param action One of "preview", to start and open a live preview of the
-#' dashboard website, or "render" to render a static version without previewing
-#' or opening.
 #' @param embeddings List of language model embeddings returned from
 #' `rm_org_emb_distances()`. These are calculated with the 'pkgmatch' package
 #' which in turn relies on \url{https://ollama.com}.
+#' @param action One of "preview", to start and open a live preview of the
+#' dashboard website, "render" to render a static version without previewing
+#' or opening, or `NULL` to set up the quarto structure in the current
+#' temporary directory without doing anything. This option is useful to
+#' generate the dashboard structure so that it can be moved to a non-temporary
+#' location, and deployed or previewed from there.
 #' @param title If not `NULL` (default), a string specifying the organizational
 #' title for the dashboard.
 #' @return (Invisibly) Path to main "index.html" document of quarto site. Note
@@ -26,8 +29,10 @@ orgmetrics_dashboard <- function (data_org,
     # Suppress no visible binding notes:
     org <- package <- NULL
 
-    action <- match.arg (action, c ("preview", "render"))
-    quarto_action <- paste0 ("quarto::quarto_", action)
+    if (!is.null (action)) {
+        action <- match.arg (action, c ("preview", "render"))
+        quarto_action <- paste0 ("quarto::quarto_", action)
+    }
 
     requireNamespace ("jsonlite", quietly = TRUE)
     requireNamespace ("quarto", quietly = TRUE)
@@ -134,9 +139,13 @@ orgmetrics_dashboard <- function (data_org,
     }
     saveRDS (similarities, fs::path (dir_data, "similarities.Rds"))
 
-    withr::with_dir (dir, {
-        do.call (eval (parse (text = quarto_action)), list ())
-    })
+    if (!is.null (action)) {
+        withr::with_dir (dir, {
+            do.call (eval (parse (text = quarto_action)), list ())
+        })
+    }
+
+    invisible (dir)
 }
 
 # Repo summaries for repo page:

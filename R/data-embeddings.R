@@ -73,15 +73,17 @@ cosine_similarity <- function (this_vec, this_mat) {
     return (cs)
 }
 
-get_pkg_text <- utils::getFromNamespace ("get_pkg_text", "pkgmatch")
-bm25_idf <- utils::getFromNamespace ("bm25_idf", "pkgmatch")
-bm25_tokens_list <- utils::getFromNamespace ("bm25_tokens_list", "pkgmatch")
-rcpp_bm25 <- utils::getFromNamespace ("rcpp_bm25", "pkgmatch")
-
 pkg_bm25 <- function (pkgs_dat) {
 
     # suppress no visible binding note:
     n <- NULL
+
+    # These must be inside this fn, to ensure 'requireNsmespace()' has been
+    # called.
+    get_pkg_text <- utils::getFromNamespace ("get_pkg_text", "pkgmatch")
+    bm25_idf <- utils::getFromNamespace ("bm25_idf", "pkgmatch")
+    bm25_tokens_list <- utils::getFromNamespace ("bm25_tokens_list", "pkgmatch")
+    rcpp_bm25 <- utils::getFromNamespace ("rcpp_bm25", "pkgmatch")
 
     txt <- lapply (pkgs_dat$path, get_pkg_text)
     tokens_idf <- bm25_idf (txt)

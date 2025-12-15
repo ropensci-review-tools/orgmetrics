@@ -122,7 +122,16 @@ orgmetrics_dashboard <- function (data_org,
 
     saveRDS (fn_calls, fs::path (dir_data, "fn-calls.Rds"))
 
-    similarities <- embeddings_to_similarities (embeddings)
+    embeddings_are_similarities <- vapply (
+        embeddings,
+        function (i) length (unique (dim (i))) == 1L,
+        logical (1L)
+    )
+    if (all (embeddings_are_similarities)) {
+        similarities <- embeddings_to_similarities (embeddings)
+    } else {
+        similarities <- embeddings
+    }
     saveRDS (similarities, fs::path (dir_data, "similarities.Rds"))
 
     withr::with_dir (dir, {

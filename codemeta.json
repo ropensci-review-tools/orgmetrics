@@ -14,7 +14,7 @@
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.5.1 (2025-06-13)",
+  "runtimePlatform": "R version 4.5.2 (2025-10-31)",
   "author": [
     {
       "@type": "Person",
@@ -198,6 +198,18 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "yaml",
+      "name": "yaml",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=yaml"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "zoo",
       "name": "zoo",
       "provider": {
@@ -330,13 +342,10 @@
       "name": "repometrics",
       "sameAs": "https://github.com/ropensci-review-tools/repometrics"
     },
-    "SystemRequirements": {}
+    "SystemRequirements": null
   },
-  "fileSize": "131990.264KB",
+  "fileSize": "70701.869KB",
   "readme": "https://github.com/ropensci-review-tools/orgmetrics/blob/main/README.md",
-  "contIntegration": [
-    "https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check.yaml",
-    "https://app.codecov.io/gh/ropensci-review-tools/orgmetrics"
-  ],
+  "contIntegration": ["https://github.com/ropensci-review-tools/orgmetrics/actions?query=workflow%3AR-CMD-check.yaml", "https://app.codecov.io/gh/ropensci-review-tools/orgmetrics"],
   "developmentStatus": "https://www.repostatus.org/#active"
 }

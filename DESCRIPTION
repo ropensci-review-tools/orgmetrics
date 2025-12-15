@@ -38,6 +38,7 @@ Suggests:
     tidyr,
     visNetwork,
     withr,
+    yaml,
     zoo
 Remotes:
     One-Health-Research-Consulting/airtabler,

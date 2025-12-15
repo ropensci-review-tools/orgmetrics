@@ -10,6 +10,17 @@ clone_univ <- function (url, dest_dir) {
     gert::git_clone (url, path = td)
     flist <- fs::dir_ls (td, type = "file")
     pkgs_json <- grep ("packages\\.json", flist, value = TRUE)
+    config <- grep ("orgmetrics.*config\\.yaml", flist, value = TRUE)
+    if (length (pkgs_json) != 1L) {
+        cli::cli_abort (
+            "Repository must have a 'packages.json' file."
+        )
+    }
+    if (length (config) != 1L) {
+        cli::cli_abort (
+            "Repository must have an 'orgmetrics-config.yaml' file."
+        )
+    }
 
     if (!fs::dir_exists (dest_dir)) {
         fs::dir_create (dest_dir)
@@ -21,7 +32,6 @@ clone_univ <- function (url, dest_dir) {
         regexp = "packages\\.json$",
         type = "file"
     )
-    config <- grep ("orgmetrics.*config\\.yaml", flist, value = TRUE)
     fs::file_copy (config, dest_dir, overwrite = TRUE)
     config <- fs::dir_ls (
         dest_dir,

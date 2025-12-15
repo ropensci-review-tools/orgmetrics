@@ -21,6 +21,7 @@ clone_univ <- function (url, dest_dir) {
             "Repository must have an 'orgmetrics-config.yaml' file."
         )
     }
+    check_config_yaml (config)
 
     if (!fs::dir_exists (dest_dir)) {
         fs::dir_create (dest_dir)
@@ -43,5 +44,23 @@ clone_univ <- function (url, dest_dir) {
         packages_json = pkgs_json,
         orgmetrics_config = config,
         repos = repos
+    )
+}
+
+check_config_yaml <- function (config_path) {
+
+    requireNamespace ("yaml", quietly = TRUE)
+    config <- yaml::read_yaml (config_path)
+
+    checkmate::assert_list (config, len = 1L)
+    checkmate::assert_named (config)
+    checkmate::assert_names (names (config), permutation.of = c ("orgmetrics"))
+
+    config_om <- config$orgmetrics
+    checkmate::assert_list (config_om, min.len = 2L)
+    checkmate::assert_named (config_om)
+    checkmate::assert_names (
+        names (config_om),
+        must.include = c ("title", "aggregation_period")
     )
 }

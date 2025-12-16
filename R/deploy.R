@@ -119,6 +119,12 @@ deploy_fn_data <- function () {
 
 get_data_from_cloned_univ <- function (url, dest_dir) {
 
+
+    if (as.character (dest_dir) == as.character (fs::path_temp ())) {
+        dest_dir <- fs::path (dest_dir, "orgmetrics")
+        fs::dir_create (dest_dir, recurse = TRUE)
+    }
+
     rm_old_data_from_cloned_univ (dest_dir)
 
     local_univ_dat <- clone_univ (url, dest_dir)

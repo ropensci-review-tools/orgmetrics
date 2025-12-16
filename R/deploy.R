@@ -28,7 +28,11 @@ orgmetrics_deploy_r_univ <- function (url, dest_dir = fs::path_temp (), action =
     path <- orgmetrics_dashboard (data_org, fn_calls, embeddings, title = title, action = action)
 
     # Move everything to 'quarto' sub-dir here:
-    path <- fs::path_abs (fs::dir_copy (path, "."))
+    if (!identical (fs::path_abs ("."), fs::path_temp ())) {
+        path <- fs::path_abs (fs::dir_copy (path, "."))
+    }
+
+    invisible (path)
 }
 
 #' Clone an r-universe

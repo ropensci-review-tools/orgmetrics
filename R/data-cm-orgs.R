@@ -149,10 +149,14 @@ dat_repo_to_end_date <- function (dat_repo, end_date = Sys.Date ()) {
     })
     dat_repo <- dat_repo_authors (dat_repo)
 
-    dat_repo$rm$gh_repo_workflow <- dat_repo$rm$gh_repo_workflow |>
-        dplyr::filter (as.Date (created) <= end_date)
-    dat_repo$rm$gitlog <- dat_repo$rm$gitlog |>
-        dplyr::filter (as.Date (timestamp) <= end_date)
+    if (length (dat_repo$rm$gh_repo_workflow) > 0L) {
+        dat_repo$rm$gh_repo_workflow <- dat_repo$rm$gh_repo_workflow |>
+            dplyr::filter (as.Date (created) <= end_date)
+    }
+    if (length (dat_repo$rm$gitlog) > 0L) {
+        dat_repo$rm$gitlog <- dat_repo$rm$gitlog |>
+            dplyr::filter (as.Date (timestamp) <= end_date)
+    }
     if (!is.null (dat_repo$issue_comments_from_gh_api)) {
         dat_repo$rm$issue_comments_from_gh_api <-
             dat_repo$rm$issue_comments_from_gh_api |>

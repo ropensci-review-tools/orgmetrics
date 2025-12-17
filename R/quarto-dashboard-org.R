@@ -265,9 +265,11 @@ dashboard_data_cran <- function (data_org) {
         data_cran <- data_cran [-(not_cran)]
     }
 
-    data_cran <- do.call (rbind, data_cran)
-    attr (data_cran, "not_cran") <- names (not_cran)
-    rownames (data_cran) <- NULL
+    if (length (data_cran) > 0L) {
+        data_cran <- do.call (rbind, data_cran)
+        attr (data_cran, "not_cran") <- names (not_cran)
+        rownames (data_cran) <- NULL
+    }
 
     return (data_cran)
 }

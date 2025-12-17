@@ -69,8 +69,12 @@ orgmetrics_dashboard <- function (data_org,
     # -------- ADDITIONAL DATA IN JSON -------
     # All saved as single JSON structure; only used in 'repo.qmd' and 'maintainer.qmd'
     data_cran <- dashboard_data_cran (data_org)
-    not_cran <- gsub ("^.*\\/", "", attr (data_cran, "not_cran"))
-    attr (data_cran, "not_cran") <- NULL
+    not_cran <- NULL
+    if (length (data_cran) > 0L) {
+        not_cran <- gsub ("^.*\\/", "", attr (data_cran, "not_cran"))
+        attr (data_cran, "not_cran") <- NULL
+    }
+
     data_gitlog <- dashboard_data_gitlog (data_org)
     data_r_universe <- dashboard_data_r_universe (data_org)
     rm_metrics_json <- system.file (

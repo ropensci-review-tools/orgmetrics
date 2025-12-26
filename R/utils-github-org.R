@@ -21,7 +21,7 @@ list_gh_org_repos <- function (org = "ropensci", n_per_page = 100) {
             add_gh_token_to_req () |>
             httr2::req_url_query (per_page = n_per_page, page = page_num)
 
-        resp <- httr2::req_perform (req)
+        resp <- httr2::req_retry (req)
         httr2::resp_check_status (resp)
 
         body <- httr2::resp_body_json (resp)

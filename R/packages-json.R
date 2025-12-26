@@ -156,7 +156,7 @@ pkgs_are_r <- function (pkgs) {
 
         req <- add_gh_token_to_req (req)
         resp <- tryCatch (
-            httr2::req_perform (req),
+            httr2::req_retry (req),
             error = function (e) NULL
         )
         if (is.null (resp)) {

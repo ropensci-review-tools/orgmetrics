@@ -185,7 +185,7 @@ fn_calls <- readRDS (fs::path ("data", "fn-calls.Rds"))$fn_calls |>
 
 # Re-ranking of embedding similarities:
 similarities <- readRDS (fs::path ("data", "similarities.Rds"))
-npkgs <- nrow (similarities [[1]])
+npkgs <- ncol (similarities [[1]])
 k <- 60
 ranks_each <- lapply (similarities, function (s) {
     1 / (k + apply (s, 2, function (i) order (i, decreasing = TRUE)))

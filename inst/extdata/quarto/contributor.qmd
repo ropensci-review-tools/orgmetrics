@@ -322,10 +322,37 @@ links = [
 <div style="margin-top: 20px; margin-bottom: 0px;"></div>
 
 
+```{ojs nodes-selector}
+// Put "otherPackages" last in the sorted result:
+types = Array.from(new Set(nodes.map(d => d.group))).sort((a, b) => {
+    if (a === "otherPackages") return 1;
+    if (b === "otherPackages") return -1;
+    return 0;
+});
+
+viewof selectedGroups = Inputs.checkbox(
+    types,
+    {
+        label: "Filter by group:",
+        value: types.filter(t => t !== "otherPackages")
+    }
+)
+
+filteredNodes = nodes.filter(node => selectedGroups.includes(node.group) || selectedGroups.length === 0);
+
+nodeIds = new Set(filteredNodes.map(node => node.id));
+filteredLinks = links.filter(link =>
+    nodeIds.has(typeof link.source === 'object' ? link.source.id : link.source) &&
+    nodeIds.has(typeof link.target === 'object' ? link.target.id : link.target)
+);
+```
+
+
 ```{ojs swatches}
 import {Swatches} from "@d3/color-legend"
 Swatches(chart.scales.color)
 ```
+
 
 ```{ojs ForceGraph-plot}
 chart = {
@@ -333,12 +360,10 @@ chart = {
     const width = 928;
     const height = 600;
 
-    const types = Array.from(new Set(nodes.map(d => d.group)));
-
     const color = d3.scaleOrdinal(types, d3.schemeCategory10);
 
-    const simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id(d => d.id))
+    const simulation = d3.forceSimulation(filteredNodes)
+        .force("link", d3.forceLink(filteredLinks).id(d => d.id))
         .force("charge", d3.forceManyBody().strength(-strength))
         .force("x", d3.forceX())
         .force("y", d3.forceY());
@@ -384,21 +409,21 @@ chart = {
         .attr("fill", "none")
         .attr("stroke-width", 1.5)
         .selectAll("path")
-        .data(links)
+        .data(filteredLinks)
         .join("path")
             .attr("stroke", "gray")
             .attr("stroke-width", d => d.value);
 
     const node = container.append("g")
         .selectAll("g")
-        .data(nodes)
+        .data(filteredNodes)
         .join("g")
             .call(drag(simulation));
 
     node.append("circle")
         .attr("stroke", "white")
         .attr("stroke-width", 1.5)
-        .data(nodes)
+        .data(filteredNodes)
         .join("circle")
             .attr("fill", d => color(d.group))
             .attr("r", d => d.size);

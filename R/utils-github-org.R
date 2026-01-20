@@ -20,7 +20,8 @@ list_gh_org_repos <- function (org = "ropensci", n_per_page = 100) {
         req <- httr2::request (u_org) |>
             add_gh_token_to_req () |>
             httr2::req_url_query (per_page = n_per_page, page = page_num) |>
-            httr2::req_retry (max_tries = 5L)
+            httr2::req_retry (max_tries = 5L) |>
+            httr2::req_error (is_error = \(resp) FALSE)
 
         resp <- httr2::req_perform (req)
         if (httr2::resp_is_error (resp)) {

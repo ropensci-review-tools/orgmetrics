@@ -156,6 +156,7 @@ pkgs_are_r <- function (pkgs) {
 
         req <- add_gh_token_to_req (req)
         resp <- httr2::req_retry (req, max_tries = 5L) |>
+            httr2::req_error (is_error = \(resp) FALSE) |>
             httr2::req_perform ()
 
         if (httr2::resp_is_error (resp)) {

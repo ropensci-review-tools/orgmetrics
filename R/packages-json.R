@@ -155,15 +155,12 @@ pkgs_are_r <- function (pkgs) {
         req <- httr2::request (u)
 
         req <- add_gh_token_to_req (req)
-        resp <- tryCatch ({
-            httr2::req_retry (req, max_tries = 5L) |>
-                httr2::req_perform ()
-            }, error = function (e) NULL
-        )
-        if (is.null (resp)) {
+        resp <- httr2::req_retry (req, max_tries = 5L) |>
+            httr2::req_perform ()
+
+        if (httr2::resp_is_error (resp)) {
             return (FALSE)
         }
-        httr2::resp_check_status (resp)
 
         body_files <- httr2::resp_body_json (resp, simplify = TRUE)
         required <- c ("DESCRIPTION", "NAMESPACE", "R", "man")

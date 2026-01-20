@@ -19,20 +19,22 @@ list_gh_org_repos <- function (org = "ropensci", n_per_page = 100) {
 
         req <- httr2::request (u_org) |>
             add_gh_token_to_req () |>
-            httr2::req_url_query (per_page = n_per_page, page = page_num)
+            httr2::req_url_query (per_page = n_per_page, page = page_num) |>
+            httr2::req_retry (max_tries = 5L)
 
-        resp <- httr2::req_retry (req, max_tries = 5L) |>
-            httr2::req_perform ()
-        httr2::resp_check_status (resp)
+        resp <- httr2::req_perform (req)
+        if (httr2::resp_is_error (resp)) {
+            is_empty <- TRUE
+        } else {
+            body <- httr2::resp_body_json (resp)
 
-        body <- httr2::resp_body_json (resp)
-
-        names <- c (
-            names,
-            vapply (body, function (i) i$name, character (1L))
-        )
-        page_num <- page_num + 1L
-        is_empty <- length (body) == 0L || is_test_env
+            names <- c (
+                names,
+                vapply (body, function (i) i$name, character (1L))
+            )
+            page_num <- page_num + 1L
+            is_empty <- length (body) == 0L || is_test_env
+        }
     }
 
     return (paste0 (org, "/", names))

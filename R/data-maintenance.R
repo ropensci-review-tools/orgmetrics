@@ -37,15 +37,18 @@ ctb_absence <- function (data_org,
     start_date <- end_date - as.integer (period)
     obj_nms <- c ("pkgstats", "pkgcheck", "cran_checks", "rm", "authors")
 
+    res0 <- data.frame (
+        repo = character (0L),
+        name = character (0L),
+        login = character (0L),
+        measure = numeric (0L),
+        what = character (0L)
+    )
+
     abs <- lapply (data_org$repos, function (repo) {
 
         if (!all (names (repo) %in% obj_nms)) {
-            return (data.frame (
-                repo = character (0L),
-                name = character (0L),
-                measure = numeric (0L),
-                what = character (0L)
-            ))
+            return (res0)
         }
 
         ctbs_gh <- repo$rm$contribs_from_gh_api |>
@@ -100,16 +103,25 @@ ctb_absence <- function (data_org,
         names <- c (names (ctb_change), names (ctb_abs))
         logins <- gh_logins [match (names, nms_norm)]
 
-        data.frame (
-            repo = repo$rm$repo_from_gh_api$name,
-            name = null2na_char (names),
-            login = null2na_char (logins),
-            measure = c (as.numeric (ctb_change), as.numeric (ctb_abs)),
-            what = c (
+        if (length (names) != length (logins)) {
+            res <- res0
+        } else {
+            n <- length (names)
+            res <- data.frame (
+                repo = rep (repo$rm$repo_from_gh_api$name, n),
+                name = names,
+                login = logins
+            )
+        }
+
+        if (nrow (res) > 0L) {
+            res$measure <- c (as.numeric (ctb_change), as.numeric (ctb_abs))
+            res$what <- c (
                 rep ("change", length (ctb_change)),
                 rep ("absence", length (ctb_abs))
             )
-        )
+        }
+        return (res)
     })
 
     abs <- do.call (rbind, abs)

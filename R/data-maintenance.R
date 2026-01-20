@@ -102,8 +102,8 @@ ctb_absence <- function (data_org,
 
         data.frame (
             repo = repo$rm$repo_from_gh_api$name,
-            name = names,
-            login = logins,
+            name = null2na_char (names),
+            login = null2na_char (logins),
             measure = c (as.numeric (ctb_change), as.numeric (ctb_abs)),
             what = c (
                 rep ("change", length (ctb_change)),

@@ -102,13 +102,13 @@ ctb_absence <- function (data_org,
 
         names <- c (names (ctb_change), names (ctb_abs))
         logins <- gh_logins [match (names, nms_norm)]
+        repo_name <- repo$rm$repo_from_gh_api$name
 
-        if (length (names) != length (logins)) {
+        if ((length (names) != length (logins)) || length (repo_name) == 0L) {
             res <- res0
         } else {
-            n <- length (names)
             res <- data.frame (
-                repo = rep (repo$rm$repo_from_gh_api$name, n),
+                repo = rep (repo_name, length (names)),
                 name = names,
                 login = logins
             )

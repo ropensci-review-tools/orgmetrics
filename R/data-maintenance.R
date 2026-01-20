@@ -126,15 +126,16 @@ ctb_absence <- function (data_org,
 
     abs <- do.call (rbind, abs)
 
-    abs <- dplyr::filter (
-        abs,
-        (what == "change" & measure >= threshold_change) |
-            (what == "absence" & measure >= threshold_abs)
-    )
-    # And remove any without GitHub logins:
-    abs <- dplyr::filter (abs, !is.na (login))
-
-    rownames (abs) <- NULL
+    if (nrow (abs) > 0L) {
+        abs <- dplyr::filter (
+            abs,
+            (what == "change" & measure >= threshold_change) |
+                (what == "absence" & measure >= threshold_abs)
+        )
+        # And remove any without GitHub logins:
+        abs <- dplyr::filter (abs, !is.na (login))
+        rownames (abs) <- NULL
+    }
 
     return (abs)
 }

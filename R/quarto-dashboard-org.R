@@ -39,15 +39,19 @@ orgmetrics_dashboard <- function (data_org,
     requireNamespace ("withr", quietly = TRUE)
 
     # -------- CHAOSS MODELS and METRICS: START -------
+    cli::cli_inform ("   -> data_models_preprocess")
     data_models <- data_models_preprocess (data_org$models) |>
         dplyr::select (-org, -date) |>
         tidyr::pivot_longer (-package)
 
+    cli::cli_inform ("   -> data_metrics_to_df")
     data_metrics <- data_metrics_to_df (data_org$metrics)
 
     dates <- sort (unique (data_metrics$date), decreasing = TRUE)
+    cli::cli_inform ("   -> dashboard_data_repo_metrics")
     repo_metrics <- dashboard_data_repo_metrics (data_metrics, dates)
 
+    cli::cli_inform ("   -> data_metrics_preprocess")
     data_metrics <- lapply (dates, function (d) {
         data_metrics |>
             dplyr::filter (date == d) |>
@@ -57,17 +61,25 @@ orgmetrics_dashboard <- function (data_org,
     # -------- CHAOSS MODELS and METRICS: END -------
 
     # -------- ADDITIONAL DATA IN R -------
+    cli::cli_inform ("   -> org_maintenance_metric")
     data_maintenance <- org_maintenance_metric (data_org)
+    cli::cli_inform ("   -> dashboard_data_releases")
     data_releases <- dashboard_data_releases (data_org)
+    cli::cli_inform ("   -> ctb_absence")
     data_abs <- ctb_absence (data_org)
+    cli::cli_inform ("   -> issue_responses")
     data_resp <- issue_responses (data_org)
+    cli::cli_inform ("   -> issue_bugs")
     data_bugs <- issue_bugs (data_org)
+    cli::cli_inform ("   -> dashboard_data_contributors")
     data_contributors <- dashboard_data_contributors (data_org)
+    cli::cli_inform ("   -> dashboard_data_repo_source")
     data_repo_src <- dashboard_data_repo_source (data_org)
     data_pkgcheck <- lapply (data_org$repos, function (i) i$pkgcheck)
 
     # -------- ADDITIONAL DATA IN JSON -------
     # All saved as single JSON structure; only used in 'repo.qmd' and 'maintainer.qmd'
+    cli::cli_inform ("   -> dashboard_data_cran")
     data_cran <- dashboard_data_cran (data_org)
     not_cran <- NULL
     if (length (data_cran) > 0L) {
@@ -75,7 +87,9 @@ orgmetrics_dashboard <- function (data_org,
         attr (data_cran, "not_cran") <- NULL
     }
 
+    cli::cli_inform ("   -> dashboard_data_gitlog")
     data_gitlog <- dashboard_data_gitlog (data_org)
+    cli::cli_inform ("   -> dashboard_data_r_universe")
     data_r_universe <- dashboard_data_r_universe (data_org)
     rm_metrics_json <- system.file (
         "extdata",
@@ -84,6 +98,7 @@ orgmetrics_dashboard <- function (data_org,
         package = "repometrics"
     )
     rm_metrics_models <- jsonlite::read_json (rm_metrics_json, simplify = TRUE)
+    cli::cli_inform ("   -> dashboard_data_maintainers")
     maintainers <- dashboard_data_maintainers (data_contributors)
 
     data_json <- list (

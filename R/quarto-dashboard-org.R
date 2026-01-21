@@ -232,7 +232,7 @@ dashboard_data_contributors <- function (data_org, desc_name_match = 0.8) {
                     cbind (match_names (a, ctbs$login) [1, ], what = "login")
                 )
             }
-        ))
+        )) |> data.frame ()
         login_matches <- dplyr::filter (aut_matches, what == "login")
         aut_matches <- aut_matches |>
             dplyr::filter (what == "name") |>

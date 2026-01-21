@@ -118,7 +118,9 @@ orgmetrics_dashboard <- function (data_org,
     if (!is.null (title)) {
         update_quarto_yml_title (dir, title)
     }
-    f <- update_quarto_yml_file (dir, data_org)
+    orgs <- names (get_orgs_from_data (data_org))
+    f <- update_quarto_yml_file (dir, orgs)
+    f <- update_quarto_orgnames (dir, orgs)
 
     dir_data <- fs::path (dir, "data")
     if (!fs::dir_exists (dir_data)) {
@@ -501,18 +503,21 @@ copy_pkg_logos <- function (data_org, path) {
             }
         }
     })
-
 }
 
-update_quarto_yml_file <- function (path, data_org) {
-
-    f <- fs::dir_ls (path, regexp = "\\_quarto\\.y(a?)ml$")
-    y <- yaml::read_yaml (f)
+get_orgs_from_data <- function (data_org, threshold = 0.02) {
 
     orgs <- gsub ("\\/.*$", "", names (data_org$repos)) |>
         table () |>
         sort (decreasing = TRUE)
-    orgs <- orgs [which (orgs / sum (orgs) > 0.02)]
+    orgs [which (orgs / sum (orgs) > threshold)]
+}
+
+update_quarto_yml_file <- function (path, orgs) {
+
+    f <- fs::dir_ls (path, regexp = "\\_quarto\\.y(a?)ml$")
+    y <- yaml::read_yaml (f)
+
     orgs_fmt <- paste0 ("github.com/", names (orgs))
 
     menu <- y$website$navbar$right [[1]]$menu
@@ -560,4 +565,16 @@ update_quarto_yml_title <- function (dir, title) {
     i <- grep ("title\\:\\s\"", index)
     index [i] <- gsub ("EpiVerse", title, index [i])
     writeLines (index, index_file)
+}
+
+update_quarto_orgnames <- function (dir, orgs) {
+
+    org <- orgs [1]
+    for (what in c ("index", "models")) {
+        f <- fs::path (dir, paste0 (what, ".qmd"))
+        stopifnot (fs::file_exists (f))
+        x <- readLines (f)
+        x <- gsub ("aaa", org, x)
+        writeLines (x, f)
+    }
 }

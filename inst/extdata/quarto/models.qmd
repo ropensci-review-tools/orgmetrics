@@ -18,19 +18,18 @@ models](https://chaoss.community/kb-metrics-and-metrics-models/) used to
 generate values shown on those two pages. Each of these conceptual models
 aggregates various individual metrics, and aims to synthesise prominent aspects
 of community health. This page provides insights into a range of those models,
-assessed for each repository in the `epiverse-trace` and `reconhub` GitHub
-organizations. Details of individual metrics can be seen on the [*Repository
-Maintenance* page](./repo.html).
+assessed for each repository in the [`aaa`  GitHub
+organization](https://github.com/aaa). Details of individual metrics can be
+seen on the [*Repository Maintenance* page](./repo.html).
 
 ## Aggregate Community Health
 
 This page shows aggregate community health scores for all repositories within
-the `reconhub` and `epiverse-trace` organizations. Higher values describe
-repositories with greater community health scores. Values for individual models
-are standardised across all repositories to have mean values of zero and
-standard deviations of one. These results are aggregated across thirteen
-distinct models, leading to maximal aggregated values slightly exceeding that
-value.
+the `aaa`  organization. Higher values describe repositories with greater
+community health scores. Values for individual models are standardised across
+all repositories to have mean values of zero and standard deviations of one.
+These results are aggregated across thirteen distinct models, leading to
+maximal aggregated values slightly exceeding that value.
 
 ```{r load-pkg, echo = FALSE, message = FALSE}
 library (orgmetrics)

@@ -77,9 +77,7 @@ npkgs_requiring_maintenance <- nrow (data)
 ```
 
 This dashboard presents metrics and models for each repository within the
-[`epiverse-trace`](https://github.com/epiverse-trace),
-[`reconhub`](https://github.com/reconhub), and
-[`reconverse`](https://github.com/reconverse) GitHub organizations, and some
+[aaa](https://github.com/aaa) GitHub organization, and some
 related repositories from other sources. These organizations are linked under the
 `r bsicons::bs_icon("github")` icon on the top right. The dashboard is intended
 to demonstrate the kinds of analyses and insights that are possible, and is

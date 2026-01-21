@@ -120,7 +120,7 @@ orgmetrics_dashboard <- function (data_org,
     }
     orgs <- names (get_orgs_from_data (data_org))
     f <- update_quarto_yml_file (dir, orgs)
-    f <- update_quarto_orgnames (dir, orgs)
+    f <- update_quarto_orgnames (dir, orgs, title)
 
     dir_data <- fs::path (dir, "data")
     if (!fs::dir_exists (dir_data)) {
@@ -567,14 +567,21 @@ update_quarto_yml_title <- function (dir, title) {
     writeLines (index, index_file)
 }
 
-update_quarto_orgnames <- function (dir, orgs) {
+update_quarto_orgnames <- function (dir, orgs, title = NULL) {
 
-    org <- orgs [1]
+    if (is.null (title)) {
+        org <- orgs [1]
+    } else {
+        org <- title
+    }
     for (what in c ("index", "models")) {
         f <- fs::path (dir, paste0 (what, ".qmd"))
         stopifnot (fs::file_exists (f))
         x <- readLines (f)
         x <- gsub ("aaa", org, x)
+        if (!is.null (title)) {
+            x <- gsub ("GitHub\\sorganization", "universe", x)
+        }
         writeLines (x, f)
     }
 }

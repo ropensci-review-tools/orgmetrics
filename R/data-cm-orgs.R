@@ -236,7 +236,9 @@ org_annual_gh_activity <- function (pkgs_repos) {
             table ()
         data_years <- rep (0L, length (years))
         index <- match (names (data), years)
-        data_years [index] <- as.integer (data)
+        if (!any (is.na (index))) {
+            data_years [index] <- as.integer (data)
+        }
         return (data_years)
     })
     data.frame (

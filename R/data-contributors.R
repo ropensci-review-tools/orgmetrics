@@ -28,6 +28,7 @@ org_contributor_data <- function (repo_data) {
             dplyr::select (!c (email, location, company, bio)) |>
             dplyr::mutate (num_orgs = nrow (ctb_dat$orgs))
     })
+    cli::cli_inform ("Contributor data extracted.")
 
     do.call (rbind, ctb_dat)
 }

@@ -128,7 +128,7 @@ ctb_absence <- function (data_org,
 
     if (nrow (abs) > 0L) {
         abs <- dplyr::filter (
-            abs,
+            as.data.frame (abs),
             (what == "change" & measure >= threshold_change) |
                 (what == "absence" & measure >= threshold_abs)
         )

@@ -27,6 +27,8 @@ orgmetrics_deploy_r_univ <- function (url = NULL, dest_dir = fs::path_temp (), a
     embeddings <- data [[3]]
     rm (data)
 
+    cli::cli_inform ("All data extracted; building dashboard ...")
+
     path <- orgmetrics_dashboard (data_org, fn_calls, embeddings, title = title, action = action)
 
     # Move everything to 'quarto' sub-dir here:
@@ -34,6 +36,7 @@ orgmetrics_deploy_r_univ <- function (url = NULL, dest_dir = fs::path_temp (), a
         path <- fs::path_abs (fs::dir_copy (path, "."))
     }
 
+    cli::cli_inform ("Dashboard built.")
     invisible (path)
 }
 

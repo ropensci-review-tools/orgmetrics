@@ -118,6 +118,8 @@ orgmetrics_dashboard <- function (data_org,
     if (!is.null (title)) {
         update_quarto_yml_title (dir, title)
     }
+    f <- update_quarto_yml_file (dir, data_org)
+
     dir_data <- fs::path (dir, "data")
     if (!fs::dir_exists (dir_data)) {
         fs::dir_create (dir_data, recurse = TRUE)
@@ -500,6 +502,36 @@ copy_pkg_logos <- function (data_org, path) {
         }
     })
 
+}
+
+update_quarto_yml_file <- function (path, data_org) {
+
+    f <- fs::dir_ls (path, regexp = "\\_quarto\\.y(a?)ml$")
+    y <- yaml::read_yaml (f)
+
+    orgs <- gsub ("\\/.*$", "", names (data_org$repos)) |>
+        table () |>
+        sort (decreasing = TRUE)
+    orgs <- orgs [which (orgs / sum (orgs) > 0.02)]
+    orgs_fmt <- paste0 ("github.com/", names (orgs))
+
+    menu <- y$website$navbar$right [[1]]$menu
+    menu <- c (
+        menu [1:2],
+        lapply (orgs_fmt, function (o) {
+            list (text = o, url = paste0 ("https://", o))
+        })
+    )
+    y$website$navbar$right [[1]]$menu <- menu
+
+    yaml::write_yaml (
+        y,
+        file = f,
+        indent.mapping.sequence = TRUE,
+        handlers = list (logical = yaml::verbatim_logical)
+    )
+
+    invisible (f)
 }
 
 update_quarto_yml_title <- function (dir, title) {

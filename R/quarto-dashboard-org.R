@@ -234,14 +234,22 @@ dashboard_data_contributors <- function (data_org, desc_name_match = 0.8) {
             }
         )) |> data.frame ()
         login_matches <- dplyr::filter (aut_matches, what == "login")
-        aut_matches <- aut_matches |>
-            dplyr::filter (what == "name") |>
-            dplyr::filter (match >= desc_name_match)
+
+        # If there are no aut_matches, df only has "what"
+        if (nrow (aut_matches) > 0L && is.numeric (aut_matches$match)) {
+            aut_matches <- aut_matches |>
+                dplyr::filter (what == "name") |>
+                dplyr::filter (match >= desc_name_match)
+        }
         if (nrow (aut_matches) == 0) {
             desc_name_match <- desc_name_match * max (login_matches$match)
         }
-        login_matches <- login_matches |>
-            dplyr::filter (match >= desc_name_match)
+
+        if (is.numeric (login_matches$match)) {
+            # FALSE is no aut_matches at all
+            login_matches <- login_matches |>
+                dplyr::filter (match >= desc_name_match)
+        }
 
         ctbs$is_author <- ctbs$name %in% aut_matches$name |
             ctbs$login %in% login_matches

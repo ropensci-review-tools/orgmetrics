@@ -30,6 +30,7 @@ orgmetrics_deploy_r_univ <- function (url = NULL, dest_dir = fs::path_temp (), a
     cli::cli_inform ("All data extracted; building dashboard ...")
 
     path <- orgmetrics_dashboard (data_org, fn_calls, embeddings, title = title, action = action)
+    update_url_segments (path, url)
 
     # Move everything to 'quarto' sub-dir here:
     if (!identical (fs::path_abs ("."), fs::path_temp ())) {
@@ -222,4 +223,50 @@ orgmetrics_generate_yaml <- function (dest_dir,
         fs::path (dest_dir, "orgmetrics-config.yaml"),
         indent.mapping.sequence = TRUE
     )
+}
+
+update_url_segments <- function (path, url) {
+
+    flist <- fs::dir_ls (path, regexp = "\\.qmd$")
+
+    for (f in flist) {
+
+        contents <- readLines (f)
+
+        chunks <- t (matrix (grep ("^\\`\\`\\`", contents), nrow = 2))
+        chunks <- data.frame (
+            from = chunks [, 1],
+            to = chunks [, 2],
+            ojs = FALSE
+        )
+        chunks_ojs <- grep ("^\\`\\`\\`\\{ojs", contents)
+        chunks$ojs [match (chunks_ojs, chunks$from)] <- TRUE
+        chunks_ojs <- as.matrix (chunks [which (chunks$ojs), 1:2])
+        contents_ojs <- apply (chunks_ojs, 1, function (i) {
+            seq (i [1], i [2])
+        }) |>
+            unlist () |>
+            unname () |>
+            sort ()
+
+        hrefs <- grep ("href(\\s*)\\=", contents)
+        hrefs_ojs <- hrefs [which (hrefs %in% contents_ojs)]
+        is_abs <- grepl ("https\\:\\/\\/", contents [hrefs_ojs])
+        is_chaoss <- grepl ("commhealth", contents [hrefs_ojs], ignore.case = TRUE)
+        hrefs_ojs <- hrefs_ojs [which (!is_abs & !is_chaoss)]
+        # Lots of hrefs in repo.qmd are to interal variables:
+        is_href_var <- grepl ("href(\\s*)\\=(\\s*)(\\\"?)\\$", contents [hrefs_ojs])
+        hrefs_ojs <- hrefs_ojs [which (!is_href_var)]
+
+        if (length (hrefs_ojs) > 0L) {
+            url_segment <- gsub ("^.*\\/", "", url)
+            contents [hrefs_ojs] <- gsub (
+                "href(\\s*)\\=(\\s*)\\\"",
+                paste0 ("href=\"", url_segment),
+                contents [hrefs_ojs]
+            )
+
+            writeLines (contents, f)
+        }
+    }
 }

@@ -518,7 +518,7 @@ update_quarto_yml_file <- function (path, orgs) {
     f <- fs::dir_ls (path, regexp = "\\_quarto\\.y(a?)ml$")
     y <- yaml::read_yaml (f)
 
-    orgs_fmt <- paste0 ("github.com/", names (orgs))
+    orgs_fmt <- paste0 ("github.com/", orgs)
 
     menu <- y$website$navbar$right [[1]]$menu
     menu <- c (

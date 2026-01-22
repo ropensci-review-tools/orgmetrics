@@ -168,7 +168,7 @@ sparkline_plot_commits_in <- function (annual_commits) {
     x_lim <- range (x)
     y_lim <- c (0, max (y) * 1.05)
 
-    if (any (is.na (x))) {
+    if (any (is.na (x_lim))) {
         return ()
     }
 
@@ -211,6 +211,10 @@ sparkline_plot_gh_in <- function (annual_gh) {
     y <- annual_gh$total
     x_lim <- range (x)
     y_lim <- c (0, max (y) * 1.05)
+
+    if (any (is.na (x_lim))) {
+        return ()
+    }
 
     par (mar = c (3, 0, 0, 0), bg = "#20c997")
     plot (

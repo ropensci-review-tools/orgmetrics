@@ -165,12 +165,13 @@ bslib::page_fillable (
 sparkline_plot_commits_in <- function (annual_commits) {
     x <- as.integer (annual_commits$year)
     y <- annual_commits$num_commits
+    if (any (is.na (x))) {
+        x <- 1:10
+        y <- rep (0, 10)
+    }
+
     x_lim <- range (x)
     y_lim <- c (0, max (y) * 1.05)
-
-    if (any (is.na (x_lim))) {
-        return ()
-    }
 
     par (mar = c (3, 0, 0, 0), bg = "#20c997")
     plot (
@@ -209,12 +210,13 @@ sparkline_plot_commits <- function () {
 sparkline_plot_gh_in <- function (annual_gh) {
     x <- as.integer (annual_gh$year)
     y <- annual_gh$total
+    if (any (is.na (x))) {
+        x <- 1:10
+        y <- rep (0, 10)
+    }
+
     x_lim <- range (x)
     y_lim <- c (0, max (y) * 1.05)
-
-    if (any (is.na (x_lim))) {
-        return ()
-    }
 
     par (mar = c (3, 0, 0, 0), bg = "#20c997")
     plot (

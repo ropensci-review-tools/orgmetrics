@@ -253,9 +253,9 @@ sparkline_plot_gh <- function () {
 
 ```{r cards-with-time-series, echo = FALSE, message = TRUE}
 lines <- paste0 (unname (repo_orgs), " from ", names (repo_orgs))
-has_gh_dat <- any (!is.na (annual_gh$year))
 showcase_gh <- NULL
-if (any (!is.na (annual_gh$year))) {
+if (length (annual_gh_activity$year) > 0L &
+    !any (is.na (annual_gh_activity$year))) {
     showcase_gh <- sparkline_plot_gh ()
 }
 bslib::page_fillable (

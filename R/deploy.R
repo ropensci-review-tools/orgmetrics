@@ -30,7 +30,7 @@ orgmetrics_deploy_r_univ <- function (url = NULL, dest_dir = fs::path_temp (), a
     cli::cli_inform ("All data extracted; building dashboard ...")
 
     path <- orgmetrics_dashboard (data_org, fn_calls, embeddings, title = title, action = action)
-    update_url_segments (path, url)
+    # update_url_segments (path, url)
 
     # Move everything to 'quarto' sub-dir here:
     if (!identical (fs::path_abs ("."), fs::path_temp ())) {

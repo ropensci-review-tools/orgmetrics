@@ -225,6 +225,18 @@ orgmetrics_generate_yaml <- function (dest_dir,
     )
 }
 
+#' Update URL segments in OJS chunks
+#'
+#' Internal URL refs to other pages need to be updated in deployed version to
+#' include URL segments before the page refs. This is automatically done in all
+#' \pkg{bslib} R segments. This updates all internal refs in OJS chunks.
+#'
+#' Note that for locally-deployed versions, this can and should not be done, so
+#' it is not part of the main dashboard function. It is only necessary when
+#' actually deploying the site to an external host on which it will be served
+#' at some segment of a main URL (such as via GitHub pages).
+#'
+#' @noRd
 update_url_segments <- function (path, url) {
 
     flist <- fs::dir_ls (path, regexp = "\\.qmd$")

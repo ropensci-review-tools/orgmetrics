@@ -462,7 +462,7 @@ similar_pkgs = matched_names.map(i => {
     const url = (repo_src.filter(function(r) {
         return r.package === i
     }, i)[0] || {}).url || null;
-    return htl.html`<li><a href="/repo.html?repo=${i}" onclick="localStorage.setItem('orgmetricsRepo', '${i}')">${i}</a></li>`
+    return htl.html`<li><a href="../repo.html?repo=${i}" onclick="localStorage.setItem('orgmetricsRepo', '${i}')">${i}</a></li>`
 });
 ```
 
@@ -499,11 +499,11 @@ author_count_txt = pluraliseObjects(author_count, "primary author");
 author_gh_list = auts_gh.length == 0 ? undefined:
     (auts_gh.length == 1 ? htl.html`
 <div onclick=${() => localStorage.setItem('orgmetricsMaintainer', auts_gh)}>
-<li><a href='/contributor.html'>${auts_gh}</a></li>
+<li><a href='../contributor.html'>${auts_gh}</a></li>
 </div>
 ` : auts_gh.map(m => htl.html`
 <div onclick=${() => localStorage.setItem('orgmetricsMaintainer', m)}>
-<li><a href='/contributor.html'>${m}</a></li>
+<li><a href='../contributor.html'>${m}</a></li>
 </div>
 `));
 author_gh_list_txt = auts_gh.length > 0 ? htl.html`<ul>${author_gh_list}</ul>` : undefined;
@@ -512,7 +512,7 @@ ctb_count = ctbs_gh.length;
 ctb_count_txt = pluraliseObjects(ctb_count, "additional contributor");
 ctb_count_list = ctbs_gh.map((item, i) => htl.html`
 <span onclick=${() => localStorage.setItem('orgmetricsMaintainer', item)}>
-<a href='/contributor.html'>${item}</a>${i < ctbs_gh.length - 1 ? ", " : ""}</span>`);
+<a href='../contributor.html'>${item}</a>${i < ctbs_gh.length - 1 ? ", " : ""}</span>`);
 ctb_count_html = ctb_count == 0 ? htl.html`<div>No additional contributors</div>` :
     htl.html`<div>${ctb_count_txt}: ${ctb_count_list}</div>`;
 
@@ -578,7 +578,7 @@ deps_in_org_txt = deps_in_org.length == 0 ?
 deps_in_org_list = deps_in_org.length === 0 ? undefined :
     deps_in_org.map(d => htl.html`
 <li>
-<a href='/repo.html?repo=${d}' onclick="localStorage.setItem('orgmetricsRepo', '${d}')">${d}</a>
+<a href='../repo.html?repo=${d}' onclick="localStorage.setItem('orgmetricsRepo', '${d}')">${d}</a>
 </li>`);
 n_deps_in_org_txt = deps_in_org.length > 0 ? htl.html`<ul>${deps_in_org_list}</ul>` : undefined;
 
@@ -586,7 +586,7 @@ revdeps = [].concat(deps[0]['revdeps'] || []);
 revdeps_list = revdeps.length == 0 ? undefined :
     revdeps.map(d => htl.html`
 <li>
-<a href='/repo.html?repo=${d}' onclick="localStorage.setItem('orgmetricsRepo', '${d}')">${d}</a>
+<a href='../repo.html?repo=${d}' onclick="localStorage.setItem('orgmetricsRepo', '${d}')">${d}</a>
 </li>`);
 revdeps_in_org = revdeps.length > 0 ?
     'Dependend on by org pkgs:' :

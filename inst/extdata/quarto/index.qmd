@@ -103,7 +103,7 @@ org_icons <- lapply (seq_along (repo_orgs), function (i) {
 style <- "color:white; text-decoration:underline;"
 onclick <- "localStorage.setItem('orgmetricsRepo', "
 pkg_links <- sprintf (
-    '<a href=\'/repo.html\' style="%s" onclick="%s \'%s\')">%s</a>',
+    '<a href=\'../repo.html\' style="%s" onclick="%s \'%s\')">%s</a>',
     style,
     onclick,
     data$package,
@@ -482,7 +482,7 @@ chart = {
         .attr("fill", d => (d.id === selectedNode ? "red" : ""))
         .text(d => d.id)
         .html(d =>
-            `<a href="/repo.html"
+            `<a href="../repo.html"
                 onclick="localStorage.setItem('orgmetricsRepo', '${d.id}')">${d.id}
             </a>`)
         .clone(true).lower()
@@ -611,7 +611,7 @@ function pkgfmt(pkg) {
     th.addEventListener("click", () => {
         localStorage.setItem("orgmetricsRepo", pkg);
         th.style.background="#a0f8ff";
-        window.location.href="/repo.html";
+        window.location.href="../repo.html";
     });
 
     return th;
@@ -630,7 +630,7 @@ function ctbfmt(ctb) {
     th.addEventListener("click", () => {
         localStorage.setItem('orgmetricsMaintainer', ctb);
         th.style.background="#a0f8ff";
-        window.location.href="/contributor.html";
+        window.location.href="../contributor.html";
     });
 
     return th;

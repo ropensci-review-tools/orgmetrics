@@ -57,7 +57,7 @@ function pkgfmt(pkg) {
     th.addEventListener("click", () => {
         localStorage.setItem("orgmetricsRepo", pkg);
         th.style.background="#a0f8ff";
-        window.location.href="/repo.html";
+        window.location.href="../repo.html";
     });
 
     return th;
@@ -143,7 +143,7 @@ these_cos = comaintainers[maintainer] || null
 these_cos_list = these_cos ?
 these_cos.map(i => htl.html`
 <div onclick=${() => localStorage.setItem('orgmetricsMaintainer', i)}>
-<li><a href="/contributor.html">${i}</a></li>
+<li><a href="../contributor.html">${i}</a></li>
 </div>`) : htl.html`<li>No co-maintainers</li>`;
 ```
 
@@ -433,10 +433,10 @@ chart = {
         .attr("y", "0.31em")
         .text(d => d.id)
         .html(d => d.group === "Co-maintainer" ?
-            `<a href="/contributor.html"
+            `<a href="../contributor.html"
                 onclick="localStorage.setItem('orgmetricsMaintainer', '${d.id}')">${d.id}</a>` :
             ((d.group === "packages" || d.group === "otherPackages") ?
-                `<a href="/repo.html"
+                `<a href="../repo.html"
                     onclick="localStorage.setItem('orgmetricsRepo', '${d.id}')">${d.id}</a>` :
             d.id))
         .clone(true).lower()

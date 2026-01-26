@@ -52,6 +52,7 @@ RUN git clone https://github.com/universal-ctags/ctags.git \
 RUN install2.r \
   rsconnect \
   quarto \
+  tidyr \
   visNetwork
 
 RUN installGithub.r \

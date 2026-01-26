@@ -272,9 +272,16 @@ update_url_segments <- function (path, url) {
         hrefs_ojs <- hrefs_ojs [which (!is_href_var)]
 
         if (length (hrefs_ojs) > 0L) {
+            # Double quotations on href strings:
             contents [hrefs_ojs] <- gsub (
                 "href(\\s*)\\=(\\s*)\\\"\\.\\.\\/",
                 paste0 ("href=\"../", url_segment, "/"),
+                contents [hrefs_ojs]
+            )
+            # Single quotation on href strings:
+            contents [hrefs_ojs] <- gsub (
+                "href(\\s*)\\=(\\s*)\'\\.\\.\\/",
+                paste0 ("href='../", url_segment, "/"),
                 contents [hrefs_ojs]
             )
 

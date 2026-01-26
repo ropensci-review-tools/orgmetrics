@@ -103,7 +103,7 @@ org_icons <- lapply (seq_along (repo_orgs), function (i) {
 style <- "color:white; text-decoration:underline;"
 onclick <- "localStorage.setItem('orgmetricsRepo', "
 pkg_links <- sprintf (
-    '<a href=\'../repo.html\' style="%s" onclick="%s \'%s\')">%s</a>',
+    '<a href=\'/repo.html\' style="%s" onclick="%s \'%s\')">%s</a>',
     style,
     onclick,
     data$package,

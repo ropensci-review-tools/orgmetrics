@@ -30,7 +30,7 @@ orgmetrics_deploy_r_univ <- function (url = NULL, dest_dir = fs::path_temp (), a
     cli::cli_inform ("All data extracted; building dashboard ...")
 
     path <- orgmetrics_dashboard (data_org, fn_calls, embeddings, title = title, action = action)
-    # update_url_segments (path, url)
+    update_url_segments (path, url)
 
     # Move everything to 'quarto' sub-dir here:
     if (!identical (fs::path_abs ("."), fs::path_temp ())) {
@@ -239,6 +239,7 @@ orgmetrics_generate_yaml <- function (dest_dir,
 #' @noRd
 update_url_segments <- function (path, url) {
 
+    url_segment <- gsub ("^.*\\/", "", url)
     flist <- fs::dir_ls (path, regexp = "\\.qmd$")
 
     for (f in flist) {
@@ -271,10 +272,9 @@ update_url_segments <- function (path, url) {
         hrefs_ojs <- hrefs_ojs [which (!is_href_var)]
 
         if (length (hrefs_ojs) > 0L) {
-            url_segment <- gsub ("^.*\\/", "", url)
             contents [hrefs_ojs] <- gsub (
-                "href(\\s*)\\=(\\s*)\\\"",
-                paste0 ("href=\"", url_segment),
+                "href(\\s*)\\=(\\s*)\\\"\\.\\.\\/",
+                paste0 ("href=\"../", url_segment, "/"),
                 contents [hrefs_ojs]
             )
 

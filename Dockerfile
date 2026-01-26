@@ -8,6 +8,19 @@ ARG GIT_REMOTE_URL
 ARG TITLE
 ARG ORGMETRICS_PERIOD
 
+ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+ENV GIT_USER_NAME=${GIT_USER_NAME}
+ENV GIT_USER_EMAIL=${GIT_USER_EMAIL}
+ENV GIT_REMOTE_URL=${GIT_REMOTE_URL}
+ENV TITLE=${TITLE}
+ENV ORGMETRICS_PERIOD=${ORGMETRICS_PERIOD}
+
+RUN echo "GITHUB_TOKEN='${GITHUB_TOKEN}'" > ~/.Renviron \
+    && echo "GITHUB_PAT='${GITHUB_TOKEN}'" >> ~/.Renviron \
+    && git config --global user.name "${GIT_USER_NAME}" \
+    && git config --global user.email "${GIT_USER_EMAIL}" \
+    && git clone "${GIT_REMOTE_URL}" repo
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
                 sudo \
                 r-cran-bspm \
@@ -19,14 +32,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         && chgrp 1000 /usr/local/lib/R/site-library \
         && install.r remotes
 
-RUN apt-get update -qq && apt-get install -y \
-    curl \
-    g++ \
-    gcc \
+RUN apt-get install -y \
+    automake \
     git \
     global \
     libcurl4 \
-    libssh-dev && \
+    libssh-dev \
+    libxml2-dev && \
     apt-get clean
 
 # ctags install
@@ -42,15 +54,12 @@ RUN install2.r \
   quarto \
   visNetwork
 
-RUN --mount=type=secret,id=GITHUB_PAT,env=GITHUB_PAT installGithub.r \
+RUN installGithub.r \
   ropensci-review-tools/orgmetrics
 
-RUN echo "GITHUB_TOKEN='${GITHUB_TOKEN}'" > ~/.Renviron \
-    && echo "GITHUB_PAT='${GITHUB_TOKEN}'" >> ~/.Renviron \
-    && git config --global user.name "${GIT_USER_NAME}" \
-    && git config --global user.email "${GIT_USER_EMAIL}" \
-    && git clone "${GIT_REMOTE_URL}" repo
+WORKDIR repo
 
-# WORKDIR repo
+COPY entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# CMD ["sh", "-c", "Rscript -e 'orgmetrics::orgmetrics_deploy_r_univ()' && cd quarto && quarto publish gh-pages && cd .."]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

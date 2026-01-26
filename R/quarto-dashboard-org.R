@@ -37,6 +37,8 @@ orgmetrics_dashboard <- function (data_org,
     requireNamespace ("jsonlite", quietly = TRUE)
     requireNamespace ("quarto", quietly = TRUE)
     requireNamespace ("withr", quietly = TRUE)
+    requireNamespace ("tidyr", quietly = TRUE)
+    requireNamespace ("yaml", quietly = TRUE)
 
     # -------- CHAOSS MODELS and METRICS: START -------
     cli::cli_inform ("   -> data_models_preprocess")

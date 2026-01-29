@@ -21,5 +21,5 @@ if grep "^/dev/" /etc/mtab | grep -v "\ /etc/" | grep " "; then
 fi
 
 cd quarto
-quarto publish gh-pages
+quarto publish gh-pages --no-prompt
 cd ..

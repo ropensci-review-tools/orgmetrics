@@ -44,7 +44,7 @@ RUN git clone https://github.com/universal-ctags/ctags.git \
 
 # Quarto binary:
 RUN QUARTO_VERSION=$(curl -s https://api.github.com/repos/quarto-dev/quarto-cli/releases/latest | grep '"tag_name"' | sed -E 's/.*"tag_name": *"(v[^"]+)".*/\1/') \
-    && wget https://github.com/quarto-dev/quarto-cli/releases/download/${QUARTO_VERSION}/quarto-${QUARTO_VERSION#v}-linux-amd64.tar.gz \
+    && wget --quiet https://github.com/quarto-dev/quarto-cli/releases/download/${QUARTO_VERSION}/quarto-${QUARTO_VERSION#v}-linux-amd64.tar.gz \
     && mkdir -p ~/opt \
     && tar -C ~/opt -xvzf quarto-${QUARTO_VERSION#v}-linux-amd64.tar.gz \
     && ln -s ~/opt/quarto-${QUARTO_VERSION#v}/bin/quarto /usr/local/bin/quarto \

@@ -14,7 +14,7 @@ if grep "^/dev/" /etc/mtab | grep -v "\ /etc/" | grep " "; then
     # Find the first mounted volume to copy to
     VOLUME_PATH=$(grep "^/dev/" /etc/mtab | grep -v "\ /etc/" | awk '{print $2}' | head -1)
     if [ -n "$VOLUME_PATH" ]; then
-        mkdir -p "$VOLUME_PATH/quarto
+        mkdir -p "$VOLUME_PATH/quarto"
         cp -r quarto/* "$VOLUME_PATH/quarto/."
         echo "Quarto directory copied to $VOLUME_PATH/quarto"
     fi

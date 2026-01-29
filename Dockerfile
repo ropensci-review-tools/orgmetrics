@@ -15,7 +15,7 @@ ENV GIT_REMOTE_URL=${GIT_REMOTE_URL}
 ENV TITLE=${TITLE}
 ENV ORGMETRICS_PERIOD=${ORGMETRICS_PERIOD}
 
-RUN apt-get install -y git
+RUN apt-get update && apt-get install -y git
 
 RUN echo "GITHUB_TOKEN='${GITHUB_TOKEN}'" > ~/.Renviron \
     && echo "GITHUB_PAT='${GITHUB_TOKEN}'" >> ~/.Renviron \
@@ -23,7 +23,7 @@ RUN echo "GITHUB_TOKEN='${GITHUB_TOKEN}'" > ~/.Renviron \
     && git config --global user.email "${GIT_USER_EMAIL}" \
     && git clone "${GIT_REMOTE_URL}" repo
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends \
                 sudo \
                 r-cran-bspm \
         && echo "bspm::enable()" >> /etc/R/Rprofile.site \

@@ -1,5 +1,15 @@
 #!/bin/bash
 
+echo "Setting up git config  ..."
+echo "GITHUB_TOKEN='${GITHUB_TOKEN}'" > ~/.Renviron \
+    && echo "GITHUB_PAT='${GITHUB_TOKEN}'" >> ~/.Renviron \
+    && git config --global user.name "${GIT_USER_NAME}" \
+    && git config --global user.email "${GIT_USER_EMAIL}" \
+    && git config --global credential.helper store \
+    && echo "https://x-access-token:$GITHUB_TOKEN@github.com" > ~/.git-credentials \
+    && chmod 600 ~/.git-credentials \
+    && git clone "${GIT_REMOTE_URL}" repo
+
 echo "Extracting data for all repos in 'packages.json' ..."
 cd /repo
 Rscript -e 'orgmetrics::orgmetrics_deploy_r_univ()'

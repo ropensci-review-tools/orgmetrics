@@ -5,26 +5,13 @@ ARG GITHUB_TOKEN
 ARG GIT_USER_NAME
 ARG GIT_USER_EMAIL
 ARG GIT_REMOTE_URL
-ARG TITLE
-ARG ORGMETRICS_PERIOD
 
 ENV GITHUB_TOKEN=${GITHUB_TOKEN}
 ENV GIT_USER_NAME=${GIT_USER_NAME}
 ENV GIT_USER_EMAIL=${GIT_USER_EMAIL}
 ENV GIT_REMOTE_URL=${GIT_REMOTE_URL}
-ENV TITLE=${TITLE}
-ENV ORGMETRICS_PERIOD=${ORGMETRICS_PERIOD}
 
 RUN apt-get update && apt-get install -y git
-
-RUN echo "GITHUB_TOKEN='${GITHUB_TOKEN}'" > ~/.Renviron \
-    && echo "GITHUB_PAT='${GITHUB_TOKEN}'" >> ~/.Renviron \
-    && git config --global user.name "${GIT_USER_NAME}" \
-    && git config --global user.email "${GIT_USER_EMAIL}" \
-    && git config --global credential.helper store \
-    && echo "https://x-access-token:$GITHUB_TOKEN@github.com" > ~/.git-credentials \
-    && chmod 600 ~/.git-credentials \
-    && git clone "${GIT_REMOTE_URL}" repo
 
 RUN apt-get install -y --no-install-recommends \
                 sudo \

@@ -69,14 +69,19 @@ RUN install2.r \
   commonmark \
   curl \
   gert \
+  gh \
   git2r \
+  httr2 \
   igraph \
+  lazyeval \
+  pbapply \
   pkgload \
   readr \
   roxygen2 \
   tidyr \
   tzdb \
   quarto \
+  selectr \
   visNetwork \
   vroom \
   xml2

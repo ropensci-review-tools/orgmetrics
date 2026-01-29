@@ -65,6 +65,7 @@ RUN install2.r \
   # rsconnect \
   backports \
   brio \
+  bsicons \
   checkmate \
   commonmark \
   curl \
@@ -77,8 +78,10 @@ RUN install2.r \
   lubridate \
   pbapply \
   pkgload \
+  plotly \
   readr \
   roxygen2 \
+  shiny \
   tidyr \
   tzdb \
   quarto \

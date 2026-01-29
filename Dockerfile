@@ -15,6 +15,8 @@ ENV GIT_REMOTE_URL=${GIT_REMOTE_URL}
 ENV TITLE=${TITLE}
 ENV ORGMETRICS_PERIOD=${ORGMETRICS_PERIOD}
 
+RUN apt-get install -y git
+
 RUN echo "GITHUB_TOKEN='${GITHUB_TOKEN}'" > ~/.Renviron \
     && echo "GITHUB_PAT='${GITHUB_TOKEN}'" >> ~/.Renviron \
     && git config --global user.name "${GIT_USER_NAME}" \
@@ -34,7 +36,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN apt-get install -y \
     automake \
-    git \
+    curl \
     global \
     libcurl4 \
     libssh-dev \
@@ -47,18 +49,34 @@ RUN git clone https://github.com/universal-ctags/ctags.git \
     && ./autogen.sh \
     && ./configure --prefix=/usr \
     && make \
-    && make install
+    && make install \
+    && cd ..
 
+# Quarto binary:
+RUN QUARTO_VERSION=$(curl -s https://api.github.com/repos/quarto-dev/quarto-cli/releases/latest | grep '"tag_name"' | sed -E 's/.*"tag_name": *"(v[^"]+)".*/\1/') \
+    && wget https://github.com/quarto-dev/quarto-cli/releases/download/${QUARTO_VERSION}/quarto-${QUARTO_VERSION#v}-linux-amd64.tar.gz \
+    && mkdir -p ~/opt \
+    && tar -C ~/opt -xvzf quarto-${QUARTO_VERSION#v}-linux-amd64.tar.gz \
+    && ln -s ~/opt/quarto-${QUARTO_VERSION#v}/bin/quarto /usr/local/bin/quarto \
+    && rm quarto-${QUARTO_VERSION#v}-linux-amd64.tar.gz
+
+# installGithub compiles, but install2.r uses bspm binaries so much quicker:
 RUN install2.r \
-  rsconnect \
-  quarto \
+  # rsconnect \
+  curl \
+  gert \
+  git2r \
+  igraph \
+  pkgload \
+  readr \
   tidyr \
-  visNetwork
+  tzdb \
+  quarto \
+  visNetwork \
+  vroom
 
 RUN installGithub.r \
   ropensci-review-tools/orgmetrics
-
-WORKDIR repo
 
 COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh

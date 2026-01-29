@@ -74,6 +74,7 @@ RUN install2.r \
   httr2 \
   igraph \
   lazyeval \
+  lubridate \
   pbapply \
   pkgload \
   readr \
@@ -82,11 +83,17 @@ RUN install2.r \
   tzdb \
   quarto \
   selectr \
+  SnowballC \
+  timechange \
+  tokenizers \
+  treesitter.r \
+  treesitter \
   visNetwork \
   vroom \
   xml2
 
 RUN installGithub.r \
+  ropensci-review-tools/pkgmatch \
   ropensci-review-tools/orgmetrics
 
 COPY entrypoint.sh /usr/local/bin/

@@ -63,17 +63,23 @@ RUN QUARTO_VERSION=$(curl -s https://api.github.com/repos/quarto-dev/quarto-cli/
 # installGithub compiles, but install2.r uses bspm binaries so much quicker:
 RUN install2.r \
   # rsconnect \
+  backports \
+  brio \
+  checkmate \
+  commonmark \
   curl \
   gert \
   git2r \
   igraph \
   pkgload \
   readr \
+  roxygen2 \
   tidyr \
   tzdb \
   quarto \
   visNetwork \
-  vroom
+  vroom \
+  xml2
 
 RUN installGithub.r \
   ropensci-review-tools/orgmetrics

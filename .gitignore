@@ -22,3 +22,5 @@ inst/bin
 inst/WORDLIST
 /quarto/
 windows
+.env
+!.env.example

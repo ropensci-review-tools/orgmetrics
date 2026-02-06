@@ -11,7 +11,15 @@ ENV GIT_USER_NAME=${GIT_USER_NAME}
 ENV GIT_USER_EMAIL=${GIT_USER_EMAIL}
 ENV GIT_REMOTE_URL=${GIT_REMOTE_URL}
 
-RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    automake \
+    curl \
+    global \
+    libcurl4 \
+    libssh-dev \
+    libxml2-dev && \
+    apt-get clean
 
 RUN apt-get install -y --no-install-recommends \
                 sudo \
@@ -23,15 +31,6 @@ RUN apt-get install -y --no-install-recommends \
         && chmod 0440 /etc/sudoers.d/local-docker-user \
         && chgrp 1000 /usr/local/lib/R/site-library \
         && install.r remotes
-
-RUN apt-get install -y \
-    automake \
-    curl \
-    global \
-    libcurl4 \
-    libssh-dev \
-    libxml2-dev && \
-    apt-get clean
 
 # ctags install
 RUN git clone https://github.com/universal-ctags/ctags.git \

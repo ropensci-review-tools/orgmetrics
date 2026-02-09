@@ -10,6 +10,8 @@ echo "GITHUB_TOKEN='$GITHUB_TOKEN'" > ~/.Renviron \
     && chmod 600 ~/.git-credentials \
     && git clone "$GIT_REMOTE_URL" repo
 
+echo "Extracting data for all repos in 'packages.json' ..."
+cd /repo
 # Write 'orgmetrics-config.yaml' with the 2 required params:
 cat > orgmetrics-config.yaml << 'EOF'
 orgmetrics:
@@ -17,8 +19,6 @@ orgmetrics:
   dashboard_title: "$DASHBOARD_TITLE"
 EOF
 
-echo "Extracting data for all repos in 'packages.json' ..."
-cd /repo
 Rscript -e 'orgmetrics::orgmetrics_deploy_r_univ()'
 
 if [ ! -d "quarto" ]; then

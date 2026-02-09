@@ -13,10 +13,10 @@ echo "GITHUB_TOKEN='$GITHUB_TOKEN'" > ~/.Renviron \
 echo "Extracting data for all repos in 'packages.json' ..."
 cd /repo
 # Write 'orgmetrics-config.yaml' with the 2 required params:
-cat > orgmetrics-config.yaml << 'EOF'
+cat > orgmetrics-config.yaml << EOF
 orgmetrics:
   aggregation_period: $AGGREGATION_PERIOD
-  dashboard_title: "$DASHBOARD_TITLE"
+  title: "$DASHBOARD_TITLE"
 EOF
 
 Rscript -e 'orgmetrics::orgmetrics_deploy_r_univ()'

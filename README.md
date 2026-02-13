@@ -35,6 +35,13 @@ remotes::install_github ("ropensci-review-tools/orgmetrics")
 pak::pkg_install ("ropensci-review-tools/orgmetrics")
 ```
 
+The package may also be installed from locations other than GitHub, with any of
+the following options:
+``` r
+remotes::install_git ("https://codeberg.org/ropensci-review-tools/orgmetrics")
+remotes::install_git ("https://codefloe.com/ropensci-review-tools/orgmetrics")
+```
+
 ## Code of Conduct
 
 Please note that this package is released with a [Contributor Code of

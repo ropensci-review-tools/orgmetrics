@@ -43,6 +43,8 @@ mock_collate_org_data <- function (end_date = Sys.Date ()) {
 
     dat <- mock_rm_data ()
     path <- generate_test_pkg ()
+    u <- "https://github.com/ropensci-review-tools/testpkg"
+    desc::desc_set ("URL" = u, file = path)
 
     # Then mock one set of org data:
     metrics_all <- withr::with_options (
@@ -77,6 +79,10 @@ mock_collate_org_data <- function (end_date = Sys.Date ()) {
 
     d1 <- desc::desc_set ("Package" = "testpkg1", file = path1)
     d2 <- desc::desc_set ("Package" = "testpkg2", file = path2)
+    u <- "https://github.com/ropensci-review-tools/testpkg1"
+    desc::desc_set ("URL" = u, file = path1)
+    u <- "https://github.com/ropensci-review-tools/testpkg2"
+    desc::desc_set ("URL" = u, file = path2)
 
     saveRDS (dat, fs::path (fs::path_temp (), "testpkg1.Rds"))
     saveRDS (dat, fs::path (fs::path_temp (), "testpkg2.Rds"))

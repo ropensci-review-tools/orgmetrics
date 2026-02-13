@@ -248,7 +248,11 @@ dashboard_data_contributors <- function (data_org, desc_name_match = 0.8) {
                 dplyr::filter (match >= desc_name_match)
         }
         if (nrow (aut_matches) == 0) {
-            desc_name_match <- desc_name_match * max (login_matches$match)
+            max_match <- 0
+            if (nrow (login_matches) > 0) {
+                max_match <- max (login_matches$match, na.rm = TRUE)
+            }
+            desc_name_match <- desc_name_match * max_match
         }
 
         if (is.numeric (login_matches$match)) {

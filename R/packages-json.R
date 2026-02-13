@@ -148,6 +148,10 @@ pkgs_are_r <- function (pkgs) {
 
     u_base <- "https://api.github.com/repos/"
 
+    if (length (pkgs) == 0L) {
+        return (logical (0L))
+    }
+
     urls <- paste0 (u_base, pkgs, "/contents")
 
     is_r_pkg <- vapply (urls, function (u) {
@@ -167,6 +171,8 @@ pkgs_are_r <- function (pkgs) {
         required <- c ("DESCRIPTION", "NAMESPACE", "R", "man")
         return (all (required %in% body_files$name))
     }, logical (1L))
+
+    names (is_r_pkg) <- pkgs
 
     return (is_r_pkg)
 }

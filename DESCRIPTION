@@ -1,6 +1,6 @@
 Package: orgmetrics
 Title: Metrics for Your GitHub Organization
-Version: 0.1.2.211
+Version: 0.1.2.212
 Authors@R: 
     person("Mark", "Padgham", , "mark.padgham@email.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2172-5265"))
@@ -45,6 +45,7 @@ Remotes:
     ropensci-review-tools/pkgmatch,
     ropensci-review-tools/repometrics
 Config/testthat/edition: 3
+Config/ropensci/maintainer: staff
 Encoding: UTF-8
 Language: en-GB
 Roxygen: list(markdown = TRUE)

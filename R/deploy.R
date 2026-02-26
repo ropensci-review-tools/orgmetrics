@@ -20,11 +20,20 @@
 orgmetrics_deploy_r_univ <- function (url = NULL,
                                       dest_dir = fs::path_temp (),
                                       title = NULL,
-                                      aggregation_period = 90,
+                                      aggregation_period = 365,
                                       action = NULL) {
+
+    checkmate::assert_directory_exists (dest_dir)
+    if (!is.null (title)) {
+        checkmate::assert_character (title, len = 1L)
+    }
+    checkmate::assert_integer (aggregation_period, lower = 90L, len = 1L)
 
     if (is.null (title) && !is.null (url)) {
         title <- gsub ("\\.git$", "", basename (url))
+    }
+    if (!is.null (action)) {
+        action <- match.arg (action, c ("preview", "render"))
     }
 
     data <- get_data_from_cloned_univ (url, dest_dir, aggregation_period)

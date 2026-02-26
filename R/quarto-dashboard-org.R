@@ -28,6 +28,9 @@ orgmetrics_dashboard <- function (data_org,
 
     # Suppress no visible binding notes:
     org <- package <- NULL
+    if (!is.null (title)) {
+        checkmate::assert_character (title, len = 1L)
+    }
 
     if (!is.null (action)) {
         action <- match.arg (action, c ("preview", "render"))

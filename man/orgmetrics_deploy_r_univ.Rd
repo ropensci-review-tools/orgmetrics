@@ -8,7 +8,7 @@ orgmetrics_deploy_r_univ(
   url = NULL,
   dest_dir = fs::path_temp(),
   title = NULL,
-  aggregation_period = 90,
+  aggregation_period = 365,
   action = NULL
 )
 }

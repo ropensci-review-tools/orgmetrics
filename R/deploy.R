@@ -27,7 +27,7 @@ orgmetrics_deploy_r_univ <- function (url = NULL,
     if (!is.null (title)) {
         checkmate::assert_character (title, len = 1L)
     }
-    checkmate::assert_integer (aggregation_period, lower = 90L, len = 1L)
+    checkmate::assert_integerish (aggregation_period, lower = 90L, len = 1L)
 
     if (is.null (title) && !is.null (url)) {
         title <- gsub ("\\.git$", "", basename (url))

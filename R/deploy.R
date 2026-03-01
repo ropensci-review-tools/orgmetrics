@@ -15,19 +15,19 @@
 #' @param title Title for 'orgmetrics' dashboard. Default is `NULL`, in
 #' which case the title is taken to be the terminal element of `url`.
 #' @param aggregation_period Period in days over which prior activity is to be
-#' aggregated.
+#' aggregated. Should be an integer greater than or equal to `90L`, with a default of one year (`365L`)
 #' @export
 orgmetrics_deploy_r_univ <- function (url = NULL,
                                       dest_dir = fs::path_temp (),
                                       title = NULL,
-                                      aggregation_period = 365,
+                                      aggregation_period = 365L,
                                       action = NULL) {
 
     checkmate::assert_directory_exists (dest_dir)
     if (!is.null (title)) {
         checkmate::assert_character (title, len = 1L)
     }
-    checkmate::assert_integer (aggregation_period, lower = 90L, len = 1L)
+    checkmate::assert_integerish (aggregation_period, lower = 90L, len = 1L)
 
     if (is.null (title) && !is.null (url)) {
         title <- gsub ("\\.git$", "", basename (url))

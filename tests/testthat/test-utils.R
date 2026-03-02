@@ -103,3 +103,33 @@ test_that ("clone gh org repos", {
 
     fs::dir_delete (d)
 })
+
+test_that ("clone gh org repos reads branch field from packages.json", {
+
+    Sys.setenv ("ORGMETRICS_TESTS" = "true")
+    Sys.setenv ("REPOMETRICS_TESTS" = "true")
+
+    d <- fs::path (fs::path_temp (), "orgrepos_branch")
+    expect_false (fs::dir_exists (d))
+    fs::dir_create (d)
+
+    pkgs <- data.frame (
+        path = "ropensci-review-tools/orgmetrics",
+        orgrepo = "ropensci-review-tools/orgmetrics",
+        root = "ropensci-review-tools/orgmetrics",
+        is_r_pkg = TRUE,
+        branch = "main"
+    )
+    pkgs_json <- fs::path (d, "packages.json")
+    jsonlite::write_json (pkgs, pkgs_json, pretty = TRUE)
+
+    clone_gh_org_repos (pkgs_json = pkgs_json)
+
+    repo_path <- fs::path (d, "ropensci-review-tools", "orgmetrics")
+    expect_true (fs::dir_exists (repo_path))
+
+    branch <- withr::with_dir (repo_path, gert::git_branch ())
+    expect_equal (branch, "main")
+
+    fs::dir_delete (d)
+})

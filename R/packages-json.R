@@ -213,6 +213,7 @@ clone_gh_org_repos <- function (pkgs_json = NULL, pkgs_dir = NULL) {
 
     out <- pbapply::pblapply (seq_len (nrow (pj)), function (i) {
         url <- paste0 ("https://github.com/", pj$orgrepo [i])
+        branch <- if ("branch" %in% names (pj) && !is.na (pj$branch [i])) pj$branch [i] else NULL
         dir_org <- fs::path_dir (pj$path [i])
         if (!fs::dir_exists (dir_org)) {
             fs::dir_create (dir_org)
@@ -220,12 +221,14 @@ clone_gh_org_repos <- function (pkgs_json = NULL, pkgs_dir = NULL) {
         if (!fs::dir_exists (pj$path [i])) {
             withr::with_dir (
                 dir_org,
-                gert::git_clone (url)
+                gert::git_clone (url, branch = branch)
             )
         } else {
             withr::with_dir (
-                pj$path [i],
-                gert::git_fetch (verbose = FALSE)
+                pj$path [i], {
+                    gert::git_fetch (verbose = FALSE)
+                    if (!is.null (branch)) gert::git_branch_checkout (branch)
+                }
             )
         }
     })

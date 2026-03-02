@@ -27,3 +27,6 @@
 ^windows$
 data-raw/
 temp-dict/
+^\.env\.example$
+^Dockerfile$
+^entrypoint\.sh$

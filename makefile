@@ -24,6 +24,9 @@ knitr: $(LFILE).Rmd ## Render `REAMDE.Rds` to `README.md`.
 open: ## Open HTML-rendered vignette
 	xdg-open docs/index.html &
 
+allcon: ## Run 'allcontributors::add_contributors'
+	Rscript -e 'allcontributors::add_contributors()'
+
 check: ## Run `rcmdcheck`
 	Rscript -e 'rcmdcheck::rcmdcheck()'
 

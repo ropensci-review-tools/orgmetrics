@@ -5,9 +5,8 @@
 #' `orgmetrics_collate_org_data` function.
 #' @param fn_calls Data on function calls between packages of the specified
 #' organization, as returned from the `rm_org_data_fn_call_network()` function.
-#' @param embeddings List of language model embeddings returned from
-#' `rm_org_emb_distances()`. These are calculated with the 'pkgmatch' package
-#' which in turn relies on \url{https://ollama.com}.
+#' @param similarities List of 'BM25' similarities between packages generated
+#' by the 'pkgmatch' package
 #' @param action One of "preview", to start and open a live preview of the
 #' dashboard website, "render" to render a static version without previewing
 #' or opening, or `NULL` to set up the quarto structure in the current
@@ -22,7 +21,7 @@
 #' @export
 orgmetrics_dashboard <- function (data_org,
                                   fn_calls,
-                                  embeddings,
+                                  similarities,
                                   title = NULL,
                                   action = "preview") {
 
@@ -155,16 +154,6 @@ orgmetrics_dashboard <- function (data_org,
 
     saveRDS (fn_calls, fs::path (dir_data, "fn-calls.Rds"))
 
-    embeddings_are_similarities <- vapply (
-        embeddings,
-        function (i) length (unique (dim (i))) == 1L,
-        logical (1L)
-    )
-    if (all (embeddings_are_similarities)) {
-        similarities <- embeddings_to_similarities (embeddings)
-    } else {
-        similarities <- embeddings
-    }
     saveRDS (similarities, fs::path (dir_data, "similarities.Rds"))
 
     if (!is.null (action)) {

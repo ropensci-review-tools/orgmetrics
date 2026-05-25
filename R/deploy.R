@@ -39,12 +39,12 @@ orgmetrics_deploy_r_univ <- function (url = NULL,
     data <- get_data_from_cloned_univ (url, dest_dir, aggregation_period)
     data_org <- data [[1]]
     fn_calls <- data [[2]]
-    embeddings <- data [[3]]
+    similarities <- data [[3]]
     rm (data)
 
     cli::cli_inform ("All data extracted; building dashboard ...")
 
-    path <- orgmetrics_dashboard (data_org, fn_calls, embeddings, title = title, action = action)
+    path <- orgmetrics_dashboard (data_org, fn_calls, similarities, title = title, action = action)
     update_url_segments (path, url)
 
     # Move everything to 'quarto' sub-dir here:
@@ -102,7 +102,7 @@ deploy_fn_data <- function () {
     rbind (
         c ("orgmetrics_collate_org_data", "data_org"),
         c ("rm_org_data_fn_call_network", "fn_calls"),
-        c ("rm_org_data_embeddings", "embeddings")
+        c ("rm_org_data_similarities", "similarities")
     )
 }
 

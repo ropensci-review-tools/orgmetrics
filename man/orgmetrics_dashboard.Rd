@@ -8,7 +8,7 @@
 orgmetrics_dashboard(
   data_org,
   fn_calls,
-  embeddings,
+  similarities,
   title = NULL,
   action = "preview"
 )
@@ -20,9 +20,8 @@ orgmetrics_dashboard(
 \item{fn_calls}{Data on function calls between packages of the specified
 organization, as returned from the \code{rm_org_data_fn_call_network()} function.}
 
-\item{embeddings}{List of language model embeddings returned from
-\code{rm_org_emb_distances()}. These are calculated with the 'pkgmatch' package
-which in turn relies on \url{https://ollama.com}.}
+\item{similarities}{List of 'BM25' similarities between packages generated
+by the 'pkgmatch' package}
 
 \item{title}{If not \code{NULL} (default), a string specifying the organizational
 title for the dashboard.}

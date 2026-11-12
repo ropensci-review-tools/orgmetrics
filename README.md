@@ -28,19 +28,12 @@ options (repos = c (
 ))
 install.packages ("orgmetrics")
 ```
-or directly from GitHub with one of these two lines:
+or directly from GitHub:
 
 ``` r
-remotes::install_github ("ropensci-review-tools/orgmetrics")
-pak::pkg_install ("ropensci-review-tools/orgmetrics")
+pak::pak("ropensci-review-tools/orgmetrics")
 ```
 
-The package may also be installed from locations other than GitHub, with any of
-the following options:
-``` r
-remotes::install_git ("https://codeberg.org/ropensci-review-tools/orgmetrics")
-remotes::install_git ("https://codefloe.com/ropensci-review-tools/orgmetrics")
-```
 
 ## Code of Conduct
 
